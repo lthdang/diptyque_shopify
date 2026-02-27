@@ -17,6 +17,18 @@
     video_style: video_style,
     video_preview_image: block_settings.video.preview_image,
     additional_attributes: block.shopify_attributes,
+    video_autoplay: block_settings.video_autoplay,
+    show_controls: block_settings.show_controls,
+    show_play_button: block_settings.show_play_button,
+    show_mute_button: block_settings.show_mute_button,
+    show_fullscreen_button: block_settings.show_fullscreen_button,
+    show_progress_bar: block_settings.show_progress_bar,
+    show_duration: block_settings.show_duration,
+    controls_position: block_settings.controls_position,
+    controls_layout: block_settings.controls_layout,
+    flex_justify: block_settings.flex_justify,
+    flex_align: block_settings.flex_align,
+    flex_gap: block_settings.flex_gap,
     section_id: section.id
   %}
 {% else %}
@@ -29,6 +41,17 @@
     video_alt: block_settings.alt,
     video_preview_image: block_settings.cover_image,
     additional_attributes: block.shopify_attributes,
+    show_controls: block_settings.show_controls,
+    show_play_button: block_settings.show_play_button,
+    show_mute_button: block_settings.show_mute_button,
+    show_fullscreen_button: block_settings.show_fullscreen_button,
+    show_progress_bar: block_settings.show_progress_bar,
+    show_duration: block_settings.show_duration,
+    controls_position: block_settings.controls_position,
+    controls_layout: block_settings.controls_layout,
+    flex_justify: block_settings.flex_justify,
+    flex_align: block_settings.flex_align,
+    flex_gap: block_settings.flex_gap,
     section_id: section.id
   %}
 {% endif %}
@@ -244,6 +267,340 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Video Controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show video controls (progress bar)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_button",
+      "label": "Show play/pause button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mute_button",
+      "label": "Show mute/unmute button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fullscreen_button",
+      "label": "Show fullscreen button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "Show progress bar (timeline)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_duration",
+      "label": "Show duration text",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "controls_position",
+      "label": "Controls position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom (default)" },
+        { "value": "center-overlay", "label": "Center overlay" },
+        { "value": "outside", "label": "Below video" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "controls_layout",
+      "label": "Controls layout direction",
+      "options": [
+        { "value": "horizontal", "label": "Horizontal" },
+        { "value": "vertical", "label": "Vertical" }
+      ],
+      "default": "horizontal"
+    },
+    {
+      "type": "header",
+      "content": "Control Group Flex"
+    },
+    {
+      "type": "select",
+      "id": "flex_justify",
+      "label": "Justify content",
+      "options": [
+        { "value": "flex-start", "label": "Start" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "End" },
+        { "value": "space-between", "label": "Space between" },
+        { "value": "space-around", "label": "Space around" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "flex_align",
+      "label": "Align items",
+      "options": [
+        { "value": "flex-start", "label": "Start" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "End" },
+        { "value": "stretch", "label": "Stretch" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "flex_gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Play Button — Position & Padding",
+      "visible_if": "{{ block.settings.show_play_button == true }}"
+    },
+    {
+      "type": "select",
+      "id": "play_btn_position",
+      "label": "Position",
+      "options": [
+        { "value": "inline", "label": "Inline (in control group)" },
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "inline",
+      "visible_if": "{{ block.settings.show_play_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "play_padding_top",
+      "label": "Padding / offset top",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_play_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "play_padding_right",
+      "label": "Padding / offset right",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_play_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "play_padding_bottom",
+      "label": "Padding / offset bottom",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_play_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "play_padding_left",
+      "label": "Padding / offset left",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_play_button == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Mute Button — Position & Padding",
+      "visible_if": "{{ block.settings.show_mute_button == true }}"
+    },
+    {
+      "type": "select",
+      "id": "mute_btn_position",
+      "label": "Position",
+      "options": [
+        { "value": "inline", "label": "Inline (in control group)" },
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "inline",
+      "visible_if": "{{ block.settings.show_mute_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "mute_padding_top",
+      "label": "Padding / offset top",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_mute_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "mute_padding_right",
+      "label": "Padding / offset right",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_mute_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "mute_padding_bottom",
+      "label": "Padding / offset bottom",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_mute_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "mute_padding_left",
+      "label": "Padding / offset left",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_mute_button == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Fullscreen Button — Position & Padding",
+      "visible_if": "{{ block.settings.show_fullscreen_button == true }}"
+    },
+    {
+      "type": "select",
+      "id": "fs_btn_position",
+      "label": "Position",
+      "options": [
+        { "value": "inline", "label": "Inline (in control group)" },
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "inline",
+      "visible_if": "{{ block.settings.show_fullscreen_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "fs_padding_top",
+      "label": "Padding / offset top",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_fullscreen_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "fs_padding_right",
+      "label": "Padding / offset right",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_fullscreen_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "fs_padding_bottom",
+      "label": "Padding / offset bottom",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_fullscreen_button == true }}"
+    },
+    {
+      "type": "range",
+      "id": "fs_padding_left",
+      "label": "Padding / offset left",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_fullscreen_button == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Duration Text — Position & Padding",
+      "visible_if": "{{ block.settings.show_duration == true }}"
+    },
+    {
+      "type": "select",
+      "id": "dur_position",
+      "label": "Position",
+      "options": [
+        { "value": "inline", "label": "Inline (in control group)" },
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "inline",
+      "visible_if": "{{ block.settings.show_duration == true }}"
+    },
+    {
+      "type": "range",
+      "id": "dur_padding_top",
+      "label": "Padding / offset top",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_duration == true }}"
+    },
+    {
+      "type": "range",
+      "id": "dur_padding_right",
+      "label": "Padding / offset right",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_duration == true }}"
+    },
+    {
+      "type": "range",
+      "id": "dur_padding_bottom",
+      "label": "Padding / offset bottom",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_duration == true }}"
+    },
+    {
+      "type": "range",
+      "id": "dur_padding_left",
+      "label": "Padding / offset left",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 8,
+      "visible_if": "{{ block.settings.show_duration == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Progress Bar — Position & Padding",
+      "visible_if": "{{ block.settings.show_progress_bar == true }}"
+    },
+    {
+      "type": "select",
+      "id": "progress_position",
+      "label": "Position",
+      "options": [
+        { "value": "inline", "label": "Inline (in control group)" },
+        { "value": "top-left", "label": "Top" },
+        { "value": "bottom-left", "label": "Bottom" }
+      ],
+      "default": "inline",
+      "visible_if": "{{ block.settings.show_progress_bar == true }}"
+    },
+    {
+      "type": "range",
+      "id": "progress_padding_top",
+      "label": "Offset top",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 0,
+      "visible_if": "{{ block.settings.show_progress_bar == true }}"
+    },
+    {
+      "type": "range",
+      "id": "progress_padding_right",
+      "label": "Offset right",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 0,
+      "visible_if": "{{ block.settings.show_progress_bar == true }}"
+    },
+    {
+      "type": "range",
+      "id": "progress_padding_bottom",
+      "label": "Offset bottom",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 0,
+      "visible_if": "{{ block.settings.show_progress_bar == true }}"
+    },
+    {
+      "type": "range",
+      "id": "progress_padding_left",
+      "label": "Offset left",
+      "min": 0, "max": 64, "step": 1, "unit": "px", "default": 0,
+      "visible_if": "{{ block.settings.show_progress_bar == true }}"
     }
   ],
   "presets": [
