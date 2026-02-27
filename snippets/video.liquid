@@ -17,6 +17,14 @@
   @param {object} video - The Shopify video object or a string containing a YouTube ID or Vimeo ID
   @param {string} section_id - The section ID
   @param {object} [block] - The block object
+  @param {boolean} [show_controls] - Show native browser controls (progress bar)
+  @param {boolean} [show_play_button] - Show custom play/pause button
+  @param {boolean} [show_mute_button] - Show custom mute/unmute button
+  @param {boolean} [show_fullscreen_button] - Show custom fullscreen button
+  @param {boolean} [show_progress_bar] - Show custom progress bar (timeline)
+  @param {boolean} [show_duration] - Show duration text next to play button
+  @param {string} [controls_position] - top | bottom | center-overlay | outside
+  @param {string} [controls_layout] - horizontal | vertical
 
   Video from URL:
 
@@ -121,12 +129,60 @@
 {% endif %}
 
 {% if video != blank %}
+  {% liquid
+    assign controls_pos = controls_position | default: 'bottom'
+    assign controls_dir = controls_layout | default: 'horizontal'
+    assign use_custom_controls = false
+    if show_play_button or show_mute_button or show_fullscreen_button or show_progress_bar or show_duration
+      assign use_custom_controls = true
+    endif
+    assign is_external = false
+    if video_from_url
+      assign is_external = true
+    endif
+
+    assign play_pos = block_settings.play_btn_position | default: 'inline'
+    assign mute_pos = block_settings.mute_btn_position | default: 'inline'
+    assign fs_pos = block_settings.fs_btn_position | default: 'inline'
+    assign dur_pos = block_settings.dur_position | default: 'inline'
+    assign progress_pos = block_settings.progress_position | default: 'inline'
+
+    assign has_inline_controls = false
+    if show_play_button and play_pos == 'inline'
+      assign has_inline_controls = true
+    endif
+    if show_mute_button and mute_pos == 'inline'
+      assign has_inline_controls = true
+    endif
+    if show_fullscreen_button and fs_pos == 'inline'
+      assign has_inline_controls = true
+    endif
+    if show_progress_bar and progress_pos == 'inline'
+      assign has_inline_controls = true
+    endif
+    if show_duration and dur_pos == 'inline'
+      assign has_inline_controls = true
+    endif
+
+    assign ctrl_justify = flex_justify | default: block_settings.flex_justify | default: 'flex-start'
+    assign ctrl_align = flex_align | default: block_settings.flex_align | default: 'center'
+    assign ctrl_gap = flex_gap | default: block_settings.flex_gap | default: 8
+  %}
   <deferred-media
     class="{{ video_class }}"
     style="{{ video_style }}"
     {% if video_autoplay %}
       autoplay
     {% endif %}
+    {% unless is_external %}
+      {% if use_custom_controls %}
+        data-show-play="{{ show_play_button | default: false }}"
+        data-show-mute="{{ show_mute_button | default: false }}"
+        data-show-fullscreen="{{ show_fullscreen_button | default: false }}"
+        data-show-progress="{{ show_progress_bar | default: false }}"
+        data-show-duration="{{ show_duration | default: false }}"
+      {% endif %}
+    {% endunless %}
     {{ additional_attributes }}
   >
     {% if video_preview_image != blank %}
@@ -168,6 +224,148 @@
         </span>
       </button>
     {% endif %}
+
+    {% unless is_external %}
+      {% if use_custom_controls %}
+        {% comment %} Corner-positioned controls — rendered as direct children of deferred-media {% endcomment %}
+        {% if show_play_button and play_pos != 'inline' %}
+          <button
+            class="video-control video-controls__btn video-controls__play video-control--play is-{{ play_pos }} button button-unstyled"
+            type="button"
+            aria-label="{{ 'accessibility.play_video' | t }}"
+            data-video-play-btn
+            style="--btn-offset-top: {{ block_settings.play_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.play_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.play_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.play_padding_left | default: 8 }}px;"
+          >
+            <span class="icon-play">{{- 'icon-play.svg' | inline_asset_content -}}</span>
+            <span class="icon-pause hidden">{{- 'icon-pause.svg' | inline_asset_content -}}</span>
+          </button>
+        {% endif %}
+
+        {% if show_duration and dur_pos != 'inline' %}
+          <span
+            class="video-control video-controls__duration video-control--duration is-{{ dur_pos }}"
+            data-video-duration
+            style="--btn-offset-top: {{ block_settings.dur_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.dur_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.dur_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.dur_padding_left | default: 8 }}px;"
+          >0:00</span>
+        {% endif %}
+
+        {% if show_progress_bar and progress_pos != 'inline' %}
+          <div
+            class="video-control video-controls__progress video-control--progress is-{{ progress_pos }}"
+            data-video-progress-wrap
+            style="--btn-offset-top: {{ block_settings.progress_padding_top | default: 0 }}px; --btn-offset-right: {{ block_settings.progress_padding_right | default: 0 }}px; --btn-offset-bottom: {{ block_settings.progress_padding_bottom | default: 0 }}px; --btn-offset-left: {{ block_settings.progress_padding_left | default: 0 }}px;"
+          >
+            <input
+              type="range"
+              class="video-controls__seek"
+              min="0"
+              max="100"
+              value="0"
+              step="0.1"
+              aria-label="Video seek bar"
+              data-video-seek
+            >
+          </div>
+        {% endif %}
+
+        {% if show_mute_button and mute_pos != 'inline' %}
+          <button
+            class="video-control video-controls__btn video-controls__mute video-control--mute is-{{ mute_pos }} button button-unstyled"
+            type="button"
+            aria-label="Mute video"
+            data-video-mute-btn
+            style="--btn-offset-top: {{ block_settings.mute_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.mute_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.mute_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.mute_padding_left | default: 8 }}px;"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15" class="mute-line"/><line x1="17" y1="9" x2="23" y2="15" class="mute-line hidden"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" class="unmute-wave"/></svg>
+          </button>
+        {% endif %}
+
+        {% if show_fullscreen_button and fs_pos != 'inline' %}
+          <button
+            class="video-control video-controls__btn video-controls__fullscreen video-control--fullscreen is-{{ fs_pos }} button button-unstyled"
+            type="button"
+            aria-label="Enter fullscreen"
+            data-video-fullscreen-btn
+            style="--btn-offset-top: {{ block_settings.fs_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.fs_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.fs_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.fs_padding_left | default: 8 }}px;"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+        {% endif %}
+
+        {% comment %} Inline controls group {% endcomment %}
+        {% if has_inline_controls %}
+          <div
+            class="video-controls controls--{{ controls_pos }} controls--{{ controls_dir }}"
+            data-video-controls
+            style="--ctrl-justify: {{ ctrl_justify }}; --ctrl-align: {{ ctrl_align }}; --ctrl-gap: {{ ctrl_gap }}px;"
+          >
+            {% if show_play_button and play_pos == 'inline' %}
+              <button
+                class="video-controls__btn video-controls__play video-control--play button button-unstyled"
+                type="button"
+                aria-label="{{ 'accessibility.play_video' | t }}"
+                data-video-play-btn
+                style="--btn-padding-top: {{ block_settings.play_padding_top | default: 4 }}px; --btn-padding-right: {{ block_settings.play_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.play_padding_bottom | default: 4 }}px; --btn-padding-left: {{ block_settings.play_padding_left | default: 4 }}px;"
+              >
+                <span class="icon-play">{{- 'icon-play.svg' | inline_asset_content -}}</span>
+                <span class="icon-pause hidden">{{- 'icon-pause.svg' | inline_asset_content -}}</span>
+              </button>
+            {% endif %}
+
+            {% if show_duration and dur_pos == 'inline' %}
+              <span
+                class="video-controls__duration video-control--duration"
+                data-video-duration
+                style="--btn-padding-top: {{ block_settings.dur_padding_top | default: 0 }}px; --btn-padding-right: {{ block_settings.dur_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.dur_padding_bottom | default: 0 }}px; --btn-padding-left: {{ block_settings.dur_padding_left | default: 4 }}px;"
+              >0:00</span>
+            {% endif %}
+
+            {% if show_progress_bar and progress_pos == 'inline' %}
+              <div
+                class="video-controls__progress video-control--progress"
+                data-video-progress-wrap
+                style="--btn-padding-top: {{ block_settings.progress_padding_top | default: 0 }}px; --btn-padding-right: {{ block_settings.progress_padding_right | default: 0 }}px; --btn-padding-bottom: {{ block_settings.progress_padding_bottom | default: 0 }}px; --btn-padding-left: {{ block_settings.progress_padding_left | default: 0 }}px;"
+              >
+                <input
+                  type="range"
+                  class="video-controls__seek"
+                  min="0"
+                  max="100"
+                  value="0"
+                  step="0.1"
+                  aria-label="Video seek bar"
+                  data-video-seek
+                >
+              </div>
+            {% endif %}
+
+            {% if show_mute_button and mute_pos == 'inline' %}
+              <button
+                class="video-controls__btn video-controls__mute video-control--mute button button-unstyled"
+                type="button"
+                aria-label="Mute video"
+                data-video-mute-btn
+                style="--btn-padding-top: {{ block_settings.mute_padding_top | default: 4 }}px; --btn-padding-right: {{ block_settings.mute_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.mute_padding_bottom | default: 4 }}px; --btn-padding-left: {{ block_settings.mute_padding_left | default: 4 }}px;"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15" class="mute-line"/><line x1="17" y1="9" x2="23" y2="15" class="mute-line hidden"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" class="unmute-wave"/></svg>
+              </button>
+            {% endif %}
+
+            {% if show_fullscreen_button and fs_pos == 'inline' %}
+              <button
+                class="video-controls__btn video-controls__fullscreen video-control--fullscreen button button-unstyled"
+                type="button"
+                aria-label="Enter fullscreen"
+                data-video-fullscreen-btn
+                style="--btn-padding-top: {{ block_settings.fs_padding_top | default: 4 }}px; --btn-padding-right: {{ block_settings.fs_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.fs_padding_bottom | default: 4 }}px; --btn-padding-left: {{ block_settings.fs_padding_left | default: 4 }}px;"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              </button>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endunless %}
 
     <template>
       {% if video_from_url %}
@@ -213,4 +411,342 @@
   .video-interaction-hint:hover {
     opacity: 1;
   }
+
+  /* Custom video controls wrapper */
+  deferred-media {
+    position: relative;
+  }
+
+  /* Base for all control buttons and elements */
+  .video-controls__btn,
+  .video-controls__duration,
+  .video-controls__progress {
+    box-sizing: border-box;
+  }
+
+  /* All inline control elements: don't stretch, don't grow unexpectedly */
+  .video-control {
+    width: auto;
+    height: auto;
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
+  /* Inline progress bar is allowed to grow */
+  .video-controls .video-control--progress {
+    flex: 1 1 auto;
+    min-width: 40px;
+    width: auto;
+  }
+
+  .video-controls {
+    display: flex !important;
+    align-items: var(--ctrl-align, center);
+    justify-content: var(--ctrl-justify, flex-start);
+    gap: var(--ctrl-gap, 8px);
+    padding: 6px 10px !important;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    z-index: 10;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* Layout direction */
+  .video-controls.controls--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+    width: auto;
+  }
+
+  /* Position variants */
+  .video-controls.controls--bottom,
+  .video-controls.controls--top {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+
+  .video-controls.controls--bottom {
+    bottom: 0;
+  }
+
+  .video-controls.controls--top {
+    top: 0;
+  }
+
+  .video-controls.controls--center-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .video-controls.controls--outside {
+    position: static;
+    background: transparent;
+    color: inherit;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 8px 0 0;
+  }
+
+  .video-controls__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--btn-padding-top, 4px) var(--btn-padding-right, 4px) var(--btn-padding-bottom, 4px) var(--btn-padding-left, 4px);
+    color: white !important;
+    cursor: pointer;
+    background: none !important;
+    border: none;
+    line-height: 1;
+  }
+
+  .video-controls__btn:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .video-controls__progress {
+    flex: 1 1 auto;
+    min-width: 40px;
+  }
+
+  .video-controls__seek {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    accent-color: currentcolor;
+  }
+
+  .video-controls__duration {
+    font-size: 12px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mute-line {
+    display: none;
+  }
+
+  [data-muted] .mute-line,
+  [data-video-controls][data-muted] .mute-line {
+    display: block;
+  }
+
+  [data-muted] .unmute-wave,
+  [data-video-controls][data-muted] .unmute-wave {
+    display: none;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Per-button internal padding via CSS variables (inline buttons only) */
+  .video-controls .video-controls__btn {
+    padding: var(--btn-padding-top, 4px) var(--btn-padding-right, 4px) var(--btn-padding-bottom, 4px) var(--btn-padding-left, 4px);
+  }
+
+  .video-controls .video-controls__duration {
+    padding: var(--btn-padding-top, 0px) var(--btn-padding-right, 4px) var(--btn-padding-bottom, 0px) var(--btn-padding-left, 4px);
+  }
+
+  /* Corner-positioned controls: absolutely positioned, isolated from flex flow */
+  deferred-media .is-top-left,
+  deferred-media .is-top-right,
+  deferred-media .is-bottom-left,
+  deferred-media .is-bottom-right {
+    position: absolute;
+    z-index: 11;
+    width: auto;
+    height: auto;
+    flex: none;
+  }
+
+  deferred-media .is-top-left {
+    top: var(--btn-offset-top, 8px);
+    left: var(--btn-offset-left, 8px);
+  }
+
+  deferred-media .is-top-right {
+    top: var(--btn-offset-top, 8px);
+    right: var(--btn-offset-right, 8px);
+  }
+
+  deferred-media .is-bottom-left {
+    bottom: var(--btn-offset-bottom, 8px);
+    left: var(--btn-offset-left, 8px);
+  }
+
+  deferred-media .is-bottom-right {
+    bottom: var(--btn-offset-bottom, 8px);
+    right: var(--btn-offset-right, 8px);
+  }
+
+  /* Corner-positioned progress bar: stretch full width at that edge */
+  deferred-media .video-control--progress.is-top-left,
+  deferred-media .video-control--progress.is-bottom-left {
+    left: var(--btn-offset-left, 0px);
+    right: var(--btn-offset-right, 0px);
+    width: auto;
+  }
 {% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    function formatTime(seconds) {
+      if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+      var m = Math.floor(seconds / 60);
+      var s = Math.floor(seconds % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function initVideoControls(wrapper) {
+      var showPlay = wrapper.dataset.showPlay === 'true';
+      var showMute = wrapper.dataset.showMute === 'true';
+      var showFullscreen = wrapper.dataset.showFullscreen === 'true';
+      var showProgress = wrapper.dataset.showProgress === 'true';
+      var showDuration = wrapper.dataset.showDuration === 'true';
+
+      if (!showPlay && !showMute && !showFullscreen && !showProgress && !showDuration) return;
+
+      var video = wrapper.querySelector('video');
+      if (!video) return;
+
+      var playBtn = wrapper.querySelector('[data-video-play-btn]');
+      var muteBtn = wrapper.querySelector('[data-video-mute-btn]');
+      var fsBtn = wrapper.querySelector('[data-video-fullscreen-btn]');
+      var seekEl = wrapper.querySelector('[data-video-seek]');
+      var durationEl = wrapper.querySelector('[data-video-duration]');
+      var controlsEl = wrapper.querySelector('[data-video-controls]');
+
+      function updatePlayState() {
+        if (!playBtn) return;
+        var iconPlay = playBtn.querySelector('.icon-play');
+        var iconPause = playBtn.querySelector('.icon-pause');
+        if (video.paused) {
+          if (iconPlay) iconPlay.classList.remove('hidden');
+          if (iconPause) iconPause.classList.add('hidden');
+          playBtn.setAttribute('aria-label', 'Play video');
+        } else {
+          if (iconPlay) iconPlay.classList.add('hidden');
+          if (iconPause) iconPause.classList.remove('hidden');
+          playBtn.setAttribute('aria-label', 'Pause video');
+        }
+      }
+
+      function updateMuteState() {
+        if (!muteBtn) return;
+        if (video.muted) {
+          muteBtn.setAttribute('aria-label', 'Unmute video');
+          if (controlsEl) controlsEl.setAttribute('data-muted', '');
+          wrapper.setAttribute('data-muted', '');
+        } else {
+          muteBtn.setAttribute('aria-label', 'Mute video');
+          if (controlsEl) controlsEl.removeAttribute('data-muted');
+          wrapper.removeAttribute('data-muted');
+        }
+      }
+
+      function updateProgress() {
+        if (seekEl && video.duration) {
+          seekEl.value = (video.currentTime / video.duration) * 100;
+        }
+        if (durationEl) {
+          durationEl.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+        }
+      }
+
+      if (playBtn) {
+        video.addEventListener('play', updatePlayState);
+        video.addEventListener('pause', updatePlayState);
+        updatePlayState();
+
+        playBtn.addEventListener('click', function () {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        });
+      }
+
+      if (muteBtn) {
+        video.addEventListener('volumechange', updateMuteState);
+        updateMuteState();
+
+        muteBtn.addEventListener('click', function () {
+          video.muted = !video.muted;
+        });
+      }
+
+      if (fsBtn) {
+        fsBtn.addEventListener('click', function () {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            wrapper.requestFullscreen && wrapper.requestFullscreen();
+          }
+        });
+      }
+
+      if (seekEl) {
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('loadedmetadata', updateProgress);
+
+        seekEl.addEventListener('input', function () {
+          if (video.duration) {
+            video.currentTime = (parseFloat(seekEl.value) / 100) * video.duration;
+          }
+        });
+      }
+
+      if (durationEl) {
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('loadedmetadata', updateProgress);
+      }
+    }
+
+    function observeWrapper(wrapper) {
+      var video = wrapper.querySelector('video');
+      if (video) {
+        initVideoControls(wrapper);
+        return;
+      }
+      // Video is inside a <template> / deferred; wait for it to appear
+      var observer = new MutationObserver(function (mutations, obs) {
+        var v = wrapper.querySelector('video');
+        if (v) {
+          obs.disconnect();
+          initVideoControls(wrapper);
+        }
+      });
+      observer.observe(wrapper, { childList: true, subtree: true });
+    }
+
+    function boot() {
+      document.querySelectorAll('deferred-media').forEach(function (wrapper) {
+        observeWrapper(wrapper);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+
+    // Support Shopify section re-rendering
+    document.addEventListener('shopify:section:load', function (e) {
+      var section = e.target;
+      if (!section) return;
+      section.querySelectorAll('deferred-media').forEach(function (wrapper) {
+        observeWrapper(wrapper);
+      });
+    });
+  })();
+{% endjavascript %}

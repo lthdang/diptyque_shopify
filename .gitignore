@@ -1,2 +1,2 @@
-# claude
-.claude/
+# Ignore the .github directory, which contains GitHub-specific files such as workflows and issue templates.
+.github/
