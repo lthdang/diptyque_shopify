@@ -1,0 +1,164 @@
+{%- assign s = block.settings -%}
+
+<div
+  class="link-block{% if s.no_underline %} link-block--no-underline{% endif %}"
+  style="
+    --link-font-size: {{ s.font_size }}px;
+    --link-color: {{ s.text_color }};
+    --link-padding-top: {{ s.padding_top }}px;
+    --link-padding-bottom: {{ s.padding_bottom }}px;
+    --link-padding-left: {{ s.padding_left }}px;
+    --link-padding-right: {{ s.padding_right }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {%- if s.link_url != blank -%}
+    <a
+      class="link-block__anchor"
+      href="{{ s.link_url }}"
+      {%- if s.open_in_new_tab %}
+        target="_blank"
+        rel="noopener noreferrer"
+      {%- endif %}
+    >
+      {{- s.link_text -}}
+    </a>
+  {%- else -%}
+    <span class="link-block__anchor">{{- s.link_text -}}</span>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .link-block {
+    display: block;
+    padding-top: var(--link-padding-top, 0px);
+    padding-bottom: var(--link-padding-bottom, 0px);
+    padding-left: var(--link-padding-left, 0px);
+    padding-right: var(--link-padding-right, 0px);
+  }
+
+  .link-block__anchor {
+    display: inline;
+    font-size: var(--link-font-size, 1em);
+    color: var(--link-color, inherit);
+    text-decoration: underline;
+    transition: opacity 0.2s ease;
+  }
+
+  .link-block__anchor:hover,
+  .link-block__anchor:focus-visible {
+    opacity: 0.75;
+  }
+
+  .link-block--no-underline .link-block__anchor {
+    text-decoration: none;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Link Block",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link text",
+      "default": "Learn more"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "no_underline",
+      "label": "Remove underline",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Link Block"
+    }
+  ]
+}
+{% endschema %}

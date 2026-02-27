@@ -748,5 +748,10 @@
         observeWrapper(wrapper);
       });
     });
+    // remove control value on video 
+    var video = document.querySelector('video');
+    if(video){
+      video.removeAttribute('controls');
+    }
   })();
 {% endjavascript %}
