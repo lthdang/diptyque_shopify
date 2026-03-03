@@ -25,6 +25,34 @@
   @param {boolean} [show_duration] - Show duration text next to play button
   @param {string} [controls_position] - top | bottom | center-overlay | outside
   @param {string} [controls_layout] - horizontal | vertical
+  @param {string} [flex_justify] - justify-content for inline control group
+  @param {string} [flex_align] - align-items for inline control group
+  @param {number} [flex_gap] - gap in px for inline control group
+  @param {string} [play_btn_position] - inline | top-left | top-right | bottom-left | bottom-right
+  @param {number} [play_padding_top] - play button padding/offset top
+  @param {number} [play_padding_right] - play button padding/offset right
+  @param {number} [play_padding_bottom] - play button padding/offset bottom
+  @param {number} [play_padding_left] - play button padding/offset left
+  @param {string} [mute_btn_position] - inline | top-left | top-right | bottom-left | bottom-right
+  @param {number} [mute_padding_top] - mute button padding/offset top
+  @param {number} [mute_padding_right] - mute button padding/offset right
+  @param {number} [mute_padding_bottom] - mute button padding/offset bottom
+  @param {number} [mute_padding_left] - mute button padding/offset left
+  @param {string} [fs_btn_position] - inline | top-left | top-right | bottom-left | bottom-right
+  @param {number} [fs_padding_top] - fullscreen button padding/offset top
+  @param {number} [fs_padding_right] - fullscreen button padding/offset right
+  @param {number} [fs_padding_bottom] - fullscreen button padding/offset bottom
+  @param {number} [fs_padding_left] - fullscreen button padding/offset left
+  @param {string} [dur_position] - inline | top-left | top-right | bottom-left | bottom-right
+  @param {number} [dur_padding_top] - duration text padding/offset top
+  @param {number} [dur_padding_right] - duration text padding/offset right
+  @param {number} [dur_padding_bottom] - duration text padding/offset bottom
+  @param {number} [dur_padding_left] - duration text padding/offset left
+  @param {string} [progress_position] - inline | top-left | bottom-left
+  @param {number} [progress_padding_top] - progress bar offset top
+  @param {number} [progress_padding_right] - progress bar offset right
+  @param {number} [progress_padding_bottom] - progress bar offset bottom
+  @param {number} [progress_padding_left] - progress bar offset left
 
   Video from URL:
 
@@ -141,11 +169,11 @@
       assign is_external = true
     endif
 
-    assign play_pos = block_settings.play_btn_position | default: 'inline'
-    assign mute_pos = block_settings.mute_btn_position | default: 'inline'
-    assign fs_pos = block_settings.fs_btn_position | default: 'inline'
-    assign dur_pos = block_settings.dur_position | default: 'inline'
-    assign progress_pos = block_settings.progress_position | default: 'inline'
+    assign play_pos = play_btn_position | default: block_settings.play_btn_position | default: 'inline'
+    assign mute_pos = mute_btn_position | default: block_settings.mute_btn_position | default: 'inline'
+    assign fs_pos = fs_btn_position | default: block_settings.fs_btn_position | default: 'inline'
+    assign dur_pos = dur_position | default: block_settings.dur_position | default: 'inline'
+    assign progress_pos = progress_position | default: block_settings.progress_position | default: 'inline'
 
     assign has_inline_controls = false
     if show_play_button and play_pos == 'inline'
@@ -234,7 +262,7 @@
             type="button"
             aria-label="{{ 'accessibility.play_video' | t }}"
             data-video-play-btn
-            style="--btn-offset-top: {{ block_settings.play_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.play_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.play_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.play_padding_left | default: 8 }}px;"
+            style="--btn-offset-top: {{ play_padding_top | default: block_settings.play_padding_top | default: 8 }}px; --btn-offset-right: {{ play_padding_right | default: block_settings.play_padding_right | default: 8 }}px; --btn-offset-bottom: {{ play_padding_bottom | default: block_settings.play_padding_bottom | default: 8 }}px; --btn-offset-left: {{ play_padding_left | default: block_settings.play_padding_left | default: 8 }}px;"
           >
             <span class="icon-play">{{- 'icon-play.svg' | inline_asset_content -}}</span>
             <span class="icon-pause hidden">{{- 'icon-pause.svg' | inline_asset_content -}}</span>
@@ -245,7 +273,7 @@
           <span
             class="video-control video-controls__duration video-control--duration is-{{ dur_pos }}"
             data-video-duration
-            style="--btn-offset-top: {{ block_settings.dur_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.dur_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.dur_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.dur_padding_left | default: 8 }}px;"
+            style="--btn-offset-top: {{ dur_padding_top | default: block_settings.dur_padding_top | default: 8 }}px; --btn-offset-right: {{ dur_padding_right | default: block_settings.dur_padding_right | default: 8 }}px; --btn-offset-bottom: {{ dur_padding_bottom | default: block_settings.dur_padding_bottom | default: 8 }}px; --btn-offset-left: {{ dur_padding_left | default: block_settings.dur_padding_left | default: 8 }}px;"
           >0:00</span>
         {% endif %}
 
@@ -253,7 +281,7 @@
           <div
             class="video-control video-controls__progress video-control--progress is-{{ progress_pos }}"
             data-video-progress-wrap
-            style="--btn-offset-top: {{ block_settings.progress_padding_top | default: 0 }}px; --btn-offset-right: {{ block_settings.progress_padding_right | default: 0 }}px; --btn-offset-bottom: {{ block_settings.progress_padding_bottom | default: 0 }}px; --btn-offset-left: {{ block_settings.progress_padding_left | default: 0 }}px;"
+            style="--btn-offset-top: {{ progress_padding_top | default: block_settings.progress_padding_top | default: 0 }}px; --btn-offset-right: {{ progress_padding_right | default: block_settings.progress_padding_right | default: 0 }}px; --btn-offset-bottom: {{ progress_padding_bottom | default: block_settings.progress_padding_bottom | default: 0 }}px; --btn-offset-left: {{ progress_padding_left | default: block_settings.progress_padding_left | default: 0 }}px;"
           >
             <input
               type="range"
@@ -274,7 +302,7 @@
             type="button"
             aria-label="Mute video"
             data-video-mute-btn
-            style="--btn-offset-top: {{ block_settings.mute_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.mute_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.mute_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.mute_padding_left | default: 8 }}px;"
+            style="--btn-offset-top: {{ mute_padding_top | default: block_settings.mute_padding_top | default: 8 }}px; --btn-offset-right: {{ mute_padding_right | default: block_settings.mute_padding_right | default: 8 }}px; --btn-offset-bottom: {{ mute_padding_bottom | default: block_settings.mute_padding_bottom | default: 8 }}px; --btn-offset-left: {{ mute_padding_left | default: block_settings.mute_padding_left | default: 8 }}px;"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15" class="mute-line"/><line x1="17" y1="9" x2="23" y2="15" class="mute-line hidden"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" class="unmute-wave"/></svg>
           </button>
@@ -286,7 +314,7 @@
             type="button"
             aria-label="Enter fullscreen"
             data-video-fullscreen-btn
-            style="--btn-offset-top: {{ block_settings.fs_padding_top | default: 8 }}px; --btn-offset-right: {{ block_settings.fs_padding_right | default: 8 }}px; --btn-offset-bottom: {{ block_settings.fs_padding_bottom | default: 8 }}px; --btn-offset-left: {{ block_settings.fs_padding_left | default: 8 }}px;"
+            style="--btn-offset-top: {{ fs_padding_top | default: block_settings.fs_padding_top | default: 8 }}px; --btn-offset-right: {{ fs_padding_right | default: block_settings.fs_padding_right | default: 8 }}px; --btn-offset-bottom: {{ fs_padding_bottom | default: block_settings.fs_padding_bottom | default: 8 }}px; --btn-offset-left: {{ fs_padding_left | default: block_settings.fs_padding_left | default: 8 }}px;"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
@@ -305,7 +333,7 @@
                 type="button"
                 aria-label="{{ 'accessibility.play_video' | t }}"
                 data-video-play-btn
-                style="--btn-padding-top: {{ block_settings.play_padding_top | default: 4 }}px; --btn-padding-right: {{ block_settings.play_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.play_padding_bottom | default: 4 }}px; --btn-padding-left: {{ block_settings.play_padding_left | default: 4 }}px;"
+                style="--btn-padding-top: {{ play_padding_top | default: block_settings.play_padding_top | default: 4 }}px; --btn-padding-right: {{ play_padding_right | default: block_settings.play_padding_right | default: 4 }}px; --btn-padding-bottom: {{ play_padding_bottom | default: block_settings.play_padding_bottom | default: 4 }}px; --btn-padding-left: {{ play_padding_left | default: block_settings.play_padding_left | default: 4 }}px;"
               >
                 <span class="icon-play">{{- 'icon-play.svg' | inline_asset_content -}}</span>
                 <span class="icon-pause hidden">{{- 'icon-pause.svg' | inline_asset_content -}}</span>
@@ -316,7 +344,7 @@
               <span
                 class="video-controls__duration video-control--duration"
                 data-video-duration
-                style="--btn-padding-top: {{ block_settings.dur_padding_top | default: 0 }}px; --btn-padding-right: {{ block_settings.dur_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.dur_padding_bottom | default: 0 }}px; --btn-padding-left: {{ block_settings.dur_padding_left | default: 4 }}px;"
+                style="--btn-padding-top: {{ dur_padding_top | default: block_settings.dur_padding_top | default: 0 }}px; --btn-padding-right: {{ dur_padding_right | default: block_settings.dur_padding_right | default: 4 }}px; --btn-padding-bottom: {{ dur_padding_bottom | default: block_settings.dur_padding_bottom | default: 0 }}px; --btn-padding-left: {{ dur_padding_left | default: block_settings.dur_padding_left | default: 4 }}px;"
               >0:00</span>
             {% endif %}
 
@@ -324,7 +352,7 @@
               <div
                 class="video-controls__progress video-control--progress"
                 data-video-progress-wrap
-                style="--btn-padding-top: {{ block_settings.progress_padding_top | default: 0 }}px; --btn-padding-right: {{ block_settings.progress_padding_right | default: 0 }}px; --btn-padding-bottom: {{ block_settings.progress_padding_bottom | default: 0 }}px; --btn-padding-left: {{ block_settings.progress_padding_left | default: 0 }}px;"
+                style="--btn-padding-top: {{ progress_padding_top | default: block_settings.progress_padding_top | default: 0 }}px; --btn-padding-right: {{ progress_padding_right | default: block_settings.progress_padding_right | default: 0 }}px; --btn-padding-bottom: {{ progress_padding_bottom | default: block_settings.progress_padding_bottom | default: 0 }}px; --btn-padding-left: {{ progress_padding_left | default: block_settings.progress_padding_left | default: 0 }}px;"
               >
                 <input
                   type="range"
@@ -345,7 +373,7 @@
                 type="button"
                 aria-label="Mute video"
                 data-video-mute-btn
-                style="--btn-padding-top: {{ block_settings.mute_padding_top | default: 4 }}px; --btn-padding-right: {{ block_settings.mute_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.mute_padding_bottom | default: 4 }}px; --btn-padding-left: {{ block_settings.mute_padding_left | default: 4 }}px;"
+                style="--btn-padding-top: {{ mute_padding_top | default: block_settings.mute_padding_top | default: 4 }}px; --btn-padding-right: {{ mute_padding_right | default: block_settings.mute_padding_right | default: 4 }}px; --btn-padding-bottom: {{ mute_padding_bottom | default: block_settings.mute_padding_bottom | default: 4 }}px; --btn-padding-left: {{ mute_padding_left | default: block_settings.mute_padding_left | default: 4 }}px;"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15" class="mute-line"/><line x1="17" y1="9" x2="23" y2="15" class="mute-line hidden"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" class="unmute-wave"/></svg>
               </button>
@@ -357,7 +385,7 @@
                 type="button"
                 aria-label="Enter fullscreen"
                 data-video-fullscreen-btn
-                style="--btn-padding-top: {{ block_settings.fs_padding_top | default: 4 }}px; --btn-padding-right: {{ block_settings.fs_padding_right | default: 4 }}px; --btn-padding-bottom: {{ block_settings.fs_padding_bottom | default: 4 }}px; --btn-padding-left: {{ block_settings.fs_padding_left | default: 4 }}px;"
+                style="--btn-padding-top: {{ fs_padding_top | default: block_settings.fs_padding_top | default: 4 }}px; --btn-padding-right: {{ fs_padding_right | default: block_settings.fs_padding_right | default: 4 }}px; --btn-padding-bottom: {{ fs_padding_bottom | default: block_settings.fs_padding_bottom | default: 4 }}px; --btn-padding-left: {{ fs_padding_left | default: block_settings.fs_padding_left | default: 4 }}px;"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
               </button>
@@ -445,7 +473,6 @@
     justify-content: var(--ctrl-justify, flex-start);
     gap: var(--ctrl-gap, 8px);
     padding: 6px 10px !important;
-    background: rgba(0, 0, 0, 0.55);
     color: #fff;
     z-index: 10;
     box-sizing: border-box;
