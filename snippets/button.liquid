@@ -19,10 +19,25 @@
   {% endif %}
   class="
     size-style
+    button-extended
+    {% if block_settings.hover_accent %}button-extended--accent{% endif %}
     {{ block_settings.style_class }}
     {{ block_settings.style_class }}--{{ block.id }}
   "
-  style="{% render 'size-style', settings: block_settings %}"
+  style="
+    {% render 'size-style', settings: block_settings %}
+    --btn-bg: {{ block_settings.bg_color }};
+    --btn-text: {{ block_settings.text_color }};
+    --btn-border-width: {{ block_settings.border_width | default: 0 }}px;
+    --btn-border-radius: {{ block_settings.border_radius | default: 0 }}px;
+    --btn-border-color: {{ block_settings.border_color }};
+    --btn-pt: {{ block_settings.padding_top | default: 0 }}px;
+    --btn-pb: {{ block_settings.padding_bottom | default: 0 }}px;
+    --btn-pl: {{ block_settings.padding_left | default: 0 }}px;
+    --btn-pr: {{ block_settings.padding_right | default: 0 }}px;
+    --btn-font-size: {{ block_settings.font_size | default: 16 }}px;
+    --btn-font-family: {{ block_settings.font_family | default: 'inherit' }};
+  "
   {%- if block_settings.open_in_new_tab -%}
     target="_blank"
     rel="noopener noreferrer"
@@ -41,5 +56,48 @@
       color: var(--color-primary-hover);
       text-decoration-color: transparent;
     }
+  }
+
+  /* ─── Extended button styling ─────────────────────────────────────────── */
+  .button-extended {
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    border: var(--btn-border-width, 0px) solid var(--btn-border-color);
+    border-radius: var(--btn-border-radius, 0px);
+    padding-top: var(--btn-pt, 0px);
+    padding-bottom: var(--btn-pb, 0px);
+    padding-left: var(--btn-pl, 0px);
+    padding-right: var(--btn-pr, 0px);
+    font-size: var(--btn-font-size, inherit);
+    font-family: var(--btn-font-family, inherit);
+    box-sizing: border-box;
+    position: relative;
+    /* prevent layout shift from border changes */
+    outline-offset: 0;
+  }
+
+  /* ─── Hover accent (bottom line that fades on hover) ─────────────────── */
+  .button-extended--accent {
+    /* ensure enough bottom space for the pseudo-element */
+    overflow: visible;
+  }
+
+  .button-extended--accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--btn-border-color, currentColor);
+    opacity: 1;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    border-radius: 0 0 var(--btn-border-radius, 0px) var(--btn-border-radius, 0px);
+  }
+
+  .button-extended--accent:hover::after,
+  .button-extended--accent:focus-visible::after {
+    opacity: 0;
   }
 {% endstylesheet %}
