@@ -100,6 +100,132 @@
       "unit": "%",
       "default": 100,
       "visible_if": "{{ block.settings.width_mobile == \"custom\" }}"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Border"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Thickness",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Font family",
+      "options": [
+        { "value": "inherit", "label": "Theme default" },
+        { "value": "var(--font-body--family)", "label": "Body font" },
+        { "value": "var(--font-heading--family)", "label": "Heading font" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "header",
+      "content": "Hover effect"
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_accent",
+      "label": "Enable bottom accent animation",
+      "info": "Shows a bold bottom line that fades out on hover.",
+      "default": false
     }
   ],
   "presets": [
