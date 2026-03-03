@@ -140,10 +140,6 @@
           <div
             class="overlay-btn-wrapper {{ pos_class }}"
             style="
-              --btn-bg: {{ bs.bg_color }};
-              --btn-color: {{ bs.text_color }};
-              --btn-padding: {{ bs.padding_top }}px {{ bs.padding_right }}px {{ bs.padding_bottom }}px {{ bs.padding_left }}px;
-              --btn-radius: {{ bs.border_radius }}px;
               --btn-offset-top: {{ bs.offset_top }}px;
               --btn-offset-right: {{ bs.offset_right }}px;
               --btn-offset-bottom: {{ bs.offset_bottom }}px;
@@ -153,8 +149,21 @@
           >
             {%- if bs.link != blank -%}
               <a
-                class="overlay-btn"
+                class="overlay-btn button-extended{% if bs.hover_accent %} button-extended--accent{% endif %}"
                 href="{{ bs.link }}"
+                style="
+                  --btn-bg: {{ bs.bg_color }};
+                  --btn-text: {{ bs.text_color }};
+                  --btn-border-width: {{ bs.border_width | default: 0 }}px;
+                  --btn-border-radius: {{ bs.border_radius | default: 0 }}px;
+                  --btn-border-color: {{ bs.border_color }};
+                  --btn-pt: {{ bs.padding_top | default: 12 }}px;
+                  --btn-pb: {{ bs.padding_bottom | default: 12 }}px;
+                  --btn-pl: {{ bs.padding_left | default: 24 }}px;
+                  --btn-pr: {{ bs.padding_right | default: 24 }}px;
+                  --btn-font-size: {{ bs.font_size | default: 16 }}px;
+                  --btn-font-family: {{ bs.font_family | default: 'inherit' }};
+                "
                 {%- if bs.open_in_new_tab %}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -163,7 +172,23 @@
                 {{- bs.label -}}
               </a>
             {%- else -%}
-              <span class="overlay-btn" role="presentation">{{- bs.label -}}</span>
+              <span
+                class="overlay-btn button-extended{% if bs.hover_accent %} button-extended--accent{% endif %}"
+                role="presentation"
+                style="
+                  --btn-bg: {{ bs.bg_color }};
+                  --btn-text: {{ bs.text_color }};
+                  --btn-border-width: {{ bs.border_width | default: 0 }}px;
+                  --btn-border-radius: {{ bs.border_radius | default: 0 }}px;
+                  --btn-border-color: {{ bs.border_color }};
+                  --btn-pt: {{ bs.padding_top | default: 12 }}px;
+                  --btn-pb: {{ bs.padding_bottom | default: 12 }}px;
+                  --btn-pl: {{ bs.padding_left | default: 24 }}px;
+                  --btn-pr: {{ bs.padding_right | default: 24 }}px;
+                  --btn-font-size: {{ bs.font_size | default: 16 }}px;
+                  --btn-font-family: {{ bs.font_family | default: 'inherit' }};
+                "
+              >{{- bs.label -}}</span>
             {%- endif -%}
           </div>
 
@@ -179,13 +204,20 @@
           >
             {%- if bs.link != blank -%}
               <a
-                class="overlay-btn"
+                class="overlay-btn button-extended{% if bs.hover_accent %} button-extended--accent{% endif %}"
                 href="{{ bs.link }}"
                 style="
                   --btn-bg: {{ bs.bg_color }};
-                  --btn-color: {{ bs.text_color }};
-                  --btn-padding: {{ bs.padding_top }}px {{ bs.padding_right }}px {{ bs.padding_bottom }}px {{ bs.padding_left }}px;
-                  --btn-radius: {{ bs.border_radius }}px;
+                  --btn-text: {{ bs.text_color }};
+                  --btn-border-width: {{ bs.border_width | default: 0 }}px;
+                  --btn-border-radius: {{ bs.border_radius | default: 0 }}px;
+                  --btn-border-color: {{ bs.border_color }};
+                  --btn-pt: {{ bs.padding_top | default: 12 }}px;
+                  --btn-pb: {{ bs.padding_bottom | default: 12 }}px;
+                  --btn-pl: {{ bs.padding_left | default: 24 }}px;
+                  --btn-pr: {{ bs.padding_right | default: 24 }}px;
+                  --btn-font-size: {{ bs.font_size | default: 16 }}px;
+                  --btn-font-family: {{ bs.font_family | default: 'inherit' }};
                 "
                 {%- if bs.open_in_new_tab %}
                   target="_blank"
@@ -196,17 +228,22 @@
               </a>
             {%- else -%}
               <span
-                class="overlay-btn"
+                class="overlay-btn button-extended{% if bs.hover_accent %} button-extended--accent{% endif %}"
                 role="presentation"
                 style="
                   --btn-bg: {{ bs.bg_color }};
-                  --btn-color: {{ bs.text_color }};
-                  --btn-padding: {{ bs.padding_top }}px {{ bs.padding_right }}px {{ bs.padding_bottom }}px {{ bs.padding_left }}px;
-                  --btn-radius: {{ bs.border_radius }}px;
+                  --btn-text: {{ bs.text_color }};
+                  --btn-border-width: {{ bs.border_width | default: 0 }}px;
+                  --btn-border-radius: {{ bs.border_radius | default: 0 }}px;
+                  --btn-border-color: {{ bs.border_color }};
+                  --btn-pt: {{ bs.padding_top | default: 12 }}px;
+                  --btn-pb: {{ bs.padding_bottom | default: 12 }}px;
+                  --btn-pl: {{ bs.padding_left | default: 24 }}px;
+                  --btn-pr: {{ bs.padding_right | default: 24 }}px;
+                  --btn-font-size: {{ bs.font_size | default: 16 }}px;
+                  --btn-font-family: {{ bs.font_family | default: 'inherit' }};
                 "
-              >
-                {{- bs.label -}}
-              </span>
+              >{{- bs.label -}}</span>
             {%- endif -%}
           </div>
 
@@ -317,21 +354,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--btn-bg, #000000);
-    color: var(--btn-color, #ffffff);
-    padding: var(--btn-padding, 12px 24px);
-    border-radius: var(--btn-radius, 0px);
     text-decoration: none;
     font: inherit;
     cursor: pointer;
     white-space: nowrap;
     transition: opacity 0.2s ease;
-    border: none;
-  }
-
-  .overlay-btn:hover,
-  .overlay-btn:focus-visible {
-    opacity: 0.85;
+    /* appearance vars handled by .button-extended */
   }
 {% endstylesheet %}
 
@@ -923,7 +951,7 @@
         },
         {
           "type": "header",
-          "content": "Appearance"
+          "content": "Colors"
         },
         {
           "type": "color",
@@ -938,14 +966,34 @@
           "default": "#ffffff"
         },
         {
+          "type": "header",
+          "content": "Border"
+        },
+        {
+          "type": "range",
+          "id": "border_width",
+          "label": "Thickness",
+          "min": 0,
+          "max": 10,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
           "type": "range",
           "id": "border_radius",
           "label": "Border radius",
           "min": 0,
-          "max": 40,
+          "max": 50,
           "step": 1,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Border color",
+          "default": "#000000"
         },
         {
           "type": "header",
@@ -956,7 +1004,7 @@
           "id": "padding_top",
           "label": "Top",
           "min": 0,
-          "max": 64,
+          "max": 60,
           "step": 1,
           "unit": "px",
           "default": 12
@@ -966,7 +1014,7 @@
           "id": "padding_right",
           "label": "Right",
           "min": 0,
-          "max": 64,
+          "max": 60,
           "step": 1,
           "unit": "px",
           "default": 24
@@ -976,7 +1024,7 @@
           "id": "padding_bottom",
           "label": "Bottom",
           "min": 0,
-          "max": 64,
+          "max": 60,
           "step": 1,
           "unit": "px",
           "default": 12
@@ -986,10 +1034,46 @@
           "id": "padding_left",
           "label": "Left",
           "min": 0,
-          "max": 64,
+          "max": 60,
           "step": 1,
           "unit": "px",
           "default": 24
+        },
+        {
+          "type": "header",
+          "content": "Typography"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Font size",
+          "min": 10,
+          "max": 48,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "select",
+          "id": "font_family",
+          "label": "Font family",
+          "options": [
+            { "value": "inherit", "label": "Theme default" },
+            { "value": "var(--font-body--family)", "label": "Body font" },
+            { "value": "var(--font-heading--family)", "label": "Heading font" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "header",
+          "content": "Hover effect"
+        },
+        {
+          "type": "checkbox",
+          "id": "hover_accent",
+          "label": "Enable bottom accent animation",
+          "info": "Shows a bold bottom line that fades out on hover.",
+          "default": false
         }
       ]
     }
