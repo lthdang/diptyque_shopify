@@ -9,12 +9,11 @@
  */
 {
   "sections": {
-    "section_gQMek6": {
-      "type": "section",
+    "video_overlay_TmCcBN": {
+      "type": "video-overlay",
       "blocks": {
-        "video_GXqkRn": {
+        "video_RMyqXh": {
           "type": "video",
-          "name": "video",
           "settings": {
             "source": "uploaded",
             "video": "shopify://files/videos/COLORSxSTUDIOS_Ezra_Collective__Diptyque_10s_Teaser_Online_16x9__1_.mp4",
@@ -23,7 +22,7 @@
             "alt": "",
             "custom_width": 100,
             "custom_width_mobile": 100,
-            "aspect_ratio": "auto",
+            "aspect_ratio": "16/9",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
@@ -31,142 +30,76 @@
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "padding-inline-end": 0,
+            "show_controls": false,
+            "show_play_button": true,
+            "show_mute_button": true,
+            "show_fullscreen_button": false,
+            "show_progress_bar": false,
+            "show_duration": false,
+            "controls_position": "bottom",
+            "controls_layout": "horizontal",
+            "flex_justify": "space-between",
+            "flex_align": "flex-start",
+            "flex_gap": 8,
+            "play_btn_position": "inline",
+            "play_padding_top": 8,
+            "play_padding_right": 8,
+            "play_padding_bottom": 8,
+            "play_padding_left": 8,
+            "mute_btn_position": "inline",
+            "mute_padding_top": 8,
+            "mute_padding_right": 8,
+            "mute_padding_bottom": 8,
+            "mute_padding_left": 8,
+            "fs_btn_position": "inline",
+            "fs_padding_top": 8,
+            "fs_padding_right": 8,
+            "fs_padding_bottom": 8,
+            "fs_padding_left": 8,
+            "dur_position": "inline",
+            "dur_padding_top": 8,
+            "dur_padding_right": 8,
+            "dur_padding_bottom": 8,
+            "dur_padding_left": 8,
+            "progress_position": "inline",
+            "progress_padding_top": 0,
+            "progress_padding_right": 0,
+            "progress_padding_bottom": 0,
+            "progress_padding_left": 0
+          }
         },
-        "button_j8hnbB": {
-          "type": "button",
-          "name": "t:names.button",
+        "overlay_button_wVE7t4": {
+          "type": "overlay_button",
           "settings": {
-            "label": "コラボレーションをみる",
-            "link": "shopify://collections/all",
+            "label": "セレクションをみる",
+            "link": "",
             "open_in_new_tab": true,
-            "style_class": "button",
-            "width": "custom",
-            "custom_width": 20,
-            "width_mobile": "custom",
-            "custom_width_mobile": 50
-          },
-          "blocks": {}
+            "is_overlay": true,
+            "position": "bottom-center",
+            "offset_top": 16,
+            "offset_right": 16,
+            "offset_bottom": 16,
+            "offset_left": 16,
+            "bg_color": "#ffffff",
+            "text_color": "#000000",
+            "border_radius": 0,
+            "padding_top": 12,
+            "padding_right": 24,
+            "padding_bottom": 12,
+            "padding_left": 24
+          }
         }
       },
       "block_order": [
-        "video_GXqkRn",
-        "button_j8hnbB"
+        "video_RMyqXh",
+        "overlay_button_wVE7t4"
       ],
-      "custom_css": [
-        ".button {color: black; background-color: white; border-radius: 0; border-color: black;}"
-      ],
-      "name": "t:names.video_section",
+      "name": "Video With Overlay Button",
       "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "flex-end",
-        "gap": 0,
         "section_width": "page-width",
-        "section_height": "large",
-        "section_height_custom": 50,
-        "color_scheme": "scheme-6",
-        "background_media": "none",
-        "video": "shopify://files/videos/COLORSxSTUDIOS_Ezra_Collective__Diptyque_10s_Teaser_Online_16x9__1_.mp4",
-        "video_position": "contain",
-        "background_image_position": "cover",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_radius": 0,
-        "toggle_overlay": false,
-        "overlay_color": "#ffffff",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "padding-block-start": 0,
-        "padding-block-end": 0
-      }
-    },
-    "hero_jVaWmY": {
-      "type": "hero",
-      "blocks": {
-        "text_YLPk4p": {
-          "type": "text",
-          "name": "t:names.heading",
-          "settings": {
-            "text": "<p>Browse our latest products</p>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground-heading)",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "button_H9gpTf": {
-          "type": "button",
-          "name": "t:names.button",
-          "settings": {
-            "label": "Shop all",
-            "link": "shopify://collections/all",
-            "open_in_new_tab": false,
-            "style_class": "button-secondary",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "text_YLPk4p",
-        "button_H9gpTf"
-      ],
-      "name": "t:names.hero",
-      "settings": {
-        "media_type_1": "image",
-        "media_type_2": "image",
-        "stack_media_on_mobile": false,
-        "custom_mobile_media": false,
-        "media_type_1_mobile": "image",
-        "media_type_2_mobile": "image",
-        "link": "",
-        "open_in_new_tab": false,
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "space-between",
-        "vertical_alignment": "flex-end",
-        "align_baseline": true,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "flex-end",
-        "gap": 24,
-        "section_width": "page-width",
-        "section_height": "medium",
-        "section_height_custom": 50,
-        "color_scheme": "scheme-6",
-        "toggle_overlay": true,
-        "overlay_color": "#12121266",
-        "overlay_style": "solid",
-        "gradient_direction": "to bottom",
-        "blurred_reflection": false,
-        "reflection_opacity": 75,
-        "padding-block-start": 100,
-        "padding-block-end": 72
+        "alignment": "flex-start",
+        "color_scheme": ""
       }
     },
     "product_list_fa6P9H": {
@@ -362,11 +295,318 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "section_JGXTHM": {
+      "type": "section",
+      "blocks": {
+        "group_Achyq6": {
+          "type": "group",
+          "name": "t:names.column",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "align_baseline": false,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "flex-start",
+            "gap": 8,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "toggle_overlay": false,
+            "overlay_color": "#00000026",
+            "overlay_style": "solid",
+            "gradient_direction": "to top",
+            "link": "",
+            "open_in_new_tab": false,
+            "placeholder": "",
+            "padding-block-start": 30,
+            "padding-block-end": 20,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "text_43JdQx": {
+              "type": "text",
+              "name": "t:names.heading",
+              "settings": {
+                "text": "<h3>DIPTYQUEの最新情報を受け取りませんか？</h3>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "center",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "2rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "text_jxLhPV": {
+              "type": "text",
+              "name": "t:names.description",
+              "settings": {
+                "text": "<p>メゾンの最新作に関するお知らせや、イベントへの招待状を受け取るために、ディプティックのニュースレター<br/>へ登録ください。<br/></p>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "center",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "text_43JdQx",
+            "text_jxLhPV"
+          ]
+        },
+        "divider_GtaFBx": {
+          "type": "_divider",
+          "name": "t:names.divider",
+          "settings": {
+            "thickness": 1,
+            "corner_radius": "square",
+            "width_percent": 100,
+            "padding-block-start": 0,
+            "padding-block-end": 0
+          },
+          "blocks": {}
+        },
+        "group_VJFKKq": {
+          "type": "group",
+          "name": "t:names.column",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "align_baseline": false,
+            "horizontal_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "flex-start",
+            "gap": 8,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "toggle_overlay": true,
+            "overlay_color": "#f8f8f8",
+            "overlay_style": "solid",
+            "gradient_direction": "to top",
+            "link": "",
+            "open_in_new_tab": false,
+            "placeholder": "",
+            "padding-block-start": 30,
+            "padding-block-end": 30,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "text_p7XdGd": {
+              "type": "text",
+              "name": "t:names.heading",
+              "settings": {
+                "text": "<h3>何かお困りですか？</h3>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "center",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "2rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "text_WEiaD9": {
+              "type": "text",
+              "name": "t:names.description",
+              "settings": {
+                "text": "<p>ご不明な点がございましたらカスタマーサービスまでお問い合わせください。<br/>ご注文でお困りの際は、カスタマーサービスにてご注文を承りますので、お問合せフォームよ<br/>りお申し付けください。<br/></p>",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "center",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "button_w7MmJd": {
+              "type": "button",
+              "name": "t:names.button",
+              "settings": {
+                "label": "お問い合わせフォーム",
+                "link": "shopify://blogs/news",
+                "open_in_new_tab": true,
+                "style_class": "button-secondary",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            },
+            "text_FxHmQA": {
+              "type": "text",
+              "name": "t:names.text",
+              "settings": {
+                "text": "<p>カスタマーサービス 営業時間<br/>月曜日 - 金曜日：10：00 - 16：00<br/>（土日祝日を除く）</p>",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "0.875rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "link_block_gPAjNH": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "オンラインヘルプガイドはこちら",
+                "link_url": "shopify://blogs/news",
+                "font_size": 16,
+                "text_color": "#000000",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": false,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "text_p7XdGd",
+            "text_WEiaD9",
+            "button_w7MmJd",
+            "text_FxHmQA",
+            "link_block_gPAjNH"
+          ]
+        }
+      },
+      "block_order": [
+        "group_Achyq6",
+        "divider_GtaFBx",
+        "group_VJFKKq"
+      ],
+      "name": "t:names.multicolumn",
+      "settings": {
+        "content_direction": "row",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "flex-start",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 0,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "solid",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
-    "section_gQMek6",
-    "hero_jVaWmY",
-    "product_list_fa6P9H"
+    "video_overlay_TmCcBN",
+    "product_list_fa6P9H",
+    "section_JGXTHM"
   ]
 }

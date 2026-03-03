@@ -23,7 +23,7 @@
             "vertical_alignment": "center",
             "align_baseline": false,
             "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "flex-start",
             "gap": 6,
             "width": "fill",
             "custom_width": 100,
@@ -78,35 +78,135 @@
               },
               "blocks": {}
             },
-            "text_f9CFLH": {
-              "type": "text",
+            "link_block_VdRBt7": {
+              "type": "link-block",
+              "name": "Link Block",
               "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "link_text": "ご利用ガイド",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_rpVWXq": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "ご注文履歴 (ログイン)",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_VyEXmF": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "配送について",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_pc4e6a": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "返品・交換について",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_7zCeBE": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "お問い合わせ",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_jBmdkk": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "一部店舗限定 製品一覧",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_fygf7B": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "店舗一覧",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
               },
               "blocks": {}
             }
           },
           "block_order": [
             "text_LWt8Pz",
-            "text_f9CFLH"
+            "link_block_VdRBt7",
+            "link_block_rpVWXq",
+            "link_block_VyEXmF",
+            "link_block_pc4e6a",
+            "link_block_7zCeBE",
+            "link_block_jBmdkk",
+            "link_block_fygf7B"
           ]
         },
         "group_QqNYGn": {
@@ -118,7 +218,7 @@
             "vertical_alignment": "center",
             "align_baseline": false,
             "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "flex-start",
             "gap": 6,
             "width": "fill",
             "custom_width": 100,
@@ -173,35 +273,117 @@
               },
               "blocks": {}
             },
-            "text_TBQNQq": {
-              "type": "text",
+            "link_block_nzXyVz": {
+              "type": "link-block",
+              "name": "Link Block",
               "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "link_text": "公式オンラインストア特典",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_g86CPt": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "お誕生日限定特典",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_4iLjwT": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "Diptyque & You (会員特典)",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_hLDqti": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "ギフトファインダーで理想のギフトを探す",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_AgNkhW": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "コーポレートギフト",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_wrQGNt": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "すべてのサービス",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
               },
               "blocks": {}
             }
           },
           "block_order": [
             "text_hh7kr3",
-            "text_TBQNQq"
+            "link_block_nzXyVz",
+            "link_block_g86CPt",
+            "link_block_4iLjwT",
+            "link_block_hLDqti",
+            "link_block_AgNkhW",
+            "link_block_wrQGNt"
           ]
         },
         "group_bFcfMn": {
@@ -213,7 +395,7 @@
             "vertical_alignment": "center",
             "align_baseline": false,
             "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "flex-start",
             "gap": 6,
             "width": "fill",
             "custom_width": 100,
@@ -268,35 +450,479 @@
               },
               "blocks": {}
             },
-            "text_RwV6dH": {
-              "type": "text",
+            "link_block_xmaaMg": {
+              "type": "link-block",
+              "name": "Link Block",
               "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
+                "link_text": "キャンドルのお手入れ方法",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_8MCNYP": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "最適なホームフレグランスを探す",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_dHrBAb": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "3ステップで叶えるホームフレグランス",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_RaeNnH": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "リフィラブル製品",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_ggdMtK": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "インテンス フレグランス コレクション",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "accordion_JL6iWc": {
+              "type": "accordion",
+              "name": "t:names.accordion",
+              "settings": {
+                "icon": "caret",
+                "dividers": false,
+                "type_preset": "h6",
+                "inherit_color_scheme": true,
+                "color_scheme": "",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
-              "blocks": {}
+              "blocks": {
+                "accordion_row_KLYkYx": {
+                  "type": "_accordion-row",
+                  "settings": {
+                    "heading": "ベストセラー",
+                    "open_by_default": false,
+                    "icon": "none",
+                    "width": 20
+                  },
+                  "blocks": {
+                    "link_block_rgLGU9": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "ディプティックのギフト",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_j7ptt9": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "象徴的なワックス フラワーベース",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_XhQC4j": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "ホリデーコレクション",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_EUheQd": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "ディプティックのバレンタイン・ホワイトデーギフト",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_3pHxVx": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "限定キャンドル Fleur de Cerisier（フルール ド スリジエ）",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_XgMpAE": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "1/19発売 新年を祝う限定コレクション",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_7faVrJ": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "サマーコレクション",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_6wa68G": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "サマーデコレーションアイテムコレクション",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_cdwfr9": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "母の日に贈る ディプティックのギフト",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_T8Lrtg": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "父の日に贈るギフト",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_cfAi9K": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "L’Ombre dans l’Eau (ロンブルダンロー)",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_Hm3nTC": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "Eau Rose (オーローズ)",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_4A3daD": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "Tam Dao (タムダオ)",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_Cb6rmJ": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "ホームフレグランスディフューザー (リードディフューザー)",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_CcBTUV": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "各都市限定 シティキャンドル",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_XJN3E7": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "ビューティーアクセサリー",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_JdNxeX": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "オフィスアクセサリー",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_TjAaDY": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "ラッカーウッドデコレーション",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    },
+                    "link_block_mVBzNp": {
+                      "type": "link-block",
+                      "name": "Link Block",
+                      "settings": {
+                        "link_text": "サヴォアフェールと職人技 ",
+                        "link_url": "shopify://blogs/news",
+                        "font_size": 14,
+                        "text_color": "#717171",
+                        "padding_top": 0,
+                        "padding_bottom": 0,
+                        "padding_left": 0,
+                        "padding_right": 0,
+                        "no_underline": true,
+                        "open_in_new_tab": false
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "link_block_rgLGU9",
+                    "link_block_j7ptt9",
+                    "link_block_XhQC4j",
+                    "link_block_EUheQd",
+                    "link_block_3pHxVx",
+                    "link_block_XgMpAE",
+                    "link_block_7faVrJ",
+                    "link_block_6wa68G",
+                    "link_block_cdwfr9",
+                    "link_block_T8Lrtg",
+                    "link_block_cfAi9K",
+                    "link_block_Hm3nTC",
+                    "link_block_4A3daD",
+                    "link_block_Cb6rmJ",
+                    "link_block_CcBTUV",
+                    "link_block_XJN3E7",
+                    "link_block_JdNxeX",
+                    "link_block_TjAaDY",
+                    "link_block_mVBzNp"
+                  ]
+                }
+              },
+              "block_order": [
+                "accordion_row_KLYkYx"
+              ]
             }
           },
           "block_order": [
             "text_yU3Vh4",
-            "text_RwV6dH"
+            "link_block_xmaaMg",
+            "link_block_8MCNYP",
+            "link_block_dHrBAb",
+            "link_block_RaeNnH",
+            "link_block_ggdMtK",
+            "accordion_JL6iWc"
           ]
         },
         "group_JrLVcJ": {
@@ -308,7 +934,7 @@
             "vertical_alignment": "center",
             "align_baseline": false,
             "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
+            "vertical_alignment_flex_direction_column": "flex-start",
             "gap": 6,
             "width": "fill",
             "custom_width": 100,
@@ -363,35 +989,99 @@
               },
               "blocks": {}
             },
-            "text_yztWkY": {
-              "type": "text",
+            "link_block_FQnPAa": {
+              "type": "link-block",
+              "name": "Link Block",
               "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "link_text": "WEBサイト利用規約",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_bTYqyU": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "オンライン販売取引条件",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_rzgBqD": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "DIPTYQUE プライバシーポリシー",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_TW3fp8": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "会社概要",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "link_block_3cjCBw": {
+              "type": "link-block",
+              "name": "Link Block",
+              "settings": {
+                "link_text": "正規品について",
+                "link_url": "shopify://blogs/news",
+                "font_size": 14,
+                "text_color": "#717171",
+                "padding_top": 0,
+                "padding_bottom": 0,
+                "padding_left": 0,
+                "padding_right": 0,
+                "no_underline": true,
+                "open_in_new_tab": false
               },
               "blocks": {}
             }
           },
           "block_order": [
             "text_HW76q4",
-            "text_yztWkY"
+            "link_block_FQnPAa",
+            "link_block_bTYqyU",
+            "link_block_rzgBqD",
+            "link_block_TW3fp8",
+            "link_block_3cjCBw"
           ]
         }
       },
