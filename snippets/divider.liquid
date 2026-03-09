@@ -9,31 +9,73 @@
   @param {number} [settings.thickness] - The thickness of the divider line in pixels.
   @param {string} [settings.corner_radius] - The corner radius of the divider, e.g., 'rounded'.
   @param {number} [settings.width_percent] - The width of the divider as a percentage of its container.
+  @param {string} [settings.divider_style] - Line style: solid | dashed | dotted | double | gradient. Defaults to 'solid'.
+  @param {string} [settings.divider_color] - Custom line color (hex). Falls back to theme border color when blank.
+  @param {string} [settings.divider_text] - Optional centered label text rendered between two divider lines.
+  @param {string} [settings.text_color] - Color for the divider label text.
+  @param {number} [settings.font_size] - Font size in px for the divider label text.
+  @param {string} [settings.font_weight] - Font weight for the divider label text.
 
   @param {boolean} [full_width] - When `true`, the divider spans the full width of its container.
   @param {boolean} [attributes] - When `true`, render block.shopify_attributes on the divider container.
 {%- enddoc -%}
 
+{%- liquid
+  assign divider_style = settings.divider_style | default: 'solid'
+  assign divider_text = settings.divider_text | default: ''
+  assign has_text = false
+  if divider_text != blank
+    assign has_text = true
+  endif
+-%}
+
 <div
-  class="divider divider-{{ id }} spacing-style"
+  class="divider divider-{{ id }} divider--{{ divider_style }}{% if has_text %} divider--with-text{% endif %} spacing-style"
   style="
     --divider-justify-content: {{ settings.alignment_horizontal | default: 'center' }};
+    {% unless settings.divider_color == blank %}--divider-color: {{ settings.divider_color }};{% endunless %}
+    --divider-thickness: {{ settings.thickness | default: 1 }}px;
+    {% unless settings.text_color == blank %}--divider-text-color: {{ settings.text_color }};{% endunless %}
+    --divider-font-size: {{ settings.font_size | default: 14 }}px;
+    --divider-font-weight: {{ settings.font_weight | default: '400' }};
     {% render 'spacing-style', settings: settings %}
   "
   {% if attributes %}
     {{- block.shopify_attributes -}}
   {% endif %}
 >
-  <span
-    class="divider__line"
-    style="
-      --divider-border-thickness: {{ settings.thickness }}px;
-      {% unless full_width %}
-        --divider-border-rounded: {% if settings.corner_radius == 'rounded' %}1{% else %}0{% endif %};
-      {% endunless %}
-      --divider-flex-basis: {{ settings.width_percent }}%;
-    "
-  ></span>
+  {%- if has_text -%}
+    <span
+      class="divider__line"
+      style="
+        --divider-border-thickness: {{ settings.thickness | default: 1 }}px;
+        {% unless full_width %}
+          --divider-border-rounded: {% if settings.corner_radius == 'rounded' %}1{% else %}0{% endif %};
+        {% endunless %}
+      "
+    ></span>
+    <span class="divider__text">{{ divider_text }}</span>
+    <span
+      class="divider__line"
+      style="
+        --divider-border-thickness: {{ settings.thickness | default: 1 }}px;
+        {% unless full_width %}
+          --divider-border-rounded: {% if settings.corner_radius == 'rounded' %}1{% else %}0{% endif %};
+        {% endunless %}
+      "
+    ></span>
+  {%- else -%}
+    <span
+      class="divider__line"
+      style="
+        --divider-border-thickness: {{ settings.thickness | default: 1 }}px;
+        {% unless full_width %}
+          --divider-border-rounded: {% if settings.corner_radius == 'rounded' %}1{% else %}0{% endif %};
+        {% endunless %}
+        --divider-flex-basis: {{ settings.width_percent | default: 100 }}%;
+      "
+    ></span>
+  {%- endif -%}
 </div>
 
 {% stylesheet %}
@@ -45,10 +87,56 @@
   }
 
   .divider__line {
-    border-bottom: var(--divider-border-thickness) solid var(--color-border);
-    border-right: var(--divider-border-thickness) solid var(--color-border);
-    border-radius: calc(var(--style-border-radius-sm) * var(--divider-border-rounded));
+    border-bottom: var(--divider-border-thickness) var(--divider-border-style, solid) var(--divider-color, var(--color-border));
+    border-right: var(--divider-border-thickness) var(--divider-border-style, solid) var(--divider-color, var(--color-border));
+    border-radius: calc(var(--style-border-radius-sm) * var(--divider-border-rounded, 0));
     flex-basis: var(--divider-flex-basis);
     min-height: var(--divider-flex-basis);
+  }
+
+  /* ── Style variants ────────────────────────────────────────────────────── */
+  .divider--solid .divider__line  { --divider-border-style: solid; }
+  .divider--dashed .divider__line { --divider-border-style: dashed; }
+  .divider--dotted .divider__line { --divider-border-style: dotted; }
+  .divider--double .divider__line {
+    --divider-border-style: double;
+    /* double border requires at least 3px to be visible */
+    border-bottom-width: max(var(--divider-border-thickness), 3px);
+    border-right-width: max(var(--divider-border-thickness), 3px);
+  }
+
+  /* ── Gradient variant ───────────────────────────────────────────────── */
+  .divider--gradient .divider__line {
+    border: none;
+    height: var(--divider-thickness, 1px);
+    min-height: 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--divider-color, var(--color-border)),
+      transparent
+    );
+    border-radius: 0;
+    align-self: center;
+  }
+
+  /* ── With-text variant ──────────────────────────────────────────────── */
+  .divider--with-text {
+    gap: 0.75em;
+  }
+
+  .divider--with-text .divider__line {
+    flex: 1 1 0%;
+    --divider-flex-basis: auto;
+    min-height: 0;
+  }
+
+  .divider__text {
+    color: var(--divider-text-color, currentColor);
+    font-size: var(--divider-font-size, 14px);
+    font-weight: var(--divider-font-weight, 400);
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1;
   }
 {% endstylesheet %}
