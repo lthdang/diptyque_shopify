@@ -1,0 +1,110 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign font_size = block.settings.font_size | default: 16
+  assign font_weight = block.settings.font_weight | default: '500'
+  assign text_color = block.settings.text_color
+  assign alignment = block.settings.alignment | default: 'left'
+%}
+
+<div
+  class="tabs-card-title tabs-card-title--align-{{ alignment }}"
+  style="
+    --title-font-size: {{ font_size }}px;
+    --title-font-weight: {{ font_weight }};
+    {% unless text_color == blank %}--title-color: {{ text_color }};{% endunless %}
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if onboarding %}
+    <h3 class="tabs-card-title__text">{{ 'placeholders.product_title' | t }}</h3>
+  {% else %}
+    <h3 class="tabs-card-title__text">
+      <a href="{{ product.url }}" class="tabs-card-title__link">{{ product.title }}</a>
+    </h3>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .tabs-card-title {
+    margin: 0;
+  }
+
+  .tabs-card-title--align-center {
+    text-align: center;
+  }
+
+  .tabs-card-title--align-right {
+    text-align: right;
+  }
+
+  .tabs-card-title__text {
+    margin: 0;
+    font-size: var(--title-font-size, 1rem);
+    font-weight: var(--title-font-weight, 500);
+    color: var(--title-color, inherit);
+    line-height: 1.4;
+  }
+
+  .tabs-card-title__link {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .tabs-card-title__link:hover {
+    opacity: 0.7;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Title",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ]
+}
+{% endschema %}

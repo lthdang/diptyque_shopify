@@ -1,0 +1,164 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign selector_type = block.settings.selector_type | default: 'dropdown'
+  assign show_label = block.settings.show_label | default: false
+
+  unless onboarding
+    assign selected_variant = product.selected_or_first_available_variant
+    assign has_multiple_variants = false
+    if product.variants.size > 1
+      assign has_multiple_variants = true
+    endif
+  endunless
+%}
+
+{% unless onboarding or has_multiple_variants == false %}
+  <div class="tabs-card-variants" data-product-id="{{ product.id }}" {{ block.shopify_attributes }}>
+    {% if show_label %}
+      <div class="tabs-card-variants__label">{{ product.options.first }}</div>
+    {% endif %}
+
+    {% if selector_type == 'buttons' %}
+      <div class="tabs-card-variants__buttons">
+        {% for variant in product.variants %}
+          <button
+            type="button"
+            class="tabs-card-variant-btn{% if variant == selected_variant %} tabs-card-variant-btn--active{% endif %}{% unless variant.available %} tabs-card-variant-btn--unavailable{% endunless %}"
+            data-variant-id="{{ variant.id }}"
+            {% unless variant.available %}disabled{% endunless %}
+            aria-pressed="{% if variant == selected_variant %}true{% else %}false{% endif %}"
+            aria-label="{{ variant.title }}"
+          >
+            {{ variant.title }}
+          </button>
+        {% endfor %}
+      </div>
+    {% else %}
+      <select
+        class="tabs-card-variants__select"
+        aria-label="{{ product.title | escape }} variants"
+      >
+        {% for variant in product.variants %}
+          <option
+            value="{{ variant.id }}"
+            {% if variant == selected_variant %}selected{% endif %}
+            {% unless variant.available %}disabled{% endunless %}
+          >
+            {{ variant.title }}{% unless variant.available %} - {{ 'products.product.sold_out' | t }}{% endunless %}
+          </option>
+        {% endfor %}
+      </select>
+    {% endif %}
+  </div>
+{% endunless %}
+
+{% javascript %}
+  (function () {
+    // Dropdown change → update card's selected variant
+    document.addEventListener('change', function (e) {
+      if (!e.target.matches('.tabs-card-variants__select')) return;
+      const card = e.target.closest('[data-selected-variant]');
+      if (card) card.dataset.selectedVariant = e.target.value;
+    });
+
+    // Variant button click → toggle active and update card's selected variant
+    document.addEventListener('click', function (e) {
+      if (!e.target.matches('.tabs-card-variant-btn')) return;
+      const btn = e.target;
+      const container = btn.closest('.tabs-card-variants__buttons');
+      if (!container) return;
+      container.querySelectorAll('.tabs-card-variant-btn').forEach(function (b) {
+        b.classList.remove('tabs-card-variant-btn--active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('tabs-card-variant-btn--active');
+      btn.setAttribute('aria-pressed', 'true');
+      const card = btn.closest('[data-selected-variant]');
+      if (card) card.dataset.selectedVariant = btn.dataset.variantId;
+    });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .tabs-card-variants {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .tabs-card-variants__label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.55;
+  }
+
+  .tabs-card-variants__select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  .tabs-card-variants__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .tabs-card-variant-btn {
+    padding: 0.3rem 0.65rem;
+    border: 1px solid currentColor;
+    background: transparent;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .tabs-card-variant-btn--active {
+    background-color: currentColor;
+    color: white;
+  }
+
+  .tabs-card-variant-btn--unavailable {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Variants",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "selector_type",
+      "label": "Selector type",
+      "options": [
+        { "value": "dropdown", "label": "Dropdown" },
+        { "value": "buttons", "label": "Buttons" }
+      ],
+      "default": "dropdown"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show variant label",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

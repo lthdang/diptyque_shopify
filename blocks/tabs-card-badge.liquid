@@ -1,0 +1,140 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign badge_style = block.settings.badge_style | default: 'solid'
+  assign badge_bg_color = block.settings.badge_bg_color
+  assign badge_text_color = block.settings.badge_text_color
+  assign badge_font_size = block.settings.badge_font_size | default: 11
+  assign new_days_threshold = block.settings.new_days_threshold | default: 30
+
+  unless onboarding
+    assign selected_variant = product.selected_or_first_available_variant
+
+    assign is_sale = false
+    if selected_variant.compare_at_price > selected_variant.price
+      assign is_sale = true
+    endif
+
+    assign is_new = false
+    assign new_cutoff = new_days_threshold | times: 86400
+    assign product_ts_str = product.created_at | date: '%s'
+    assign now_ts_str = 'now' | date: '%s'
+    assign product_ts_int = product_ts_str | plus: 0
+    assign now_ts_int = now_ts_str | plus: 0
+    assign age_diff = now_ts_int | minus: product_ts_int
+    if age_diff < new_cutoff
+      assign is_new = true
+    endif
+
+    assign is_bestseller = false
+    if product.tags contains 'bestseller'
+      assign is_bestseller = true
+    endif
+  endunless
+%}
+
+{% if onboarding or is_sale or is_new or is_bestseller %}
+  <div
+    class="tabs-card-badges"
+    style="
+      {% unless badge_bg_color == blank %}--badge-bg: {{ badge_bg_color }};{% endunless %}
+      {% unless badge_text_color == blank %}--badge-text: {{ badge_text_color }};{% endunless %}
+      --badge-font-size: {{ badge_font_size }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% if onboarding %}
+      <span class="tabs-card-badge{% if badge_style == 'outline' %} tabs-card-badge--outline{% endif %}">Sale</span>
+    {% else %}
+      {% if is_sale %}
+        <span class="tabs-card-badge{% if badge_style == 'outline' %} tabs-card-badge--outline{% endif %}">{{ 'content.product_badge_sale' | t | default: 'Sale' }}</span>
+      {% endif %}
+      {% if is_new %}
+        <span class="tabs-card-badge{% if badge_style == 'outline' %} tabs-card-badge--outline{% endif %}">New</span>
+      {% endif %}
+      {% if is_bestseller %}
+        <span class="tabs-card-badge{% if badge_style == 'outline' %} tabs-card-badge--outline{% endif %}">Bestseller</span>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .tabs-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .tabs-card-badge {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    font-size: var(--badge-font-size, 11px);
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 2px;
+    background-color: var(--badge-bg, #111);
+    color: var(--badge-text, #fff);
+  }
+
+  .tabs-card-badge--outline {
+    background-color: transparent;
+    border: 1px solid var(--badge-bg, #111);
+    color: var(--badge-bg, #111);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Badge",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "badge_style",
+      "label": "Badge style",
+      "options": [
+        { "value": "solid", "label": "Solid" },
+        { "value": "outline", "label": "Outline" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "badge_font_size",
+      "label": "Badge font size",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "new_days_threshold",
+      "label": "\"New\" badge days",
+      "info": "Show \"New\" badge for products created within this many days",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "default": 30
+    }
+  ]
+}
+{% endschema %}

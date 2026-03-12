@@ -1,0 +1,94 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign show_compare = block.settings.show_compare | default: true
+  assign show_discount = block.settings.show_discount | default: false
+  assign alignment = block.settings.alignment | default: 'left'
+
+  unless onboarding
+    assign selected_variant = product.selected_or_first_available_variant
+    assign is_sale = false
+    if selected_variant.compare_at_price > selected_variant.price
+      assign is_sale = true
+    endif
+    if show_discount and is_sale
+      assign discount_amount = selected_variant.compare_at_price | minus: selected_variant.price
+      assign discount_pct = discount_amount | times: 100 | divided_by: selected_variant.compare_at_price | round
+    endif
+  endunless
+%}
+
+<div
+  class="tabs-card-price tabs-card-price--align-{{ alignment }}"
+  {{ block.shopify_attributes }}
+>
+  {% if onboarding %}
+    <span class="tabs-card-price__amount">{{ 1999 | money }}</span>
+  {% elsif show_compare %}
+    {% render 'price', product_resource: product %}
+    {% if show_discount and is_sale %}
+      <span class="tabs-card-price__discount">-{{ discount_pct }}%</span>
+    {% endif %}
+  {% else %}
+    <span class="tabs-card-price__amount">{{ selected_variant.price | money }}</span>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .tabs-card-price {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .tabs-card-price--align-center {
+    text-align: center;
+  }
+
+  .tabs-card-price--align-right {
+    text-align: right;
+  }
+
+  .tabs-card-price__discount {
+    display: inline-block;
+    margin-left: 0.4em;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--color-sale, #c0392b);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Price",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_compare",
+      "label": "Show compare at price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discount",
+      "label": "Show discount percentage",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ]
+}
+{% endschema %}

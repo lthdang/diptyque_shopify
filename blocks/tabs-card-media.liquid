@@ -1,0 +1,125 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign image_ratio = block.settings.image_ratio | default: '3/4'
+  assign image_fit = block.settings.image_fit | default: 'cover'
+  assign hover_effect = block.settings.hover_effect | default: 'zoom'
+%}
+
+<div
+  class="tabs-card-media tabs-card-media--hover-{{ hover_effect }}"
+  style="--image-ratio: {{ image_ratio }}; --image-fit: {{ image_fit }};"
+  {{ block.shopify_attributes }}
+>
+  {% if onboarding %}
+    {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+  {% elsif product.featured_media %}
+    <a href="{{ product.url }}" class="tabs-card-media__link">
+      {{ product.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 400, 500, 600', alt: product.featured_media.alt | escape }}
+      {% if hover_effect == 'secondary' and product.media.size > 1 %}
+        {{ product.media[1] | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 400, 500, 600', alt: product.media[1].alt, class: 'tabs-card-media__secondary-img' }}
+      {% endif %}
+    </a>
+  {% else %}
+    {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .tabs-card-media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    aspect-ratio: var(--image-ratio, 3 / 4);
+    background-color: #f5f5f5;
+    flex-shrink: 0;
+  }
+
+  .tabs-card-media img,
+  .tabs-card-media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--image-fit, cover);
+    display: block;
+  }
+
+  .tabs-card-media__link {
+    display: block;
+    height: 100%;
+  }
+
+  /* Hover: zoom */
+  .tabs-card-media--hover-zoom img:first-of-type {
+    transition: transform 0.4s ease;
+  }
+
+  .tabs-card-media--hover-zoom:hover img:first-of-type {
+    transform: scale(1.06);
+  }
+
+  /* Hover: secondary image swap */
+  .tabs-card-media__secondary-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--image-fit, cover);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .tabs-card-media--hover-secondary:hover .tabs-card-media__secondary-img {
+    opacity: 1;
+  }
+
+  .tabs-card-media--hover-secondary:hover img:first-of-type {
+    opacity: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Media",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image aspect ratio",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "1/1", "label": "1:1 Square" },
+        { "value": "4/3", "label": "4:3 Landscape" },
+        { "value": "3/4", "label": "3:4 Portrait" },
+        { "value": "4/5", "label": "4:5 Tall" }
+      ],
+      "default": "3/4"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Image fit",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "hover_effect",
+      "label": "Hover effect",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "zoom", "label": "Zoom" },
+        { "value": "secondary", "label": "Secondary image" }
+      ],
+      "default": "zoom"
+    }
+  ]
+}
+{% endschema %}
