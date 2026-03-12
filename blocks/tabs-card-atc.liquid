@@ -1,0 +1,176 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign button_style = block.settings.button_style | default: 'outline'
+  assign full_width = block.settings.full_width | default: true
+
+  unless onboarding
+    assign selected_variant = product.selected_or_first_available_variant
+  endunless
+%}
+
+{% unless onboarding %}
+  <div
+    class="tabs-card-atc{% if full_width %} tabs-card-atc--full-width{% endif %}"
+    {{ block.shopify_attributes }}
+  >
+    {% if product.available %}
+      <button
+        type="button"
+        class="tabs-card-atc__btn tabs-card-atc__btn--{{ button_style }}"
+        data-variant-id="{{ selected_variant.id }}"
+        aria-label="{{ 'products.product.add_to_cart' | t }}: {{ product.title | escape }}"
+      >
+        {{ 'products.product.add_to_cart' | t }}
+      </button>
+    {% else %}
+      <button
+        type="button"
+        class="tabs-card-atc__btn tabs-card-atc__btn--{{ button_style }}"
+        disabled
+        aria-disabled="true"
+      >
+        {{ 'products.product.sold_out' | t }}
+      </button>
+    {% endif %}
+  </div>
+{% endunless %}
+
+{% javascript %}
+  (function () {
+    document.addEventListener('click', async function (e) {
+      const btn = e.target.closest('.tabs-card-atc__btn');
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+
+      // Read selected variant from parent card or fall back to button's own data
+      const card = btn.closest('[data-selected-variant]');
+      const variantId = (card && card.dataset.selectedVariant) || btn.dataset.variantId;
+      if (!variantId) return;
+
+      const originalText = btn.textContent.trim();
+      btn.disabled = true;
+      btn.textContent = '\u2026';
+
+      try {
+        const addRes = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 })
+        });
+
+        if (!addRes.ok) throw new Error('cart/add failed');
+
+        const cartRes = await fetch('/cart.js');
+        const cart = await cartRes.json();
+
+        document.dispatchEvent(new CustomEvent('cart:update', {
+          bubbles: true,
+          detail: { data: { itemCount: cart.item_count } }
+        }));
+
+        btn.textContent = '\u2713';
+        setTimeout(function () {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      } catch (err) {
+        console.error('[tabs-card-atc]', err);
+        btn.textContent = 'Error';
+        setTimeout(function () {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      }
+    });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .tabs-card-atc {
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+
+  .tabs-card-atc--full-width .tabs-card-atc__btn {
+    width: 100%;
+  }
+
+  .tabs-card-atc__btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+
+  .tabs-card-atc__btn--primary {
+    background-color: currentColor;
+    color: white;
+    border: 1px solid currentColor;
+  }
+
+  .tabs-card-atc__btn--primary:not(:disabled):hover {
+    opacity: 0.8;
+  }
+
+  .tabs-card-atc__btn--secondary {
+    background-color: transparent;
+    color: currentColor;
+    border: 1px solid transparent;
+  }
+
+  .tabs-card-atc__btn--secondary:not(:disabled):hover {
+    text-decoration: underline;
+  }
+
+  .tabs-card-atc__btn--outline {
+    background-color: transparent;
+    color: currentColor;
+    border: 1px solid currentColor;
+  }
+
+  .tabs-card-atc__btn--outline:not(:disabled):hover {
+    background-color: currentColor;
+    color: white;
+  }
+
+  .tabs-card-atc__btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Add to Cart",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" },
+        { "value": "outline", "label": "Outline" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width button",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

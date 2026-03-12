@@ -1,0 +1,921 @@
+
+<script src="{{ 'results-list.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<collection-tabs-section
+  data-section-id="{{ section.id }}"
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    spacing-style
+    gap-style
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    {% render 'gap-style', value: section.settings.gap %}
+  "
+>
+  {% liquid
+    assign selected_collections = section.settings.collections
+    assign max_products = section.settings.max_products
+  %}
+
+  {%- comment -%} Render heading block if exists {%- endcomment -%}
+  <div class="collections-tabs-header">
+    {%- content_for 'block', type: 'tabs-heading', id: 'heading-block' -%}
+  </div>
+
+  {%- comment -%} Render collection tabs {%- endcomment -%}
+  <div class="collection-tabs-wrapper">
+    <div
+      class="collection-tabs collection-tabs--{{ section.settings.tabs_direction }} collection-tabs--underline-{{ section.settings.tabs_underline_animation | default: 'slide' }}{% if section.settings.tabs_hover_effect != 'none' %} collection-tabs--hover-{{ section.settings.tabs_hover_effect }}{% endif %}"
+      style="
+        --tabs-direction: {{ section.settings.tabs_direction | default: 'row' }};
+        --tabs-justify-content: {{ section.settings.tabs_alignment | default: 'center' }};
+        --tabs-align-items: center;
+        --tabs-gap: {{ section.settings.tabs_gap | default: 24 }}px;
+        --tabs-padding-top: {{ section.settings.tabs_padding_top | default: 0 }}px;
+        --tabs-padding-bottom: {{ section.settings.tabs_padding_bottom | default: 24 }}px;
+        --tabs-padding-left: {{ section.settings.tabs_padding_left | default: 0 }}px;
+        --tabs-padding-right: {{ section.settings.tabs_padding_right | default: 0 }}px;
+        --tab-font-size: {{ section.settings.tabs_font_size | default: 16 }}px;
+        --tab-font-weight: {{ section.settings.tabs_font_weight | default: '400' }};
+        --tab-letter-spacing: {{ section.settings.tabs_letter_spacing | default: 0 }}em;
+        --tab-text-transform: {{ section.settings.tabs_text_transform | default: 'none' }};
+        {% if section.settings.tabs_text_color != blank %}--tab-color: {{ section.settings.tabs_text_color }};{% endif %}
+        {% if section.settings.tabs_active_color != blank %}--tab-active-color: {{ section.settings.tabs_active_color }};{% endif %}
+        {% if section.settings.tabs_hover_color != blank %}--tab-hover-color: {{ section.settings.tabs_hover_color }};{% endif %}
+        --tab-underline-thickness: {{ section.settings.tabs_underline_thickness | default: 2 }}px;
+        {% if section.settings.tabs_underline_color != blank %}--tab-underline-color: {{ section.settings.tabs_underline_color }};{% endif %}
+      "
+      role="tablist"
+      aria-label="Collection tabs"
+    >
+      {% if selected_collections.size > 0 %}
+        {% for collection in selected_collections %}
+          {% assign is_first = forloop.first %}
+          <button
+            type="button"
+            class="collection-tab{% if is_first %} collection-tab--active{% endif %}"
+            data-collection-tab="{{ collection.handle }}"
+            data-collection-index="{{ forloop.index0 }}"
+            id="tab-{{ section.id }}-{{ collection.handle }}"
+            role="tab"
+            aria-selected="{% if is_first %}true{% else %}false{% endif %}"
+            aria-controls="panel-{{ section.id }}-{{ collection.handle }}"
+            tabindex="{% if is_first %}0{% else %}-1{% endif %}"
+          >
+            {{ collection.title }}
+          </button>
+        {% endfor %}
+      {% else %}
+        {%- comment -%} Placeholder tabs for theme editor {%- endcomment -%}
+        <button
+          type="button"
+          class="collection-tab collection-tab--active"
+          data-collection-tab="placeholder-1"
+          role="tab"
+          aria-selected="true"
+          tabindex="0"
+        >
+          Collection 1
+        </button>
+        <button
+          type="button"
+          class="collection-tab"
+          data-collection-tab="placeholder-2"
+          role="tab"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Collection 2
+        </button>
+        <button
+          type="button"
+          class="collection-tab"
+          data-collection-tab="placeholder-3"
+          role="tab"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Collection 3
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+  {%- comment -%} Render product grids for each collection {%- endcomment -%}
+  <div class="collection-products-wrapper">
+    {% if selected_collections.size > 0 %}
+      {% for collection in selected_collections %}
+        {% assign collection_index = forloop.index0 %}
+        {% assign is_active = false %}
+        {% if forloop.first %}
+          {% assign is_active = true %}
+        {% endif %}
+
+        <div
+          class="collection-products-grid{% unless is_active %} collection-products-grid--hidden{% endunless %}"
+          data-collection-products="{{ collection.handle }}"
+          data-collection-index="{{ collection_index }}"
+          role="tabpanel"
+          aria-labelledby="tab-{{ section.id }}-{{ collection.handle }}"
+          {% unless is_active %}hidden{% endunless %}
+        >
+          {% capture list_items %}
+            {% if collection.products.size > 0 %}
+              {% for product in collection.products limit: max_products %}
+                <div class="resource-list__item">
+                  {% # theme-check-disable UniqueStaticBlockId %}
+                  {% content_for 'block', type: 'tabs-product-card', id: 'static-product-card', closest.product: product %}
+                  {% # theme-check-enable UniqueStaticBlockId %}
+                </div>
+                {% unless forloop.last %}
+                  <!--@list/split-->
+                {% endunless %}
+              {% endfor %}
+            {% else %}
+              {%- comment -%} Show placeholder if collection is empty {%- endcomment -%}
+              {% for i in (1..4) %}
+                <div class="resource-list__item">
+                  {% # theme-check-disable UniqueStaticBlockId %}
+                  {% content_for 'block', type: 'tabs-product-card', id: 'static-product-card', closest.product: null %}
+                  {% # theme-check-enable UniqueStaticBlockId %}
+                </div>
+                {% unless forloop.last %}
+                  <!--@list/split-->
+                {% endunless %}
+              {% endfor %}
+            {% endif %}
+          {% endcapture %}
+
+          {% liquid
+            assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+            assign slide_count = collection.products.size | at_most: max_products
+            if slide_count == 0
+              assign slide_count = 4
+            endif
+          %}
+
+          {% render 'resource-list',
+            list_items: list_items,
+            list_items_array: list_items_array,
+            settings: section.settings,
+            slide_count: slide_count,
+            content_type: 'products',
+            test_id: 'collection-products-grid'
+          %}
+        </div>
+      {% endfor %}
+    {% else %}
+      {%- comment -%} No collections selected - show placeholder {%- endcomment -%}
+      <div class="collection-products-grid" data-collection-products="placeholder">
+        {% capture list_items %}
+          {% for i in (1..max_products) %}
+            <div class="resource-list__item">
+              {% # theme-check-disable UniqueStaticBlockId %}
+              {% content_for 'block', type: 'tabs-product-card', id: 'static-product-card', closest.product: null %}
+              {% # theme-check-enable UniqueStaticBlockId %}
+            </div>
+            {% unless forloop.last %}
+              <!--@list/split-->
+            {% endunless %}
+          {% endfor %}
+        {% endcapture %}
+
+        {% liquid
+          assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+        %}
+
+        {% render 'resource-list',
+          list_items: list_items,
+          list_items_array: list_items_array,
+          settings: section.settings,
+          slide_count: max_products,
+          content_type: 'products',
+          test_id: 'collection-products-placeholder'
+        %}
+      </div>
+    {% endif %}
+  </div>
+</collection-tabs-section>
+
+{% javascript %}
+  class CollectionTabsSection extends HTMLElement {
+    constructor() {
+      super();
+      this.sectionId = this.dataset.sectionId;
+      this.tabs = [];
+      this.panels = [];
+      this.currentIndex = 0;
+      
+      this.init();
+    }
+
+    init() {
+      // Find all tabs and panels
+      this.tabs = Array.from(this.querySelectorAll('[data-collection-tab]'));
+      this.panels = Array.from(this.querySelectorAll('[data-collection-products]'));
+      
+      if (this.tabs.length === 0 || this.panels.length === 0) return;
+
+      // Set up event listeners
+      this.tabs.forEach((tab, index) => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.switchTab(index);
+        });
+
+        // Keyboard navigation
+        tab.addEventListener('keydown', (e) => {
+          this.handleKeyDown(e, index);
+        });
+      });
+
+      // Set first tab as active
+      this.switchTab(0);
+    }
+
+    switchTab(index) {
+      if (index < 0 || index >= this.tabs.length) return;
+      
+      // Update tabs
+      this.tabs.forEach((tab, i) => {
+        const isActive = i === index;
+        tab.setAttribute('aria-selected', isActive);
+        tab.classList.toggle('collection-tab--active', isActive);
+        tab.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+
+      // Update panels
+      this.panels.forEach((panel, i) => {
+        const isActive = i === index;
+        panel.classList.toggle('collection-products-grid--hidden', !isActive);
+        panel.hidden = !isActive;
+      });
+
+      this.currentIndex = index;
+    }
+
+    handleKeyDown(e, currentIndex) {
+      let newIndex = currentIndex;
+
+      switch(e.key) {
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          e.preventDefault();
+          newIndex = currentIndex > 0 ? currentIndex - 1 : this.tabs.length - 1;
+          break;
+        case 'ArrowRight':
+        case 'ArrowDown':
+          e.preventDefault();
+          newIndex = currentIndex < this.tabs.length - 1 ? currentIndex + 1 : 0;
+          break;
+        case 'Home':
+          e.preventDefault();
+          newIndex = 0;
+          break;
+        case 'End':
+          e.preventDefault();
+          newIndex = this.tabs.length - 1;
+          break;
+        default:
+          return;
+      }
+
+      this.switchTab(newIndex);
+      this.tabs[newIndex].focus();
+    }
+  }
+
+  if (!customElements.get('collection-tabs-section')) {
+    customElements.define('collection-tabs-section', CollectionTabsSection);
+  }
+{% endjavascript %}
+
+{% stylesheet %}
+  .collection-tabs-wrapper {
+    width: 100%;
+  }
+
+  .collection-products-wrapper {
+    width: 100%;
+    position: relative;
+  }
+
+  .collection-products-grid {
+    width: 100%;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .collection-products-grid--hidden {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .collection-tabs-additional-content {
+    width: 100%;
+  }
+
+  /* Tab styles */
+  .collection-tabs {
+    display: flex;
+    gap: var(--tabs-gap, 1.5rem);
+    align-items: var(--tabs-align-items, center);
+    justify-content: var(--tabs-justify-content, flex-start);
+    flex-direction: var(--tabs-direction, row);
+    flex-wrap: wrap;
+    padding: var(--tabs-padding-top, 0) var(--tabs-padding-right, 0) var(--tabs-padding-bottom, 0) var(--tabs-padding-left, 0);
+    width: var(--tabs-width, 100%);
+    height: var(--tabs-height, auto);
+    background-color: var(--tabs-bg-color, transparent);
+    border: var(--tabs-border-width, 0) var(--tabs-border-style, solid) var(--tabs-border-color, transparent);
+    border-radius: var(--tabs-border-radius, 0);
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-tabs {
+      width: var(--tabs-width-mobile, 100%);
+    }
+  }
+
+  .collection-tab {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    font-size: var(--tab-font-size, 1rem);
+    font-family: inherit;
+    font-weight: var(--tab-font-weight, 400);
+    color: var(--tab-color, currentColor);
+    letter-spacing: var(--tab-letter-spacing, 0);
+    text-transform: var(--tab-text-transform, none);
+    position: relative;
+    transition: color 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .collection-tab--active {
+    color: var(--tab-active-color, var(--tab-color, currentColor));
+  }
+
+  .collection-tab:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Active tab underline */
+  .collection-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--tab-underline-thickness, 2px);
+    background-color: var(--tab-underline-color, var(--tab-active-color, currentColor));
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  /* Underline animation: slide (default) */
+  .collection-tabs--underline-slide .collection-tab::after {
+    transition: transform 0.25s ease;
+  }
+
+  /* Underline animation: fade */
+  .collection-tabs--underline-fade .collection-tab::after {
+    transform: scaleX(1);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .collection-tabs--underline-fade .collection-tab--active::after {
+    opacity: 1;
+  }
+
+  /* Underline animation: none */
+  .collection-tabs--underline-none .collection-tab::after {
+    transition: none;
+  }
+
+  .collection-tab--active::after {
+    transform: scaleX(1);
+  }
+
+  /* Hover color */
+  .collection-tab:not(.collection-tab--active):hover {
+    color: var(--tab-hover-color, var(--tab-color, currentColor));
+  }
+
+  /* Hover effects */
+  .collection-tabs--hover-color-change .collection-tab:hover {
+    opacity: 0.7;
+  }
+
+  .collection-tabs--hover-scale .collection-tab:hover {
+    transform: scale(1.05);
+  }
+
+  .collection-tabs--hover-shadow .collection-tab:hover {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .collection-tabs--hover-translate .collection-tab:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Vertical layout */
+  .collection-tabs--column {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .collection-tabs--column .collection-tab::after {
+    left: 0;
+    right: auto;
+    bottom: 0;
+    top: 0;
+    width: var(--tab-underline-thickness, 2px);
+    height: 100%;
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+
+  .collection-tabs--column .collection-tab--active::after {
+    transform: scaleY(1);
+  }
+
+  .collection-tabs--column.collection-tabs--underline-fade .collection-tab::after {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+
+  .collection-tabs--column.collection-tabs--underline-fade .collection-tab--active::after {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  /* Tab badge/vendor */
+  .collections-tabs-product-card__vendor {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(0, 0, 0, 0.5);
+    margin-bottom: 0.25rem;
+  }
+
+  .collections-tabs-product-card__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .collections-tabs-badge {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    font-size: var(--badge-font-size, 0.7rem);
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 2px;
+    background-color: var(--badge-bg-color, currentColor);
+    color: var(--badge-text-color, white);
+  }
+
+  .collections-tabs-badge--outline {
+    background-color: transparent;
+    border: 1px solid var(--badge-bg-color, currentColor);
+    color: var(--badge-bg-color, currentColor);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collections Tabs",
+  "class": "section-collections-tabs",
+  "blocks": [
+    { "type": "@theme" }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collections"
+    },
+    {
+      "type": "collection_list",
+      "id": "collections",
+      "label": "Collections",
+      "limit": 10,
+      "info": "Select multiple collections to display as tabs"
+    },
+    {
+      "type": "header",
+      "content": "Tabs Typography"
+    },
+    {
+      "type": "range",
+      "id": "tabs_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "tabs_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "tabs_text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "tabs_active_color",
+      "label": "Active tab color"
+    },
+    {
+      "type": "color",
+      "id": "tabs_hover_color",
+      "label": "Hover color"
+    },
+    {
+      "type": "range",
+      "id": "tabs_letter_spacing",
+      "label": "Letter spacing",
+      "min": -0.1,
+      "max": 0.3,
+      "step": 0.1,
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "tabs_text_transform",
+      "label": "Text transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "header",
+      "content": "Tab Underline"
+    },
+    {
+      "type": "range",
+      "id": "tabs_underline_thickness",
+      "label": "Underline thickness",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "tabs_underline_color",
+      "label": "Underline color"
+    },
+    {
+      "type": "select",
+      "id": "tabs_underline_animation",
+      "label": "Underline animation",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "fade", "label": "Fade" },
+        { "value": "slide", "label": "Slide" }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "header",
+      "content": "Tabs Settings"
+    },
+    {
+      "type": "select",
+      "id": "tabs_direction",
+      "label": "Direction",
+      "options": [
+        { "value": "row", "label": "Horizontal" },
+        { "value": "column", "label": "Vertical" }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "tabs_alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "tabs_gap",
+      "label": "Gap between tabs",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "tabs_hover_effect",
+      "label": "Hover effect",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "color-change", "label": "Color change" },
+        { "value": "scale", "label": "Scale" },
+        { "value": "shadow", "label": "Shadow" },
+        { "value": "translate", "label": "Translate" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "tabs_padding_top",
+      "label": "Tabs padding top",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tabs_padding_bottom",
+      "label": "Tabs padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "tabs_padding_left",
+      "label": "Tabs padding left",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tabs_padding_right",
+      "label": "Tabs padding right",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Product Display"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "Layout Type",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "carousel", "label": "Carousel" },
+        { "value": "editorial", "label": "Editorial" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_on_mobile",
+      "label": "Carousel on mobile",
+      "default": false,
+      "visible_if": "{{ section.settings.layout_type != 'carousel' }}"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Product count",
+      "min": 1,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "visible_if": "{{ section.settings.layout_type != 'editorial' }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Mobile columns",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2",
+      "visible_if": "{{ section.settings.layout_type == 'grid' and section.settings.carousel_on_mobile == false }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_card_size",
+      "label": "Mobile card size",
+      "options": [
+        { "value": "60cqw", "label": "Large (1 column)" },
+        { "value": "44cqw", "label": "Small (2 columns)" }
+      ],
+      "default": "44cqw",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "range",
+      "id": "columns_gap",
+      "label": "Horizontal gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8,
+      "visible_if": "{{ section.settings.layout_type == 'grid' or section.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "label": "Vertical gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ section.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "header",
+      "content": "Carousel Navigation",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "Icon style",
+      "options": [
+        { "value": "arrow", "label": "Arrows" },
+        { "value": "chevron", "label": "Chevrons" },
+        { "value": "arrows_large", "label": "Arrows large" },
+        { "value": "chevron_large", "label": "Chevrons large" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "arrow",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "icons_shape",
+      "label": "Icon background",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "circle", "label": "Circle" },
+        { "value": "square", "label": "Square" }
+      ],
+      "default": "none",
+      "visible_if": "{{ section.settings.icons_style != 'none' and section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Section Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collections Tabs",
+      "category": "Products",
+      "settings": {
+        "collections": [],
+        "layout_type": "grid",
+        "max_products": 8,
+        "columns": 4,
+        "mobile_columns": "2",
+        "columns_gap": 8,
+        "rows_gap": 24,
+        "section_width": "page-width",
+        "horizontal_alignment": "flex-start",
+        "gap": 32,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      },
+      "blocks": {
+        "heading-block": {
+          "type": "tabs-heading",
+          "static": true
+        },
+        "static-product-card": {
+          "type": "tabs-product-card",
+          "static": true,
+          "blocks": {
+            "card-media": { "type": "tabs-card-media" },
+            "card-title": { "type": "tabs-card-title" },
+            "card-price": { "type": "tabs-card-price" },
+            "card-description": { "type": "tabs-card-description" },
+            "card-atc": { "type": "tabs-card-atc" }
+          },
+          "block_order": ["card-media", "card-title", "card-price", "card-description", "card-atc"]
+        }
+      },
+      "block_order": []
+    }
+  ]
+}
+{% endschema %}
