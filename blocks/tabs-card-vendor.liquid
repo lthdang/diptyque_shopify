@@ -1,0 +1,33 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+%}
+
+<div class="tabs-card-vendor" {{ block.shopify_attributes }}>
+  {% if onboarding %}
+    <span>Sample Vendor</span>
+  {% else %}
+    <span>{{ product.vendor }}</span>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .tabs-card-vendor {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.5;
+    line-height: 1;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Vendor",
+  "tag": null,
+  "settings": []
+}
+{% endschema %}

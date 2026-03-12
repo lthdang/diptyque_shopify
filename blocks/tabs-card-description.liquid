@@ -1,0 +1,48 @@
+{% liquid
+  assign product = closest.product
+  assign onboarding = false
+  if product == blank or product.id == empty
+    assign onboarding = true
+  endif
+
+  assign description_length = block.settings.description_length | default: 100
+%}
+
+<div class="tabs-card-description" {{ block.shopify_attributes }}>
+  {% if onboarding %}
+    <p>Sample product description.</p>
+  {% elsif product.description != blank %}
+    <p>{{ product.description | strip_html | truncate: description_length }}</p>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .tabs-card-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    opacity: 0.65;
+  }
+
+  .tabs-card-description p {
+    margin: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Description",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "description_length",
+      "label": "Description length",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "unit": "ch",
+      "default": 100
+    }
+  ]
+}
+{% endschema %}
