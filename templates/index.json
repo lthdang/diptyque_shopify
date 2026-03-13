@@ -298,7 +298,10 @@
               "settings": {
                 "image_ratio": "3/4",
                 "image_fit": "cover",
-                "hover_effect": "zoom"
+                "hover_effect": "secondary",
+                "border_style": "none",
+                "border_color": "#e5e5e5",
+                "padding": 0
               },
               "blocks": {}
             },
@@ -312,19 +315,25 @@
               },
               "blocks": {}
             },
+            "tabs_card_description_WUx4UT": {
+              "type": "tabs-card-description",
+              "settings": {
+                "description_length": 100,
+                "font_size": 14,
+                "font_family": "inherit",
+                "text_color": "#333333",
+                "text_align": "left",
+                "padding": 0,
+                "background_color": "rgba(0,0,0,0)"
+              },
+              "blocks": {}
+            },
             "tabs_card_price_DCLcD6": {
               "type": "tabs-card-price",
               "settings": {
                 "show_compare": true,
-                "show_discount": false,
-                "alignment": "left"
-              },
-              "blocks": {}
-            },
-            "tabs_card_description_WUx4UT": {
-              "type": "tabs-card-description",
-              "settings": {
-                "description_length": 100
+                "show_discount": true,
+                "alignment": "center"
               },
               "blocks": {}
             },
@@ -332,7 +341,21 @@
               "type": "tabs-card-atc",
               "settings": {
                 "button_style": "secondary",
-                "full_width": true
+                "full_width": true,
+                "button_text_available": "ショッピングバッグに入れる",
+                "button_text_sold_out": "Sold out",
+                "background_color": "#000000",
+                "text_color": "#ffffff",
+                "border_width": 1,
+                "border_radius": 4,
+                "border_color": "#000000",
+                "padding_top": 12,
+                "padding_bottom": 12,
+                "padding_left": 20,
+                "padding_right": 20,
+                "font_size": 14,
+                "font_family": "inherit",
+                "hover_effect": "scale"
               },
               "blocks": {}
             }
@@ -340,8 +363,8 @@
           "block_order": [
             "tabs_card_media_KC9iGe",
             "tabs_card_title_aRBeei",
-            "tabs_card_price_DCLcD6",
             "tabs_card_description_WUx4UT",
+            "tabs_card_price_DCLcD6",
             "tabs_card_atc_pCRhNK"
           ]
         }

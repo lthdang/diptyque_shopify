@@ -1,12 +1,35 @@
 {% liquid
-  assign product = closest.product
+assign product = closest.product
   assign onboarding = false
   if product == blank or product.id == empty
     assign onboarding = true
   endif
 
   assign button_style = block.settings.button_style | default: 'outline'
-  assign full_width = block.settings.full_width | default: true
+  assign full_width   = block.settings.full_width   | default: true
+
+assign btn_text_available = block.settings.button_text_available
+  if btn_text_available == blank
+    assign btn_text_available = 'Add to cart'
+  endif
+
+  assign btn_text_sold_out = block.settings.button_text_sold_out
+  if btn_text_sold_out == blank
+    assign btn_text_sold_out = 'Sold out'
+  endif
+
+  assign bg_color       = block.settings.background_color     | default: 'currentColor'
+  assign text_color     = block.settings.text_color           | default: 'white'
+  assign border_width   = block.settings.border_width         | default: 1
+  assign border_radius  = block.settings.border_radius        | default: 4
+  assign border_color   = block.settings.border_color         | default: 'currentColor'
+  assign padding_top    = block.settings.padding_top          | default: 12
+  assign padding_bottom = block.settings.padding_bottom       | default: 12
+  assign padding_left   = block.settings.padding_left         | default: 20
+  assign padding_right  = block.settings.padding_right        | default: 20
+  assign font_size      = block.settings.font_size            | default: 14
+  assign font_family    = block.settings.font_family          | default: 'inherit'
+  assign hover_effect   = block.settings.hover_effect         | default: 'opacity'
 
   unless onboarding
     assign selected_variant = product.selected_or_first_available_variant
@@ -21,20 +44,40 @@
     {% if product.available %}
       <button
         type="button"
-        class="tabs-card-atc__btn tabs-card-atc__btn--{{ button_style }}"
+        class="tabs-card-atc__btn tabs-card-atc__btn--{{ button_style }} tabs-card-atc__btn--hover-{{ hover_effect }}"
         data-variant-id="{{ selected_variant.id }}"
-        aria-label="{{ 'products.product.add_to_cart' | t }}: {{ product.title | escape }}"
+        aria-label="{{ btn_text_available }}: {{ product.title | escape }}"
+        style="
+          --atc-bg: {{ bg_color }};
+          --atc-color: {{ text_color }};
+          --atc-border-width: {{ border_width }}px;
+          --atc-border-radius: {{ border_radius }}px;
+          --atc-border-color: {{ border_color }};
+          --atc-padding: {{ padding_top }}px {{ padding_right }}px {{ padding_bottom }}px {{ padding_left }}px;
+          --atc-font-size: {{ font_size }}px;
+          --atc-font-family: {{ font_family }};
+        "
       >
-        {{ 'products.product.add_to_cart' | t }}
+        {{ btn_text_available }}
       </button>
     {% else %}
       <button
         type="button"
-        class="tabs-card-atc__btn tabs-card-atc__btn--{{ button_style }}"
+        class="tabs-card-atc__btn tabs-card-atc__btn--{{ button_style }} tabs-card-atc__btn--hover-{{ hover_effect }} tabs-card-atc__btn--disabled"
         disabled
         aria-disabled="true"
+        style="
+          --atc-bg: {{ bg_color }};
+          --atc-color: {{ text_color }};
+          --atc-border-width: {{ border_width }}px;
+          --atc-border-radius: {{ border_radius }}px;
+          --atc-border-color: {{ border_color }};
+          --atc-padding: {{ padding_top }}px {{ padding_right }}px {{ padding_bottom }}px {{ padding_left }}px;
+          --atc-font-size: {{ font_size }}px;
+          --atc-font-family: {{ font_family }};
+        "
       >
-        {{ 'products.product.sold_out' | t }}
+        {{ btn_text_sold_out }}
       </button>
     {% endif %}
   </div>
@@ -47,7 +90,6 @@
       if (!btn || btn.disabled) return;
       e.preventDefault();
 
-      // Read selected variant from parent card or fall back to button's own data
       const card = btn.closest('[data-selected-variant]');
       const variantId = (card && card.dataset.selectedVariant) || btn.dataset.variantId;
       if (!variantId) return;
@@ -101,51 +143,41 @@
   }
 
   .tabs-card-atc__btn {
-    padding: 0.75rem 1.25rem;
-    font-size: 0.875rem;
-    font-family: inherit;
+    display: inline-block;
+    padding: var(--atc-padding, 0.75rem 1.25rem);
+    font-size: var(--atc-font-size, 0.875rem);
+    font-family: var(--atc-font-family, inherit);
     font-weight: 500;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    letter-spacing: 0.03em;
     line-height: 1;
+    cursor: pointer;
+    border: var(--atc-border-width, 1px) solid var(--atc-border-color, currentColor);
+    border-radius: var(--atc-border-radius, 3px);
+    background-color: var(--atc-bg, currentColor);
+    color: var(--atc-color, white);
+    letter-spacing: 0.03em;
+    transition: all 0.2s ease;
   }
 
-  .tabs-card-atc__btn--primary {
-    background-color: currentColor;
-    color: white;
-    border: 1px solid currentColor;
+  /* Hover effects */
+  .tabs-card-atc__btn--hover-opacity:hover {
+    opacity: 0.85;
   }
 
-  .tabs-card-atc__btn--primary:not(:disabled):hover {
-    opacity: 0.8;
-  }
-
-  .tabs-card-atc__btn--secondary {
-    background-color: transparent;
-    color: currentColor;
-    border: 1px solid transparent;
-  }
-
-  .tabs-card-atc__btn--secondary:not(:disabled):hover {
-    text-decoration: underline;
-  }
-
-  .tabs-card-atc__btn--outline {
-    background-color: transparent;
-    color: currentColor;
-    border: 1px solid currentColor;
-  }
-
-  .tabs-card-atc__btn--outline:not(:disabled):hover {
-    background-color: currentColor;
+  .tabs-card-atc__btn--hover-color-change:hover {
+    background-color: color-mix(in srgb, var(--atc-bg) 70%, black);
     color: white;
   }
 
+  .tabs-card-atc__btn--hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Disabled state */
+  .tabs-card-atc__btn--disabled,
   .tabs-card-atc__btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+    pointer-events: none;
   }
 {% endstylesheet %}
 
@@ -157,7 +189,7 @@
     {
       "type": "select",
       "id": "button_style",
-      "label": "Button style",
+      "label": "Button style (base)",
       "options": [
         { "value": "primary", "label": "Primary" },
         { "value": "secondary", "label": "Secondary" },
@@ -170,6 +202,162 @@
       "id": "full_width",
       "label": "Full width button",
       "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Button Text"
+    },
+    {
+      "type": "text",
+      "id": "button_text_available",
+      "label": "Text when available",
+      "default": "Add to cart",
+      "info": "Leave blank to use default translation"
+    },
+    {
+      "type": "text",
+      "id": "button_text_sold_out",
+      "label": "Text when sold out",
+      "default": "Sold out",
+      "info": "Leave blank to use default translation"
+    },
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+
+    {
+      "type": "header",
+      "content": "Border"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border thickness",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Font family",
+      "options": [
+        { "value": "inherit", "label": "Inherit from theme" },
+        { "value": "system-ui, sans-serif", "label": "System default" },
+        { "value": "-apple-system, Roboto, sans-serif", "label": "Modern system" },
+        { "value": "Georgia, serif", "label": "Serif (Georgia)" }
+      ],
+      "default": "inherit"
+    },
+
+    {
+      "type": "header",
+      "content": "Hover Effect"
+    },
+    {
+      "type": "select",
+      "id": "hover_effect",
+      "label": "Hover effect",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "opacity", "label": "Fade (opacity)" },
+        { "value": "color-change", "label": "Color change" },
+        { "value": "scale", "label": "Scale up" }
+      ],
+      "default": "opacity"
     }
   ]
 }
