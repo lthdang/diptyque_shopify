@@ -6,11 +6,28 @@
   endif
 
   assign description_length = block.settings.description_length | default: 100
+
+  assign font_size          = block.settings.font_size          | default: 14
+  assign font_family        = block.settings.font_family        | default: 'inherit'
+  assign text_color         = block.settings.text_color         | default: 'inherit'
+  assign text_align         = block.settings.text_align         | default: 'left'
+  assign padding            = block.settings.padding            | default: 0
+  assign bg_color           = block.settings.background_color   | default: 'transparent'
 %}
 
-<div class="tabs-card-description" {{ block.shopify_attributes }}>
+<div
+  class="tabs-card-description tabs-card-description--align-{{ text_align }}"
+  style="
+    --description-font-size: {{ font_size }}px;
+    --description-font-family: {{ font_family }};
+    --description-color: {{ text_color }};
+    --description-padding: {{ padding }}px;
+    --description-bg: {{ bg_color }};
+  "
+  {{ block.shopify_attributes }}
+>
   {% if onboarding %}
-    <p>Sample product description.</p>
+    <p>Sample product description text goes here. This is a longer sample to show truncation.</p>
   {% elsif product.description != blank %}
     <p>{{ product.description | strip_html | truncate: description_length }}</p>
   {% endif %}
@@ -18,14 +35,22 @@
 
 {% stylesheet %}
   .tabs-card-description {
-    font-size: 0.875rem;
+    font-size: var(--description-font-size, 0.875rem);
+   font-family: var(--font-paragraph--family);
+    color: var(--description-color, inherit);
     line-height: 1.5;
-    opacity: 0.65;
+    background-color: var(--description-bg, transparent);
+    padding: var(--description-padding, 0);
+    border-radius: 4px; /* optional, cho đẹp khi có background */
   }
 
   .tabs-card-description p {
     margin: 0;
   }
+
+  .tabs-card-description--align-left   { text-align: left;   }
+  .tabs-card-description--align-center { text-align: center; }
+  .tabs-card-description--align-right  { text-align: right;  }
 {% endstylesheet %}
 
 {% schema %}
@@ -36,12 +61,78 @@
     {
       "type": "range",
       "id": "description_length",
-      "label": "Description length",
-      "min": 50,
-      "max": 200,
+      "label": "Description length (characters)",
+      "min": 30,
+      "max": 300,
       "step": 10,
       "unit": "ch",
-      "default": 100
+      "default": 100,
+      "info": "Number of characters to show before truncation"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Font family",
+      "options": [
+        { "value": "inherit", "label": "Inherit from theme" },
+        { "value": "system-ui, sans-serif", "label": "System default" },
+        { "value": "-apple-system, Roboto, sans-serif", "label": "Modern system" },
+        { "value": "Georgia, serif", "label": "Serif (Georgia)" },
+        { "value": "'Helvetica Neue', Helvetica, Arial, sans-serif", "label": "Helvetica/Arial" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Layout & Appearance"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Padding (all sides)",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "Inner spacing around the description text"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "transparent"
     }
   ]
 }

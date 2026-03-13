@@ -6,13 +6,35 @@
   endif
 
   assign image_ratio = block.settings.image_ratio | default: '3/4'
-  assign image_fit = block.settings.image_fit | default: 'cover'
+  assign image_fit   = block.settings.image_fit   | default: 'cover'
   assign hover_effect = block.settings.hover_effect | default: 'zoom'
+
+  assign has_secondary = false
+  if product.media.size > 1
+    assign has_secondary = true
+  endif
+
+  assign border_style = block.settings.border_style | default: 'none'
+  assign border_color = block.settings.border_color | default: '#e5e5e5'
+  assign border_width = 0
+  case border_style
+    when 'light'  then assign border_width = 1
+    when 'medium' then assign border_width = 2
+    when 'thick'  then assign border_width = 3
+  endcase
+
+  assign padding = block.settings.padding | default: 0
 %}
 
 <div
-  class="tabs-card-media tabs-card-media--hover-{{ hover_effect }}"
-  style="--image-ratio: {{ image_ratio }}; --image-fit: {{ image_fit }};"
+  class="tabs-card-media{% if hover_effect == 'secondary' and has_secondary %} tabs-card-media--hover-secondary{% elsif hover_effect == 'zoom' %} tabs-card-media--hover-zoom{% endif %}"
+  style="
+    --image-ratio: {{ image_ratio }};
+    --image-fit: {{ image_fit }};
+    border: {{ border_width }}px solid {{ border_color }};
+    padding: {{ padding }}px;
+    box-sizing: border-box;
+  "
   {{ block.shopify_attributes }}
 >
   {% if onboarding %}
@@ -52,7 +74,7 @@
     height: 100%;
   }
 
-  /* Hover: zoom */
+  /* Zoom effect */
   .tabs-card-media--hover-zoom img:first-of-type {
     transition: transform 0.4s ease;
   }
@@ -61,7 +83,7 @@
     transform: scale(1.06);
   }
 
-  /* Hover: secondary image swap */
+  /* Secondary image swap – chỉ áp dụng khi có secondary */
   .tabs-card-media__secondary-img {
     position: absolute;
     inset: 0;
@@ -118,7 +140,45 @@
         { "value": "zoom", "label": "Zoom" },
         { "value": "secondary", "label": "Secondary image" }
       ],
-      "default": "zoom"
+      "default": "zoom",
+      "info": "Secondary image only works if product has 2+ images"
+    },
+    {
+      "type": "header",
+      "content": "Borders"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Border style",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "light", "label": "Light (1px)" },
+        { "value": "medium", "label": "Medium (2px)" },
+        { "value": "thick", "label": "Thick (3px)" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Inner padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "Space between image and card border"
     }
   ]
 }
