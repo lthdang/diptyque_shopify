@@ -59,6 +59,7 @@
         autocapitalize="off"
         autocomplete="email"
         placeholder="{{ block_settings.input_placeholder | escape }}"
+        required
         novalidate
         style="max-width: {{ block_settings.input_width }}px;"
       >
@@ -80,6 +81,8 @@
         <button
           type="submit"
           class="signup-button"
+          disabled
+          aria-disabled="true"
           style="
             --btn-bg: {{ block_settings.button_bg_color }};
             --btn-color: {{ block_settings.button_text_color }};
@@ -172,6 +175,17 @@
     opacity: 0.9;
   }
 
+  .signup-button:disabled,
+  .signup-button[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .signup-button:disabled::after,
+  .signup-button[aria-disabled='true']::after {
+    width: 0;
+  }
+
   .signup-error {
     margin: 8px 0 0;
     color: #e74c3c;
@@ -244,11 +258,12 @@
 
     const form = root.querySelector('form');
     const input = root.querySelector('.signup-input');
+    const submitButton = root.querySelector('.signup-button');
     const requiredError = root.querySelector('.signup-required-error');
     const invalidError = root.querySelector('.signup-invalid-error');
     const stateWrap = root.querySelector('.signup-state') || form;
 
-    if (!input || !form) return;
+    if (!input || !form || !submitButton) return;
 
     let hasBeenFocused = false;
 
@@ -261,6 +276,12 @@
     const hideErrors = () => {
       requiredError.style.display = 'none';
       invalidError.style.display = 'none';
+    };
+
+    const updateButtonState = () => {
+      const hasValue = input.value.trim() !== '';
+      submitButton.disabled = !hasValue;
+      submitButton.setAttribute('aria-disabled', hasValue ? 'false' : 'true');
     };
 
     const validateInput = () => {
@@ -293,8 +314,17 @@
     });
 
     input.addEventListener('input', () => {
+      updateButtonState();
+
       if (hasBeenFocused) {
         validateInput();
+      }
+    });
+
+    submitButton.addEventListener('click', (e) => {
+      if (submitButton.disabled) {
+        e.preventDefault();
+        input.focus();
       }
     });
 
@@ -304,6 +334,8 @@
         input.focus();
       }
     });
+
+    updateButtonState();
   })();
 </script>
 
