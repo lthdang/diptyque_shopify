@@ -1,0 +1,739 @@
+{% assign block_settings = block.settings %}
+{% assign form_id = block.id | prepend: 'AdvancedEmailSignup-' %}
+
+{% capture terms_link %}
+  {% if block_settings.terms_url != blank %}
+    <a href="{{ block_settings.terms_url }}">{{ 'Terms of Service' }}</a>
+  {% else %}
+    {{ 'Terms of Service' }}
+  {% endif %}
+{% endcapture %}
+
+{% capture privacy_link %}
+  {% if block_settings.privacy_url != blank %}
+    <a href="{{ block_settings.privacy_url }}">{{ 'Privacy Policy' }}</a>
+  {% else %}
+    {{ 'Privacy Policy' }}
+  {% endif %}
+{% endcapture %}
+
+{% assign policy_content = block_settings.policy_text | replace: '[terms]', terms_link | replace: '[privacy]', privacy_link %}
+
+<div
+  id="AdvancedEmailSignup-{{ block.id }}"
+  class="advanced-email-signup"
+  style="
+    --heading-color: {{ block_settings.heading_color }};
+    --padding-top: {{ block_settings.padding_top }}px;
+    --padding-bottom: {{ block_settings.padding_bottom }}px;
+    --padding-left: {{ block_settings.padding_left }}px;
+    --padding-right: {{ block_settings.padding_right }}px;
+    --policy-padding-top: {{ block_settings.policy_padding_top }}px;
+    --policy-padding-bottom: {{ block_settings.policy_padding_bottom }}px;
+    --policy-padding-left: {{ block_settings.policy_padding_left }}px;
+    --policy-padding-right: {{ block_settings.policy_padding_right }}px;
+    --gap: {{ block_settings.gap }}px;
+    --policy-font-size: {{ block_settings.policy_font_size }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="advanced-email-signup__inner align-{{ block_settings.form_alignment }}">
+    {% if block_settings.heading != blank %}
+      <div class="advanced-email-signup__heading {{ block_settings.heading_preset }} align-{{ block_settings.heading_alignment }}">
+        {{ block_settings.heading | escape }}
+      </div>
+    {% endif %}
+
+    {%- form 'customer', class: 'signup-form', id: form_id -%}
+      <input type="hidden" name="contact[id]" value="{{ form_id }}">
+
+      <label for="AdvancedEmailInput-{{ block.id }}" class="visually-hidden">
+        {{ 'blocks.email_signup.label' | t }}
+      </label>
+      <input
+        id="AdvancedEmailInput-{{ block.id }}"
+        class="signup-input align-{{ block_settings.input_text_alignment }}"
+        type="email"
+        name="contact[email]"
+        autocorrect="off"
+        autocapitalize="off"
+        autocomplete="email"
+        placeholder="{{ block_settings.input_placeholder | escape }}"
+        novalidate
+        style="max-width: {{ block_settings.input_width }}px;"
+      >
+
+      <div class="signup-error-wrap" aria-live="polite">
+        <p class="signup-error signup-required-error" style="display: none;">
+          {{ block_settings.error_required_text | escape }}
+        </p>
+        <p class="signup-error signup-invalid-error" style="display: none;">
+          {{ block_settings.error_invalid_text | escape | default: '有効なメールアドレスを入力してください' }}
+        </p>
+      </div>
+
+      <div class="signup-policy rte align-{{ block_settings.form_alignment }}">
+        {{ policy_content }}
+      </div>
+
+      <div class="signup-button-wrap align-{{ block_settings.button_alignment }}">
+        <button
+          type="submit"
+          class="signup-button"
+          style="
+            --btn-bg: {{ block_settings.button_bg_color }};
+            --btn-color: {{ block_settings.button_text_color }};
+            --btn-border-width: {{ block_settings.button_border_width }}px;
+            --btn-border-radius: {{ block_settings.button_border_radius }}px;
+            --btn-border-color: {{ block_settings.button_border_color }};
+            --btn-padding-top: {{ block_settings.button_padding_top }}px;
+            --btn-padding-right: {{ block_settings.button_padding_right }}px;
+            --btn-padding-bottom: {{ block_settings.button_padding_bottom }}px;
+            --btn-padding-left: {{ block_settings.button_padding_left }}px;
+            --btn-font-size: {{ block_settings.button_font_size }}px;
+            --btn-font-family: {{ block_settings.button_font_family }};
+          "
+        >
+          {{ block_settings.button_label | escape }}
+        </button>
+      </div>
+    {%- endform -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .advanced-email-signup {
+    padding: var(--padding-top) var(--padding-right) var(--padding-bottom) var(--padding-left);
+    width: 100%;
+  }
+
+  .advanced-email-signup__inner {
+    width: min(100%, 520px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap, 10px);
+  }
+
+  .signup-policy {
+    padding-top: var(--policy-padding-top, 0px) !important;
+    padding-right: var(--policy-padding-right, 0px) !important;
+    padding-bottom: var(--policy-padding-bottom, 0px) !important;
+    padding-left: var(--policy-padding-left, 0px) !important;
+    font-size: var(--policy-font-size, 0.9rem);
+    line-height: 1.5;
+  }
+
+  .signup-input {
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 12px 16px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 0.2);
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  .signup-button {
+    min-height: 44px;
+    min-width: 140px;
+    padding-top: var(--btn-padding-top, 10px) !important;
+    padding-right: var(--btn-padding-right, 22px) !important;
+    padding-bottom: var(--btn-padding-bottom, 10px) !important;
+    padding-left: var(--btn-padding-left, 22px) !important;
+    font-size: var(--btn-font-size, 1rem);
+    font-family: var(--btn-font-family, inherit);
+    font-weight: 500;
+    background-color: var(--btn-bg, #000);
+    color: var(--btn-color, #fff);
+    border: var(--btn-border-width, 1px) solid var(--btn-border-color, #000);
+    border-radius: var(--btn-border-radius, 0px) !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .signup-button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: var(--btn-color, #fff);
+    transition: width 0.3s ease;
+  }
+
+  .signup-button:hover::after {
+    width: 100%;
+  }
+
+  .signup-button:hover {
+    opacity: 0.9;
+  }
+
+  .signup-error {
+    margin: 8px 0 0;
+    color: #e74c3c;
+    font-size: 0.85rem;
+  }
+
+  .signup-policy {
+    margin: 0;
+  }
+
+  .signup-policy p {
+    margin: 0;
+  }
+
+  .signup-policy a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .signup-button-wrap {
+    display: flex;
+  }
+
+  .signup-button {
+    white-space: nowrap;
+  }
+
+  .signup-success {
+    margin: 4px 0 0;
+  }
+
+  .align-left {
+    text-align: left;
+    justify-content: flex-start;
+    margin-inline: 0 auto;
+  }
+
+  .align-center {
+    text-align: center;
+    justify-content: center;
+    margin-inline: auto;
+  }
+
+  .align-right {
+    text-align: right;
+    justify-content: flex-end;
+    margin-inline: auto 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .advanced-email-signup__inner {
+      width: 100%;
+    }
+
+    .signup-button {
+      width: 100%;
+    }
+
+    .signup-button-wrap.align-left,
+    .signup-button-wrap.align-center,
+    .signup-button-wrap.align-right {
+      justify-content: stretch;
+    }
+  }
+{% endstylesheet %}
+<script>
+  (() => {
+    const root = document.getElementById('AdvancedEmailSignup-{{ block.id }}');
+    if (!root) return;
+
+    const form = root.querySelector('form');
+    const input = root.querySelector('.signup-input');
+    const requiredError = root.querySelector('.signup-required-error');
+    const invalidError = root.querySelector('.signup-invalid-error');
+    const stateWrap = root.querySelector('.signup-state') || form;
+
+    if (!input || !form) return;
+
+    let hasBeenFocused = false;
+
+    const showError = (type) => {
+      requiredError.style.display = type === 'required' ? 'block' : 'none';
+      invalidError.style.display = type === 'invalid' ? 'block' : 'none';
+      stateWrap.classList.add('signup-active');
+    };
+
+    const hideErrors = () => {
+      requiredError.style.display = 'none';
+      invalidError.style.display = 'none';
+    };
+
+    const validateInput = () => {
+      const value = input.value.trim();
+      if (value === '') {
+        showError('required');
+        return false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        showError('invalid');
+        return false;
+      }
+      hideErrors();
+      return true;
+    };
+
+    input.addEventListener('focus', () => {
+      if (!hasBeenFocused) {
+        hasBeenFocused = true;
+        if (input.value.trim() === '') {
+          showError('required');
+        }
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      if (hasBeenFocused && input.value.trim() !== '') {
+        validateInput();
+      }
+    });
+
+    input.addEventListener('input', () => {
+      if (hasBeenFocused) {
+        validateInput();
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      if (!validateInput()) {
+        e.preventDefault();
+        input.focus();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Advanced email signup",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Creates customer profiles for newsletter subscribers."
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "Newsletter"
+    },
+    {
+      "type": "select",
+      "id": "heading_preset",
+      "label": "Heading style",
+      "options": [
+        {
+          "value": "",
+          "label": "Default"
+        },
+        {
+          "value": "paragraph",
+          "label": "Paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between elements",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 10,
+      "info": "Khoảng cách giữa heading, input, error, policy, button"
+    },
+    {
+      "type": "range",
+      "id": "input_width",
+      "label": "Input email width",
+      "min": 100,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 100,
+      "info": "Chiều rộng tối đa của input (100% nếu để 100px)"
+    },
+    {
+      "type": "select",
+      "id": "form_alignment",
+      "label": "Form alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Input"
+    },
+    {
+      "type": "text",
+      "id": "input_placeholder",
+      "label": "Input placeholder",
+      "default": "メールアドレスを入力する"
+    },
+    {
+      "type": "select",
+      "id": "input_text_alignment",
+      "label": "Input text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Policy text"
+    },
+    {
+      "type": "textarea",
+      "id": "policy_text",
+      "label": "Policy text",
+      "default": "こちらのフォームを送信することで、[terms] と [privacy] に同意したものとみなされます。"
+    },
+    {
+      "type": "url",
+      "id": "terms_url",
+      "label": "Terms of Service URL"
+    },
+    {
+      "type": "url",
+      "id": "privacy_url",
+      "label": "Privacy Policy URL"
+    },
+    {
+      "type": "range",
+      "id": "policy_font_size",
+      "label": "Policy font size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "policy_padding_top",
+      "label": "Policy padding top",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "policy_padding_bottom",
+      "label": "Policy padding bottom",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "policy_padding_left",
+      "label": "Policy padding left",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "policy_padding_right",
+      "label": "Policy padding right",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "登録する"
+    },
+    {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "Button alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Border thickness",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+     "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "button_padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "button_font_family",
+      "label": "Font family",
+      "options": [
+        { "value": "inherit", "label": "Inherit" },
+        { "value": "system-ui, sans-serif", "label": "System" },
+        { "value": "Arial, sans-serif", "label": "Arial" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "header",
+      "content": "Error"
+    },
+    {
+      "type": "text",
+      "id": "error_required_text",
+      "label": "Required field error text",
+      "default": "これは必須項目です。"
+    },
+    {
+      "type": "text",
+      "id": "error_invalid_text",
+      "label": "Invalid email error text",
+      "default": "有効なメールアドレスを入力してください"
+    }
+
+  ],
+  "presets": [
+    {
+      "name": "Advanced email signup",
+      "category": "Forms"
+    }
+  ]
+}
+{% endschema %}
