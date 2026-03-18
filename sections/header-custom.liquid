@@ -20,7 +20,6 @@
     --header-custom-title-justify: {{ title_justify }};
     --header-custom-title-letter-spacing: {{ section.settings.title_letter_spacing }}px;
     --header-custom-title-weight: {{ section.settings.title_font_weight }};
-    --header-custom-dropdown-columns: {{ section.settings.dropdown_columns }};
   "
 >
   <div class="header-custom__backdrop" aria-hidden="true"></div>
@@ -70,11 +69,22 @@
                   {% endif %}
 
                   {% if has_children %}
-                    <div id="dropdown-{{ block.id }}" class="header-custom__dropdown" role="region" aria-label="{{ block.settings.title | escape }}">
+                    {%- assign dropdown_cols = block.settings.columns | default: 4 -%}
+                    {%- assign dropdown_gap_col = block.settings.column_gap | default: 28 -%}
+                    {%- assign dropdown_gap_row = block.settings.row_gap | default: 40 -%}
+                    <div
+                      id="dropdown-{{ block.id }}"
+                      class="header-custom__dropdown{% if block.settings.layout_type == 'full' %} header-custom__dropdown--layout-full{% endif %}"
+                      role="region"
+                      aria-label="{{ block.settings.title | escape }}"
+                    >
                       <div class="header-custom__dropdown-inner">
-                        <div class="header-custom__dropdown-grid">
+                        <div
+                          class="header-custom__dropdown-grid{% if block.settings.center_content %} header-custom__dropdown-grid--centered{% endif %}"
+                          style="--columns: {{ dropdown_cols }}; --column-gap: {{ dropdown_gap_col }}px; --row-gap: {{ dropdown_gap_row }}px;"
+                        >
 
-                          {%- assign dropdown_cols = section.settings.dropdown_columns | default: 4 -%}
+                          {%- comment %}— columns driven by block.settings.columns —{% endcomment %}
                           {% for col in (1..dropdown_cols) %}
 
                             {%- comment %}— Skip empty columns (bonus: hide empty columns) —{% endcomment %}
@@ -564,8 +574,19 @@
 
   .header-custom__dropdown-grid {
     display: grid;
-    grid-template-columns: repeat(var(--header-custom-dropdown-columns), 1fr);
-    gap: 2.5rem 1.75rem;
+    grid-template-columns: repeat(var(--columns, 4), 1fr);
+    column-gap: var(--column-gap, 1.75rem);
+    row-gap: var(--row-gap, 2.5rem);
+  }
+
+  .header-custom__dropdown-grid--centered {
+    margin-inline: auto;
+    max-width: max-content;
+  }
+
+  .header-custom__dropdown--layout-full > .header-custom__dropdown-inner {
+    max-width: 100%;
+    padding-inline: 2rem;
   }
 
   .header-custom__mega-column {
@@ -832,7 +853,7 @@
     }
 
     .header-custom__dropdown-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(min(var(--columns, 4), 2), minmax(0, 1fr));
     }
   }
 
@@ -1082,15 +1103,6 @@
       "content": "Dropdown settings"
     },
     {
-      "type": "range",
-      "id": "dropdown_columns",
-      "label": "Desktop columns (2–4)",
-      "min": 2,
-      "max": 4,
-      "step": 1,
-      "default": 4
-    },
-    {
       "type": "text",
       "id": "navigation_label",
       "label": "Navigation aria label",
@@ -1159,6 +1171,57 @@
           "id": "link",
           "label": "Direct link",
           "info": "If set and no matching content blocks exist, clicking the title navigates here instead of opening a dropdown."
+        },
+        {
+          "type": "header",
+          "content": "Dropdown layout"
+        },
+        {
+          "type": "range",
+          "id": "columns",
+          "label": "Columns for this Navigation Group",
+          "info": "Each menu can have a different column layout.",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "select",
+          "id": "layout_type",
+          "label": "Layout type",
+          "options": [
+            { "value": "grid", "label": "Grid" },
+            { "value": "full", "label": "Full width" }
+          ],
+          "default": "grid"
+        },
+        {
+          "type": "range",
+          "id": "column_gap",
+          "label": "Column gap",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 28
+        },
+        {
+          "type": "range",
+          "id": "row_gap",
+          "label": "Row gap",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 40
+        },
+        {
+          "type": "checkbox",
+          "id": "center_content",
+          "label": "Center grid content",
+          "info": "Horizontally centers the column grid when columns don't fill the full width.",
+          "default": false
         }
       ]
     },
