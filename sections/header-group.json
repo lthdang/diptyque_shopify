@@ -26,19 +26,65 @@
           },
           "blocks": {}
         },
-        "header-menu": {
+        "header-menu-main": {
           "type": "_header-menu",
           "disabled": true,
           "static": true,
           "settings": {
             "menu": "main-menu",
             "color_scheme": "",
-            "type_font_primary_size": "0.875rem",
-            "menu_font_style": "inverse_large",
-            "type_font_primary_link": "body",
+            "type_font_primary_size": "1rem",
+            "menu_font_style": "inverse",
+            "type_font_primary_link": "heading",
             "type_case_primary_link": "none",
-            "menu_style": "featured_collections",
-            "featured_products_aspect_ratio": "1 / 1",
+            "menu_style": "collection_images",
+            "featured_products_aspect_ratio": "4 / 5",
+            "featured_collections_aspect_ratio": "16 / 9",
+            "image_border_radius": 0,
+            "navigation_bar": false,
+            "color_scheme_navigation_bar": "",
+            "drawer_accordion": false,
+            "drawer_accordion_expand_first": false,
+            "drawer_dividers": false
+          },
+          "blocks": {}
+        },
+        "header-menu-mobile": {
+          "type": "_header-menu",
+          "disabled": true,
+          "static": true,
+          "settings": {
+            "menu": "main-menu",
+            "color_scheme": "",
+            "type_font_primary_size": "1rem",
+            "menu_font_style": "inverse",
+            "type_font_primary_link": "heading",
+            "type_case_primary_link": "none",
+            "menu_style": "collection_images",
+            "featured_products_aspect_ratio": "4 / 5",
+            "featured_collections_aspect_ratio": "16 / 9",
+            "image_border_radius": 0,
+            "navigation_bar": false,
+            "color_scheme_navigation_bar": "",
+            "drawer_accordion": false,
+            "drawer_accordion_expand_first": false,
+            "drawer_dividers": false
+          },
+          "blocks": {}
+        },
+        "header-menu-nav": {
+          "type": "_header-menu",
+          "disabled": true,
+          "static": true,
+          "settings": {
+            "menu": "main-menu",
+            "color_scheme": "",
+            "type_font_primary_size": "1rem",
+            "menu_font_style": "inverse",
+            "type_font_primary_link": "heading",
+            "type_case_primary_link": "none",
+            "menu_style": "collection_images",
+            "featured_products_aspect_ratio": "4 / 5",
             "featured_collections_aspect_ratio": "16 / 9",
             "image_border_radius": 0,
             "navigation_bar": false,
@@ -85,9 +131,902 @@
         "enable_transparent_header_collection": false,
         "collection_color_scheme": "default"
       }
+    },
+    "header_custom_JabJkR": {
+      "type": "header-custom",
+      "blocks": {
+        "nav_group_CP8CqQ": {
+          "type": "nav_group",
+          "name": "WHAT'S NEW",
+          "settings": {
+            "title": "WHAT'S NEW",
+            "group_id": "1",
+            "link": ""
+          }
+        },
+        "group_content_pmqXcN": {
+          "type": "group_content",
+          "name": "WHAT'S NEW (column 1)",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "text_item_Ea8tT9": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "text": "<p>3月19日登場</p>",
+            "text_color": "#717171",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "left",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "link_item_Gbjch9": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "link_text": "各都市限定 シティキャンドル",
+            "link_url": "/collections/new",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_XegV9J": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "link_text": "限定キャンドル フルール ド スリジエ (サクラ)",
+            "link_url": "/collections/best-sellers",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_hVwTtA": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "link_text": "オンラインストア フレグランス刻印サービス",
+            "link_url": "/collections/best-sellers",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_RiEcDr": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "link_text": "オルフェオン 新作コレクション",
+            "link_url": "/collections/best-sellers",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_BqRcpq": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "link_text": "公式オンラインストア特典",
+            "link_url": "/collections/best-sellers",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_xfWm4q": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 1,
+            "link_text": "最新情報をみる",
+            "link_url": "/collections/best-sellers",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_HLTR3x": {
+          "type": "group_content",
+          "name": "What's new (column 2)",
+          "settings": {
+            "group_id": "1",
+            "column": 2,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_7mGPCD": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 2,
+            "link_text": "プレミアム コレクション",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_Whejn7": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 2,
+            "link_text": "レ ゼサンス ドゥ ディプティック (オードパルファン)",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_NgjLzk": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 2,
+            "link_text": "レ モンド ドゥ ディプティック (リフィラブルキャンドル)",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_wWWNVU": {
+          "type": "group_content",
+          "name": "What's new (column 3)",
+          "settings": {
+            "group_id": "1",
+            "column": 3,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "image_item_REQVAL": {
+          "type": "image_item",
+          "settings": {
+            "group_id": "1",
+            "column": 3,
+            "image": "shopify://shop_images/FLEUR-DE-CERISIER-SPRING-DROP_2026_VISUEL_COUVERCLE_RVB_4080x2295_DIPTYQUE.avif",
+            "image_link": ""
+          }
+        },
+        "text_item_axKQJn": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "1",
+            "column": 3,
+            "text": "<p>春のきらめき</p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "text_item_7L699g": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "1",
+            "column": 3,
+            "text": "<p>Fleur de Cerisier（フルール ド スリジエ）のキャンドルが咲き誇ります。儚くも美しい瞬間を、限定版キャンドルで祝福。<br/></p>",
+            "text_color": "#717171",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "link_item_Rdxmqe": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 3,
+            "link_text": "詳細をみる",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "center",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_NHtXRc": {
+          "type": "group_content",
+          "name": "What's new (column 4)",
+          "settings": {
+            "group_id": "1",
+            "column": 4,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "image_item_meJCMP": {
+          "type": "image_item",
+          "settings": {
+            "group_id": "1",
+            "column": 4,
+            "image": "shopify://shop_images/fleur-de-cerisier-spring-drop_2026_visuel_multi-produits_rvb_2025x1518_diptyque__1.avif",
+            "image_link": ""
+          }
+        },
+        "text_item_dDiGGL": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "1",
+            "column": 4,
+            "text": "<p>春のキャンドル</p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "text_item_YWpmb8": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "1",
+            "column": 4,
+            "text": "<p>咲き誇る庭園のフレッシュな香り。Fleur de Cerisier（フルール ド スリジエ）、Géranium Rosa（ゼラニウム ローザ）、そしてGardénia（ガーデニア）。<br/><br/></p>",
+            "text_color": "#717171",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "link_item_TgzQyg": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "1",
+            "column": 4,
+            "link_text": "コレクションをみる",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "center",
+            "remove_underline": false,
+            "hover_effect": "underline",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "nav_group_PVLP9Y": {
+          "type": "nav_group",
+          "name": "ギフト",
+          "settings": {
+            "title": "ギフト",
+            "group_id": "2",
+            "link": ""
+          }
+        },
+        "group_content_93VrTR": {
+          "type": "group_content",
+          "name": "ギフト (column 1)",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_dHwrAY": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "link_text": "数量限定 オーローズ ギフトセット",
+            "link_url": "/collections/fragrance",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_FcPU88": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "link_text": "オンラインストア フレグランス刻印サービス",
+            "link_url": "/collections/fragrance",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_mDdFnH": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "link_text": "理想の贈り物が見つかるギフトファインダー",
+            "link_url": "/collections/fragrance",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_VDjwdk": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "link_text": "ベストセレクション",
+            "link_url": "/collections/fragrance",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_a3AVCy": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "link_text": "会員限定特典",
+            "link_url": "/collections/fragrance",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_xbEYcB": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 1,
+            "link_text": "ギフトを探す",
+            "link_url": "/collections/fragrance",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 10,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_3fJJzD": {
+          "type": "group_content",
+          "name": "ギフト (column 2)",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_GygiqT": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "カテゴリー",
+            "link_url": "/collections/home",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "★",
+            "icon_after": ""
+          }
+        },
+        "link_item_3PTGhc": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "コフレ",
+            "link_url": "/collections/home",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_qdim3x": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "フレグランス",
+            "link_url": "/collections/home",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_afUxwh": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "キャンドル＆ホーム",
+            "link_url": "/collections/home",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_XhaRDz": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "ボディケア",
+            "link_url": "/collections/home",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_x3bqJ4": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "デコレーション",
+            "link_url": "/collections/home",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_K4GG33": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 2,
+            "link_text": "すべてみる",
+            "link_url": "/collections/home",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 10,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_mLXncc": {
+          "type": "group_content",
+          "name": "ギフト (column 3)",
+          "settings": {
+            "group_id": "2",
+            "column": 3,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_3mPWMV": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 3,
+            "link_text": "ギフトガイド",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_B3zGnN": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 3,
+            "link_text": "ささやかな心遣い",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_at8cQY": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 3,
+            "link_text": "特別なギフト",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_YXF4jn": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 3,
+            "link_text": "独創的なギフト",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_kApUne": {
+          "type": "group_content",
+          "name": "ギフト (column 4)",
+          "settings": {
+            "group_id": "2",
+            "column": 4,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "image_item_aEWABV": {
+          "type": "image_item",
+          "settings": {
+            "group_id": "2",
+            "column": 4,
+            "image": "shopify://shop_images/GIFT_GOLD_SELECTION_2026_VISUEL_MIXED_CATEGORIE_COLLECTION_2025_x_1518px_DIPTYQUE.avif",
+            "image_link": ""
+          }
+        },
+        "text_item_pFGCK8": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "2",
+            "column": 4,
+            "text": "<p>特別なギフト</p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "text_item_Ukagdn": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "2",
+            "column": 4,
+            "text": "<p>フレグランス、キャンドルホルダー、砂時計型ディフューザー… ゴールドの輝きをまとった、香り豊かなデコレーションオブジェの特別なセレクション。ギフトとして、またはご自分へのご褒美に。<br/></p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "link_item_HLWfKX": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 4,
+            "link_text": "セレクションをみる",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "underline",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        }
+      },
+      "block_order": [
+        "nav_group_CP8CqQ",
+        "group_content_pmqXcN",
+        "text_item_Ea8tT9",
+        "link_item_Gbjch9",
+        "link_item_XegV9J",
+        "link_item_hVwTtA",
+        "link_item_RiEcDr",
+        "link_item_BqRcpq",
+        "link_item_xfWm4q",
+        "group_content_HLTR3x",
+        "link_item_7mGPCD",
+        "link_item_Whejn7",
+        "link_item_NgjLzk",
+        "group_content_wWWNVU",
+        "image_item_REQVAL",
+        "text_item_axKQJn",
+        "text_item_7L699g",
+        "link_item_Rdxmqe",
+        "group_content_NHtXRc",
+        "image_item_meJCMP",
+        "text_item_dDiGGL",
+        "text_item_YWpmb8",
+        "link_item_TgzQyg",
+        "nav_group_PVLP9Y",
+        "group_content_93VrTR",
+        "link_item_dHwrAY",
+        "link_item_FcPU88",
+        "link_item_mDdFnH",
+        "link_item_VDjwdk",
+        "link_item_a3AVCy",
+        "link_item_xbEYcB",
+        "group_content_3fJJzD",
+        "link_item_GygiqT",
+        "link_item_3PTGhc",
+        "link_item_qdim3x",
+        "link_item_afUxwh",
+        "link_item_XhaRDz",
+        "link_item_x3bqJ4",
+        "link_item_K4GG33",
+        "group_content_mLXncc",
+        "link_item_3mPWMV",
+        "link_item_B3zGnN",
+        "link_item_at8cQY",
+        "link_item_YXF4jn",
+        "group_content_kApUne",
+        "image_item_aEWABV",
+        "text_item_pFGCK8",
+        "text_item_Ukagdn",
+        "link_item_HLWfKX"
+      ],
+      "name": "Header custom",
+      "settings": {
+        "title_font_size": 14,
+        "title_font_family": "heading",
+        "title_color": "#000000",
+        "title_padding_y": 14,
+        "title_padding_x": 16,
+        "title_alignment": "center",
+        "title_letter_spacing": 0,
+        "title_font_weight": "400",
+        "dropdown_columns": 4,
+        "navigation_label": "Main navigation",
+        "section_width": "full-width",
+        "color_scheme": "",
+        "show_search": false,
+        "show_account": false,
+        "show_cart": false
+      }
     }
   },
   "order": [
-    "header_section"
+    "header_section",
+    "header_custom_JabJkR"
   ]
 }
