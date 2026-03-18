@@ -114,8 +114,33 @@
                                   {% if child.settings.group_id != blank and child.settings.group_id == group_id and child_col == col and child.type != 'group_content' and child.type != 'nav_group' %}
                                     {% case child.type %}
                                       {% when 'link_item' %}
+                                        {%- assign lnk_decoration = 'none' -%}
+                                        {%- unless child.settings.remove_underline -%}
+                                          {%- assign lnk_decoration = 'underline' -%}
+                                        {%- endunless -%}
                                         <div class="header-custom__mega-item header-custom__mega-item--link" {{ child.shopify_attributes }}>
-                                          <a href="{{ child.settings.link_url }}" class="header-custom__mega-link">{{ child.settings.link_text | escape }}</a>
+                                          <a
+                                            href="{{ child.settings.link_url }}"
+                                            class="header-custom__mega-link custom-link-effect-{{ child.settings.hover_effect | default: 'underline' }}"
+                                            style="
+                                              --hover-color: {{ child.settings.hover_color | default: 'currentColor' }};
+                                              color: {{ child.settings.text_color | default: 'inherit' }};
+                                              font-size: {{ child.settings.font_size | default: 14 }}px;
+                                              font-weight: {{ child.settings.font_weight | default: '400' }};
+                                              font-family: var(--font-{{ child.settings.font_family | default: 'body' }}--family);
+                                              text-align: {{ child.settings.alignment | default: 'left' }};
+                                              text-decoration: {{ lnk_decoration }};
+                                              letter-spacing: {{ child.settings.letter_spacing | default: 0 }}px;
+                                            "
+                                          >
+                                            {%- if child.settings.icon_before != blank -%}
+                                              <span class="header-custom__mega-link-icon header-custom__mega-link-icon--before" aria-hidden="true">{{ child.settings.icon_before }}</span>
+                                            {%- endif -%}
+                                            {{- child.settings.link_text | escape -}}
+                                            {%- if child.settings.icon_after != blank -%}
+                                              <span class="header-custom__mega-link-icon header-custom__mega-link-icon--after" aria-hidden="true">{{ child.settings.icon_after }}</span>
+                                            {%- endif -%}
+                                          </a>
                                         </div>
                                       {% when 'image_item' %}
                                         {% if child.settings.image %}
@@ -474,18 +499,50 @@
   }
 
   .header-custom__mega-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
     color: rgb(var(--color-foreground-rgb));
     text-decoration: none;
     font-size: 0.95rem;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, opacity 0.2s ease;
     opacity: 0.9;
+    position: relative;
   }
 
   .header-custom__mega-link:hover {
-    color: rgb(var(--color-foreground-rgb));
+    color: var(--hover-color, rgb(var(--color-foreground-rgb)));
     opacity: 1;
+  }
+
+  /* Hover effects */
+  .custom-link-effect-underline:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  .custom-link-effect-fade:hover {
+    opacity: 0.55;
+  }
+
+  .custom-link-effect-slide::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.25s ease;
+  }
+
+  .custom-link-effect-slide:hover::after {
+    width: 100%;
+  }
+
+  .header-custom__mega-link-icon {
+    font-style: normal;
+    line-height: 1;
   } 
 
   .header-custom__mega-image-wrapper {
@@ -1178,6 +1235,115 @@
           "type": "url",
           "id": "link_url",
           "label": "Link URL"
+        },
+        {
+          "type": "header",
+          "content": "Text style"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "hover_color",
+          "label": "Hover text color",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Font size",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "Font weight",
+          "options": [
+            { "value": "300", "label": "Light (300)" },
+            { "value": "400", "label": "Normal (400)" },
+            { "value": "500", "label": "Medium (500)" },
+            { "value": "600", "label": "Semi-bold (600)" },
+            { "value": "700", "label": "Bold (700)" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "select",
+          "id": "font_family",
+          "label": "Font family",
+          "options": [
+            { "value": "heading", "label": "Heading" },
+            { "value": "body", "label": "Body" },
+            { "value": "accent", "label": "Accent" }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "range",
+          "id": "letter_spacing",
+          "label": "Letter spacing",
+          "min": -2,
+          "max": 10,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "checkbox",
+          "id": "remove_underline",
+          "label": "Remove underline",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Hover effect"
+        },
+        {
+          "type": "select",
+          "id": "hover_effect",
+          "label": "Hover effect",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "underline", "label": "Underline" },
+            { "value": "fade", "label": "Fade" },
+            { "value": "slide", "label": "Slide underline" }
+          ],
+          "default": "underline"
+        },
+        {
+          "type": "header",
+          "content": "Icons (optional)"
+        },
+        {
+          "type": "text",
+          "id": "icon_before",
+          "label": "Icon before link text",
+          "info": "Paste an emoji, symbol, or single character (e.g. \"→\", \"★\")"
+        },
+        {
+          "type": "text",
+          "id": "icon_after",
+          "label": "Icon after link text",
+          "info": "Paste an emoji, symbol, or single character (e.g. \"→\", \"★\")"
         }
       ]
     },
