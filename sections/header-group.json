@@ -141,7 +141,12 @@
           "settings": {
             "title": "WHAT'S NEW",
             "group_id": "1",
-            "link": ""
+            "link": "",
+            "columns": 4,
+            "layout_type": "grid",
+            "column_gap": 28,
+            "row_gap": 40,
+            "center_content": false
           }
         },
         "group_content_pmqXcN": {
@@ -507,7 +512,12 @@
           "settings": {
             "title": "ギフト",
             "group_id": "2",
-            "link": ""
+            "link": "",
+            "columns": 5,
+            "layout_type": "grid",
+            "column_gap": 28,
+            "row_gap": 40,
+            "center_content": false
           }
         },
         "group_content_93VrTR": {
@@ -952,6 +962,1262 @@
             "icon_before": "",
             "icon_after": ""
           }
+        },
+        "group_content_RzkgFj": {
+          "type": "group_content",
+          "name": "ギフト (column 5)",
+          "settings": {
+            "group_id": "2",
+            "column": 5,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "image_item_QYJdqM": {
+          "type": "image_item",
+          "settings": {
+            "group_id": "2",
+            "column": 5,
+            "image": "shopify://shop_images/HOLIDAY_2024_VISUEL_SECONDAIRE_BEST-SELLERS-PARFUMS_RVB_HD_2025_x_1518_DIPTYQUE.avif",
+            "image_link": ""
+          }
+        },
+        "text_item_98MA8k": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "2",
+            "column": 5,
+            "text": "<p>フレグランスギフト</p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "text_item_zx68nc": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "2",
+            "column": 5,
+            "text": "<p>ディプティックを象徴する香りでフレグランスを通した旅へのインビテーションを贈りましょう。記念日や誕生日に最適なコフレや選べるセットも。<br/></p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "link_item_6q8UB3": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "2",
+            "column": 5,
+            "link_text": "セレクションをみる",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "underline",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "nav_group_j6ggDr": {
+          "type": "nav_group",
+          "name": "フレグランス",
+          "settings": {
+            "title": "フレグランス",
+            "group_id": "3",
+            "link": "",
+            "columns": 5,
+            "layout_type": "grid",
+            "column_gap": 28,
+            "row_gap": 40,
+            "center_content": false
+          }
+        },
+        "group_content_ppJ9gM": {
+          "type": "group_content",
+          "name": "フレグランス (column 1)",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_Nwhmrj": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "link_text": "オンラインストア フレグランス刻印サービス",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_RiiNxJ": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "link_text": "インテンス フレグランス",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_6iBjMt": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "link_text": "ベストセラー",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_JFD8Pi": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "link_text": "ギフトセレクション",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_X6B99R": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "link_text": "ディスカバリーセット",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_Eywgxi": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 1,
+            "link_text": "フレグランスを探す",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_Dy8qHi": {
+          "type": "group_content",
+          "name": "フレグランス (column 2)",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_DBtiPh": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "コレクション",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_UzNNDd": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "Orphéon（オルフェオン）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_zjgLVQ": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "Fleur de Peau（フルール ドゥ ポー）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_eqCPxH": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "Do Son（ドソン）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_wrCtPL": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "Philosykos（フィロシコス）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_JaGbzL": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "Tam Dao（タムダオ）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_Hza3mi": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "Eau Rose（オーローズ）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_ef3EXU": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 2,
+            "link_text": "すべてみる",
+            "link_url": "",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_N9PaRT": {
+          "type": "group_content",
+          "name": "フレグランス (column 3)",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_fxRPqe": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "カテゴリー",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_JqkpTn": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "オードパルファン",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_r7eQgm": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "オードトワレ",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_t3hM8W": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "ソリッド パフューム（練り香水）",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_6YadTx": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "ヘアフレグランス",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_VwbQUn": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "フレグランスボディケア",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_PJFVrr": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "プレミアム フレグランス",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_YxR9Mg": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 3,
+            "link_text": "すべてみる",
+            "link_url": "",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_mJXDLD": {
+          "type": "group_content",
+          "name": "フレグランス (column 4)",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_kR99hj": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "レ ゼサンス ドゥ ディプティック",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "underline",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_hKJer9": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "Lazulio (ラズリオ)",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_gPnXy9": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "Lilyphéa (リリフェア)",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_zwaaxq": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "Bois Corsé (ボワコルセ)",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_9ftX9E": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "Lunamaris (ルナマリス)",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_4YFhpe": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "Roche (ローズロッシュ)",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_8i7FyD": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "Corail Oscuro (コライユオスクロ)",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_mnmph9": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 4,
+            "link_text": "すべてみる",
+            "link_url": "",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_KFALzA": {
+          "type": "group_content",
+          "name": "フレグランス (column 5)",
+          "settings": {
+            "group_id": "3",
+            "column": 5,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "image_item_d7CTRF": {
+          "type": "image_item",
+          "settings": {
+            "group_id": "3",
+            "column": 5,
+            "image": "shopify://shop_images/REPUSH-EAU-RIHLA_2024_VISUEL_PRIORITAIRE_MULTI-PRODUITS_2_RVB_HD_SANS-LOGO_2025x1518_DIPTYQUE.avif",
+            "image_link": ""
+          }
+        },
+        "text_item_cpPPNh": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "3",
+            "column": 5,
+            "text": "<p>インテンス フレグランス コレクション</p>",
+            "text_color": "#111111",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "text_item_yj7ip7": {
+          "type": "text_item",
+          "settings": {
+            "group_id": "3",
+            "column": 5,
+            "text": "<p>ディプティックの創立者たちの様々な旅の思い出に着想を得たフレグランスコレクションが、香りを通じて中東へ続く旅路へと誘います。<br/></p>",
+            "text_color": "#717171",
+            "font_size": 10,
+            "font_weight": "400",
+            "font_family": "body",
+            "alignment": "center",
+            "max_width": 0,
+            "margin_bottom": 0
+          }
+        },
+        "link_item_nUkVmF": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "3",
+            "column": 5,
+            "link_text": "コレクションをみる",
+            "link_url": "",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "nav_group_CikxQt": {
+          "type": "nav_group",
+          "name": "キャンドル＆ホーム",
+          "settings": {
+            "title": "キャンドル＆ホーム",
+            "group_id": "4",
+            "link": "",
+            "columns": 5,
+            "layout_type": "grid",
+            "column_gap": 28,
+            "row_gap": 40,
+            "center_content": false
+          }
+        },
+        "group_content_VTLYrA": {
+          "type": "group_content",
+          "name": "キャンドル＆ホーム (column 1)",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_mFmnMU": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "今月のキャンドル Baies (ベ)",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_8kbNCB": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "春のキャンドル",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_dnBdkp": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "ベストセラー",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_MHwEyG": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "ギフトセレクション",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_4PAd6d": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "ホームフレグランス ガイド",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_yeYxTh": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "キャンドルのお手入れ方法",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_zARF3K": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 1,
+            "link_text": "キャンドル&ホームを探す",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_FfqYba": {
+          "type": "group_content",
+          "name": "キャンドル＆ホーム (column 2)",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_XJmKgw": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "フレグランスキャンドル",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_G7qVkg": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "クラシックキャンドル",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_mzRyt6": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "スモールキャンドル",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_6CyCWQ": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "ミディアム・ラージキャンドル",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_cqJLNk": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "キャンドル コフレ",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_jQRabg": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "リフィラブルキャンドル",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_4BY9yb": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "テーパーキャンドル",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_HppkxT": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "アクセサリー",
+            "link_url": "",
+            "text_color": "#717171",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "fade",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_pRWiNJ": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 2,
+            "link_text": "すべてみる",
+            "link_url": "",
+            "text_color": "#000000",
+            "hover_color": "#000000",
+            "font_size": 12,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": false,
+            "hover_effect": "none",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_MeBaPm": {
+          "type": "group_content",
+          "name": "キャンドル＆ホーム (column 3)",
+          "settings": {
+            "group_id": "4",
+            "column": 3,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_TiYR6x": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 3,
+            "link_text": "ホーム",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "link_item_zaBmWC": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 3,
+            "link_text": "ホームフレグランス ディフューザー（リードディフューザー）",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_UUkc68": {
+          "type": "group_content",
+          "name": "キャンドル＆ホーム (column 4)",
+          "settings": {
+            "group_id": "4",
+            "column": 4,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "link_item_AaGPze": {
+          "type": "link_item",
+          "settings": {
+            "group_id": "4",
+            "column": 4,
+            "link_text": "コレクション",
+            "link_url": "",
+            "text_color": "#111111",
+            "hover_color": "#000000",
+            "font_size": 14,
+            "font_weight": "400",
+            "font_family": "body",
+            "letter_spacing": 0,
+            "alignment": "left",
+            "remove_underline": true,
+            "hover_effect": "slide",
+            "icon_before": "",
+            "icon_after": ""
+          }
+        },
+        "group_content_Rj7kYb": {
+          "type": "group_content",
+          "name": "キャンドル＆ホーム (column 5)",
+          "settings": {
+            "group_id": "4",
+            "column": 5,
+            "heading": "",
+            "rich_text": "",
+            "code": ""
+          }
+        },
+        "image_item_R7Bt7r": {
+          "type": "image_item",
+          "settings": {
+            "group_id": "4",
+            "column": 5,
+            "image": "shopify://shop_images/LMDD_2026_VISUEL_MONO_PRODUIT_TERRES_BLONDES_2025_x_1518px_DIPTYQUE.avif",
+            "image_link": ""
+          }
         }
       },
       "block_order": [
@@ -1003,7 +2269,78 @@
         "image_item_aEWABV",
         "text_item_pFGCK8",
         "text_item_Ukagdn",
-        "link_item_HLWfKX"
+        "link_item_HLWfKX",
+        "group_content_RzkgFj",
+        "image_item_QYJdqM",
+        "text_item_98MA8k",
+        "text_item_zx68nc",
+        "link_item_6q8UB3",
+        "nav_group_j6ggDr",
+        "group_content_ppJ9gM",
+        "link_item_Nwhmrj",
+        "link_item_RiiNxJ",
+        "link_item_6iBjMt",
+        "link_item_JFD8Pi",
+        "link_item_X6B99R",
+        "link_item_Eywgxi",
+        "group_content_Dy8qHi",
+        "link_item_DBtiPh",
+        "link_item_UzNNDd",
+        "link_item_zjgLVQ",
+        "link_item_eqCPxH",
+        "link_item_wrCtPL",
+        "link_item_JaGbzL",
+        "link_item_Hza3mi",
+        "link_item_ef3EXU",
+        "group_content_N9PaRT",
+        "link_item_fxRPqe",
+        "link_item_JqkpTn",
+        "link_item_r7eQgm",
+        "link_item_t3hM8W",
+        "link_item_6YadTx",
+        "link_item_VwbQUn",
+        "link_item_PJFVrr",
+        "link_item_YxR9Mg",
+        "group_content_mJXDLD",
+        "link_item_kR99hj",
+        "link_item_hKJer9",
+        "link_item_gPnXy9",
+        "link_item_zwaaxq",
+        "link_item_9ftX9E",
+        "link_item_4YFhpe",
+        "link_item_8i7FyD",
+        "link_item_mnmph9",
+        "group_content_KFALzA",
+        "image_item_d7CTRF",
+        "text_item_cpPPNh",
+        "text_item_yj7ip7",
+        "link_item_nUkVmF",
+        "nav_group_CikxQt",
+        "group_content_VTLYrA",
+        "link_item_mFmnMU",
+        "link_item_8kbNCB",
+        "link_item_dnBdkp",
+        "link_item_MHwEyG",
+        "link_item_4PAd6d",
+        "link_item_yeYxTh",
+        "link_item_zARF3K",
+        "group_content_FfqYba",
+        "link_item_XJmKgw",
+        "link_item_G7qVkg",
+        "link_item_mzRyt6",
+        "link_item_6CyCWQ",
+        "link_item_cqJLNk",
+        "link_item_jQRabg",
+        "link_item_4BY9yb",
+        "link_item_HppkxT",
+        "link_item_pRWiNJ",
+        "group_content_MeBaPm",
+        "link_item_TiYR6x",
+        "link_item_zaBmWC",
+        "group_content_UUkc68",
+        "link_item_AaGPze",
+        "group_content_Rj7kYb",
+        "image_item_R7Bt7r"
       ],
       "name": "Header custom",
       "settings": {
@@ -1015,7 +2352,6 @@
         "title_alignment": "center",
         "title_letter_spacing": 0,
         "title_font_weight": "400",
-        "dropdown_columns": 4,
         "navigation_label": "Main navigation",
         "section_width": "full-width",
         "color_scheme": "",
