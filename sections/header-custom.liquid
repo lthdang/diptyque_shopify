@@ -1,0 +1,1598 @@
+{%- liquid
+  assign title_justify = 'center'
+  case section.settings.title_alignment
+    when 'left'    | assign title_justify = 'flex-start'
+    when 'right'   | assign title_justify = 'flex-end'
+  endcase
+-%}
+
+<section
+  id="HeaderCustom-{{ section.id }}"
+  class="header-custom color-{{ section.settings.color_scheme }}"
+  style="
+    --header-custom-logo-max-width: {{ section.settings.logo_max_width | default: 140 }}px;
+    --header-custom-title-font-size: {{ section.settings.title_font_size }}px;
+    --header-custom-title-font-family: var(--font-{{ section.settings.title_font_family }}--family);
+    --header-custom-title-color: {{ section.settings.title_color }};
+    --header-custom-title-padding-y: {{ section.settings.title_padding_y }}px;
+    --header-custom-title-padding-x: {{ section.settings.title_padding_x }}px;
+    --header-custom-title-alignment: {{ section.settings.title_alignment }};
+    --header-custom-title-justify: {{ title_justify }};
+    --header-custom-title-letter-spacing: {{ section.settings.title_letter_spacing }}px;
+    --header-custom-title-weight: {{ section.settings.title_font_weight }};
+  "
+>
+  <div class="header-custom__backdrop" aria-hidden="true"></div>
+  <div class="header-custom__wrap">
+    <div class="header-custom__inner section section--full-width-margin section--{{ section.settings.section_width }}">
+
+      <nav class="header-custom__top-row" aria-label="{{ section.settings.navigation_label | escape }}">
+        {% if section.blocks.size > 0 %}
+          <ul class="header-custom__titles list-unstyled" role="list">
+            {% for block in section.blocks %}
+              {% if block.type == 'nav_group' %}
+
+                {%- liquid
+                  assign group_id = block.settings.group_id | strip
+                  assign has_children = false
+                  if group_id != blank
+                    for child in section.blocks
+                      if child.type == 'group_content' and child.settings.group_id == group_id
+                        assign has_children = true
+                        break
+                      endif
+                    endfor
+                  endif
+                -%}
+
+                <li class="header-custom__item{% if has_children %} header-custom__item--has-dropdown{% endif %}" {{ block.shopify_attributes }}>
+                  {% if block.settings.link != blank and has_children == false %}
+                    <a class="header-custom__title" href="{{ block.settings.link }}">
+                      {{- block.settings.title | escape -}}
+                    </a>
+                  {% else %}
+                    <button
+                      type="button"
+                      class="header-custom__title header-custom__title-button"
+                      aria-expanded="false"
+                      {% if has_children %}aria-controls="dropdown-{{ block.id }}"{% endif %}
+                    >
+                      <span class="header-custom__title-text">{{ block.settings.title | escape }}</span>
+                      {% if has_children %}
+                        <span class="header-custom__title-caret" aria-hidden="true">
+                          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      {% endif %}
+                    </button>
+                  {% endif %}
+
+                  {% if has_children %}
+                    {%- assign dropdown_cols = block.settings.columns | default: 4 -%}
+                    {%- assign dropdown_gap_col = block.settings.column_gap | default: 28 -%}
+                    {%- assign dropdown_gap_row = block.settings.row_gap | default: 40 -%}
+                    <div
+                      id="dropdown-{{ block.id }}"
+                      class="header-custom__dropdown{% if block.settings.layout_type == 'full' %} header-custom__dropdown--layout-full{% endif %}"
+                      role="region"
+                      aria-label="{{ block.settings.title | escape }}"
+                    >
+                      <div class="header-custom__dropdown-inner">
+                        <div
+                          class="header-custom__dropdown-grid{% if block.settings.center_content %} header-custom__dropdown-grid--centered{% endif %}"
+                          style="--columns: {{ dropdown_cols }}; --column-gap: {{ dropdown_gap_col }}px; --row-gap: {{ dropdown_gap_row }}px;"
+                        >
+
+                          {%- comment %}— columns driven by block.settings.columns —{% endcomment %}
+                          {% for col in (1..dropdown_cols) %}
+
+                            {%- comment %}— Skip empty columns (bonus: hide empty columns) —{% endcomment %}
+                            {%- assign col_has_content = false -%}
+                            {%- for child in section.blocks -%}
+                              {%- assign child_col = child.settings.column | default: 1 | plus: 0 -%}
+                              {%- if child.settings.group_id != blank and child.settings.group_id == group_id and child_col == col and child.type != 'nav_group' -%}
+                                {%- assign col_has_content = true -%}
+                                {%- break -%}
+                              {%- endif -%}
+                            {%- endfor -%}
+
+                            {% if col_has_content %}
+                              <div class="header-custom__mega-column">
+
+                                {%- comment %}— Pass A: group_content blocks for this column (always first) —{% endcomment %}
+                                {% for child in section.blocks %}
+                                  {%- assign child_col = child.settings.column | default: 1 | plus: 0 -%}
+                                  {% if child.type == 'group_content' and child.settings.group_id != blank and child.settings.group_id == group_id and child_col == col %}
+                                    <div class="header-custom__mega-item" {{ child.shopify_attributes }}>
+                                      {% if child.settings.heading != blank %}
+                                        <h3 class="header-custom__mega-heading">{{ child.settings.heading | escape }}</h3>
+                                      {% endif %}
+                                      {% if child.settings.rich_text != blank %}
+                                        <div class="header-custom__mega-richtext">{{ child.settings.rich_text }}</div>
+                                      {% endif %}
+                                      {% if child.settings.code != blank %}
+                                        <div class="header-custom__mega-custom-html">{{ child.settings.code }}</div>
+                                      {% endif %}
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+
+                                {%- comment %}— Pass B: link_item and image_item for this column (Theme Editor order) —{% endcomment %}
+                                {% for child in section.blocks %}
+                                  {%- assign child_col = child.settings.column | default: 1 | plus: 0 -%}
+                                  {% if child.settings.group_id != blank and child.settings.group_id == group_id and child_col == col and child.type != 'group_content' and child.type != 'nav_group' %}
+                                    {% case child.type %}
+                                      {% when 'link_item' %}
+                                        {%- assign lnk_decoration = 'none' -%}
+                                        {%- unless child.settings.remove_underline -%}
+                                          {%- assign lnk_decoration = 'underline' -%}
+                                        {%- endunless -%}
+                                        <div class="header-custom__mega-item header-custom__mega-item--link" {{ child.shopify_attributes }}>
+                                          <a
+                                            href="{{ child.settings.link_url }}"
+                                            class="header-custom__mega-link custom-link-effect-{{ child.settings.hover_effect | default: 'underline' }}"
+                                            style="
+                                              --hover-color: {{ child.settings.hover_color | default: 'currentColor' }};
+                                              color: {{ child.settings.text_color | default: 'inherit' }};
+                                              font-size: {{ child.settings.font_size | default: 14 }}px;
+                                              font-weight: {{ child.settings.font_weight | default: '400' }};
+                                              font-family: var(--font-{{ child.settings.font_family | default: 'body' }}--family);
+                                              text-align: {{ child.settings.alignment | default: 'left' }};
+                                              text-decoration: {{ lnk_decoration }};
+                                              letter-spacing: {{ child.settings.letter_spacing | default: 0 }}px;
+                                            "
+                                          >
+                                            {%- if child.settings.icon_before != blank -%}
+                                              <span class="header-custom__mega-link-icon header-custom__mega-link-icon--before" aria-hidden="true">{{ child.settings.icon_before }}</span>
+                                            {%- endif -%}
+                                            {{- child.settings.link_text | escape -}}
+                                            {%- if child.settings.icon_after != blank -%}
+                                              <span class="header-custom__mega-link-icon header-custom__mega-link-icon--after" aria-hidden="true">{{ child.settings.icon_after }}</span>
+                                            {%- endif -%}
+                                          </a>
+                                        </div>
+                                      {% when 'image_item' %}
+                                        {% if child.settings.image %}
+                                          <div class="header-custom__mega-item header-custom__mega-item--image" {{ child.shopify_attributes }}>
+                                            <a href="{{ child.settings.image_link | default: '#' }}" class="header-custom__mega-image-link">
+                                              {{
+                                                child.settings.image
+                                                | image_url: width: 800
+                                                | image_tag: class: 'header-custom__mega-image', loading: 'lazy'
+                                              }}
+                                            </a>
+                                          </div>
+                                        {% endif %}
+                                      {% when 'text_item' %}
+                                        {% if child.settings.text != blank %}
+                                          <div
+                                            class="header-custom__mega-item header-custom__mega-item--text"
+                                            style="
+                                              color: {{ child.settings.text_color }};
+                                              font-size: {{ child.settings.font_size }}px;
+                                              font-weight: {{ child.settings.font_weight }};
+                                              text-align: {{ child.settings.alignment }};
+                                              font-family: var(--font-{{ child.settings.font_family }}--family);
+                                              {% if child.settings.max_width > 0 %}max-width: {{ child.settings.max_width }}px;{% endif %}
+                                              {% if child.settings.margin_bottom > 0 %}margin-bottom: {{ child.settings.margin_bottom }}px;{% endif %}
+                                            "
+                                            {{ child.shopify_attributes }}
+                                          >
+                                            <div class="header-custom__mega-text">{{ child.settings.text }}</div>
+                                          </div>
+                                        {% endif %}
+                                    {% endcase %}
+                                  {% endif %}
+                                {% endfor %}
+
+                              </div>
+                            {% endif %}
+
+                          {% endfor %}
+
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </li>
+
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="header-custom__placeholder">Add "Navigation Group" blocks and assign Group Content blocks to them to build the menu.</p>
+        {% endif %}
+      </nav>
+
+      <div class="header-custom__utilities">
+        {% if section.settings.show_search %}
+          <button type="button" class="header-custom__util-btn header-custom__util-btn--search" aria-label="Search">
+            <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
+        {% endif %}
+        {% if section.settings.show_account %}
+          {% if customer %}
+            <a href="{{ routes.account_url }}" class="header-custom__util-btn" aria-label="Account">
+              <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </a>
+          {% else %}
+            <a href="{{ routes.account_login_url }}" class="header-custom__util-btn" aria-label="Sign in">
+              <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </a>
+          {% endif %}
+        {% endif %}
+        {% if section.settings.show_cart %}
+          <a href="{{ routes.cart_url }}" class="header-custom__util-btn header-custom__cart-btn" aria-label="Cart ({{ cart.item_count }})">
+            <span class="header-custom__util-icon-wrap">
+              <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              {% if cart.item_count > 0 %}
+                <span class="header-custom__cart-count" aria-hidden="true">{{ cart.item_count }}</span>
+              {% endif %}
+            </span>
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* ---- Section shell ---- */
+  .header-custom {
+    position: relative;
+    z-index: 100;
+    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.08);
+  }
+
+  /* Dimming backdrop shown when any dropdown is open */
+  .header-custom__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 0.22);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 220ms ease, visibility 220ms ease;
+    z-index: -1;
+  }
+
+  .header-custom.has-open-menu .header-custom__backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* ---- Full-width wrap: positioning context for full-width dropdowns ---- */
+  .header-custom__wrap {
+    position: relative;
+    overflow: visible;
+  }
+
+  /* ---- Header bar: flex row — logo | nav | utilities ---- */
+  .header-custom__inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* ---- Logo column ---- */
+  .header-custom__logo-col {
+    flex: 0 0 auto;
+  }
+
+  .header-custom__logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .header-custom__logo-img {
+    display: block;
+    max-width: var(--header-custom-logo-max-width, 140px);
+    width: auto;
+    height: auto;
+  }
+
+  .header-custom__logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ---- Utilities column ---- */
+  .header-custom__utilities {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    margin-left: auto;
+  }
+
+  .header-custom__util-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 160ms ease;
+    flex-shrink: 0;
+  }
+
+  .header-custom__util-btn:hover {
+    background-color: rgb(var(--color-foreground-rgb) / 0.06);
+  }
+
+  .header-custom__util-icon {
+    flex-shrink: 0;
+  }
+
+  .header-custom__util-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-custom__cart-count {
+    position: absolute;
+    top: -0.45rem;
+    right: -0.45rem;
+    min-width: 1.05rem;
+    height: 1.05rem;
+    padding: 0 0.15rem;
+    background: rgb(var(--color-foreground-rgb));
+    color: rgb(var(--color-background-rgb));
+    border-radius: 99px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    line-height: 1.05rem;
+    text-align: center;
+  }
+
+  /* ---- Nav row ---- */
+  .header-custom__top-row {
+    flex: 1;
+    min-width: 0;
+    text-align: var(--header-custom-title-alignment);
+  }
+
+  /* ---- Titles flex row ---- */
+  .header-custom__titles {
+    display: flex;
+    align-items: stretch;
+    justify-content: var(--header-custom-title-justify);
+    gap: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ---- Nav items: STATIC so the dropdown escapes to the nav row ---- */
+  .header-custom__item {
+    position: static;
+  }
+
+  /* ---- Title link / button ---- */
+  .header-custom__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 3rem;
+    font-size: var(--header-custom-title-font-size);
+    font-family: var(--header-custom-title-font-family);
+    font-weight: var(--header-custom-title-weight, 400);
+    letter-spacing: var(--header-custom-title-letter-spacing, 0em);
+    color: var(--header-custom-title-color);
+    padding: var(--header-custom-title-padding-y) var(--header-custom-title-padding-x);
+    text-decoration: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 160ms ease, color 160ms ease;
+    white-space: nowrap;
+  }
+
+  @media (hover: hover) {
+    .header-custom__item--has-dropdown:hover > .header-custom__title {
+      border-bottom-color: currentColor;
+    }
+  }
+
+  .header-custom__item.is-open > .header-custom__title {
+    border-bottom-color: currentColor;
+  }
+
+  /* Caret SVG animation */
+  .header-custom__title-caret {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 200ms ease;
+  }
+
+  @media (hover: hover) {
+    .header-custom__item--has-dropdown:hover > .header-custom__title .header-custom__title-caret {
+      transform: rotate(180deg);
+    }
+  }
+
+  .header-custom__item.is-open > .header-custom__title .header-custom__title-caret {
+    transform: rotate(180deg);
+  }
+
+  /* ================================================================
+     FULL-WIDTH MEGA-MENU DROPDOWN
+     ================================================================ */
+  .header-custom__dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 50;
+    background: rgb(var(--color-background-rgb));
+    border-top: 1px solid rgba(var(--color-foreground-rgb), 0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  }
+
+  .header-custom__item--has-dropdown:hover > .header-custom__dropdown,
+  .header-custom__item.is-open > .header-custom__dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* Open via JS .is-open class (mobile tap + keyboard) */
+  .header-custom__item.is-open > .header-custom__dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .header-custom__dropdown-inner {
+    max-width: 1400px; /* Giới hạn chiều rộng tối đa cho đẹp */
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+  }
+
+  .header-custom__mega-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header-custom__mega-heading {
+    margin: 0 0 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: rgb(var(--color-foreground-rgb));
+  }
+
+  .header-custom__mega-subheading {
+    margin: 0 0 1rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: rgb(var(--color-foreground-rgb));
+  }
+
+  .header-custom__mega-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .header-custom__mega-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    color: rgb(var(--color-foreground-rgb));
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.9;
+    position: relative;
+  }
+
+  .header-custom__mega-link:hover {
+    color: var(--hover-color, rgb(var(--color-foreground-rgb)));
+    opacity: 1;
+  }
+
+  /* Hover effects */
+  .custom-link-effect-underline:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .custom-link-effect-fade:hover {
+    opacity: 0.55;
+  }
+
+  .custom-link-effect-slide::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.25s ease;
+  }
+
+  .custom-link-effect-slide:hover::after {
+    width: 100%;
+  }
+
+  .header-custom__mega-link-icon {
+    font-style: normal;
+    line-height: 1;
+  } 
+
+  .header-custom__mega-image-wrapper {
+    overflow: hidden;
+    border-radius: 8px;
+    background: rgba(var(--color-foreground-rgb), 0.04);
+  }
+
+  .header-custom__mega-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .header-custom__mega-image-link:hover .header-custom__mega-image {
+    transform: scale(1.06);
+  }
+
+  .header-custom__dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns, 4), 1fr);
+    column-gap: var(--column-gap, 1.75rem);
+    row-gap: var(--row-gap, 2.5rem);
+  }
+
+  .header-custom__dropdown-grid--centered {
+    margin-inline: auto;
+    max-width: max-content;
+  }
+
+  .header-custom__dropdown--layout-full > .header-custom__dropdown-inner {
+    max-width: 100%;
+    padding-inline: 2rem;
+  }
+
+  .header-custom__mega-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .header-custom__mega-text {
+    line-height: 1.6;
+  }
+
+  .header-custom__mega-text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .header-custom__mega-richtext,
+  .header-custom__mega-custom-html {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(var(--color-foreground-rgb), 0.85);
+  }
+
+  .header-custom__mega-richtext p {
+    margin: 0 0 1rem;
+  }
+
+  .header-custom__mega-richtext strong {
+    font-weight: 600;
+    color: rgb(var(--color-foreground-rgb));
+  }
+
+  /* ---- Child block wrapper — each theme block fills its grid cell ---- */
+  .header-custom__child-block {
+    min-width: 0;
+  }
+
+  /* ---- Card base ---- */
+  .header-custom__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Image/media wrapper with consistent 4:3 aspect ratio */
+  .header-custom__card-media,
+  .header-custom__image-link,
+  .header-custom__media-link {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+  }
+
+  .header-custom__card-img,
+  .header-custom__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 300ms ease;
+  }
+
+  .header-custom__card-media:hover .header-custom__card-img,
+  .header-custom__card-media:hover .header-custom__image,
+  .header-custom__image-link:hover .header-custom__image,
+  .header-custom__media-link:hover .header-custom__image {
+    transform: scale(1.04);
+  }
+
+  /* Text area below image */
+  .header-custom__card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding-top: 0.75rem;
+  }
+
+  .header-custom__card-heading {
+    margin: 0.75rem 0 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .header-custom__card-body .header-custom__card-heading,
+  .header-custom__card--rich_text .header-custom__card-heading,
+  .header-custom__card--link_list .header-custom__card-heading {
+    margin-top: 0;
+  }
+
+  .header-custom__card-heading a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .header-custom__card-heading a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .header-custom__card-price {
+    margin: 0;
+    font-size: 0.875rem;
+    color: rgb(var(--color-foreground-rgb) / 0.8);
+  }
+
+  .header-custom__card-description {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: rgb(var(--color-foreground-rgb) / 0.65);
+  }
+
+  .header-custom__card-richtext {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .header-custom__card-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.05em;
+    transition: opacity 160ms ease;
+  }
+
+  .header-custom__card-link:hover {
+    opacity: 0.65;
+  }
+
+  /* ---- Link list block ---- */
+  .header-custom__link-list {
+    margin: 0.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .header-custom__link-list-item {
+    display: block;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: inherit;
+    padding: 0.15rem 0;
+    border-bottom: 1px solid transparent;
+    transition: border-color 140ms ease, opacity 140ms ease;
+  }
+
+  .header-custom__link-list-item:hover {
+    opacity: 0.7;
+    border-bottom-color: currentColor;
+  }
+
+  /* ---- Promotion banner block ---- */
+  .header-custom__promo {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 14rem;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--promo-bg, #f3e9db);
+    color: var(--promo-text, #111111);
+    text-decoration: none;
+    transition: filter 200ms ease;
+  }
+
+  .header-custom__promo:hover {
+    filter: brightness(0.95);
+  }
+
+  /* Promo with a background image */
+  .header-custom__promo--has-image {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-custom__promo-image-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .header-custom__promo-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 400ms ease;
+  }
+
+  .header-custom__promo--has-image:hover .header-custom__promo-bg-img {
+    transform: scale(1.04);
+  }
+
+  /* Dark overlay for legibility when image is present */
+  .header-custom__promo--has-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.1) 60%);
+  }
+
+  .header-custom__promo-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .header-custom__promo--has-image .header-custom__promo-content {
+    color: #fff;
+  }
+
+  .header-custom__promo .header-custom__card-heading,
+  .header-custom__promo-heading {
+    display: block;
+    margin: 0 0 0.4rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .header-custom__promo .header-custom__card-description {
+    display: block;
+    margin: 0 0 0.8rem;
+    color: var(--promo-text, #111111);
+    opacity: 0.85;
+  }
+
+  .header-custom__promo--has-image .header-custom__card-description {
+    color: #fff;
+    opacity: 0.88;
+  }
+
+  .header-custom__promo .header-custom__card-link {
+    font-weight: 600;
+  }
+
+  /* ---- Empty state ---- */
+  .header-custom__placeholder {
+    margin: 0;
+    padding: 1.25rem 0;
+    font-size: 0.875rem;
+    color: rgb(var(--color-foreground-rgb) / 0.5);
+  }
+
+  /* ================================================================
+     TABLET (≤ 989px) — 2-column grid
+     ================================================================ */
+  @media (max-width: 989px) {
+    .header-custom__titles {
+      flex-wrap: wrap;
+    }
+
+    .header-custom__dropdown-grid {
+      grid-template-columns: repeat(min(var(--columns, 4), 2), minmax(0, 1fr));
+    }
+  }
+
+  /* ================================================================
+     MOBILE (≤ 749px) — accordion, entirely JS-driven
+     ================================================================ */
+  @media (max-width: 749px) {
+    .header-custom__backdrop {
+      display: none;
+    }
+
+    /* Mobile: logo + utilities inline, nav accordion below */
+    .header-custom__inner {
+      flex-wrap: wrap;
+    }
+
+    .header-custom__logo-col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header-custom__utilities {
+      margin-left: 0;
+      order: 2;
+    }
+
+    .header-custom__top-row {
+      order: 3;
+      flex: 0 0 100%;
+      min-width: 0;
+    }
+
+    .header-custom__titles {
+      flex-direction: column;
+    }
+
+    .header-custom__title {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .header-custom__item {
+      border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.06);
+    }
+
+    /* Dropdown becomes a collapsible accordion panel */
+    .header-custom__dropdown {
+      position: static;
+      transform: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      box-shadow: none;
+      border-top: 1px solid rgb(var(--color-foreground-rgb) / 0.06);
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 220ms ease, max-height 260ms ease, visibility 220ms ease;
+    }
+
+    .header-custom__item.is-open > .header-custom__dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      max-height: 100vh;
+    }
+
+    .header-custom__dropdown-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .header-custom__dropdown-inner {
+      padding: 1.5rem 1rem;
+    }
+
+    .header-custom__mega-heading {
+      font-size: 1.25rem !important;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  /* Giữ nguyên toàn bộ JavaScript cũ – rất tốt rồi */
+  (function () {
+    var sectionEl = document.getElementById('HeaderCustom-{{ section.id }}');
+    if (!sectionEl) return;
+
+    var items = Array.from(sectionEl.querySelectorAll('.header-custom__item--has-dropdown'));
+    var backdrop = sectionEl.querySelector('.header-custom__backdrop');
+
+    function openItem(item) {
+      closeAll();
+      item.classList.add('is-open');
+      sectionEl.classList.add('has-open-menu');
+      var btn = item.querySelector('.header-custom__title-button');
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeItem(item) {
+      item.classList.remove('is-open');
+      var btn = item.querySelector('.header-custom__title-button');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function closeAll() {
+      items.forEach(closeItem);
+      sectionEl.classList.remove('has-open-menu');
+    }
+
+    var isHoverDevice = window.matchMedia('(hover: hover)').matches;
+
+    items.forEach(function (item) {
+      var btn = item.querySelector('.header-custom__title-button');
+      if (!btn) return;
+
+      if (isHoverDevice) {
+        item.addEventListener('mouseenter', function () {
+          btn.setAttribute('aria-expanded', 'true');
+          sectionEl.classList.add('has-open-menu');
+        });
+        item.addEventListener('mouseleave', function () {
+          btn.setAttribute('aria-expanded', 'false');
+          if (!sectionEl.querySelector('.header-custom__item.is-open')) {
+            sectionEl.classList.remove('has-open-menu');
+          }
+        });
+      }
+
+      btn.addEventListener('click', function () {
+        var isOpen = item.classList.contains('is-open');
+        if (isOpen) {
+          closeItem(item);
+          if (!sectionEl.querySelector('.header-custom__item.is-open')) {
+            sectionEl.classList.remove('has-open-menu');
+          }
+        } else {
+          openItem(item);
+        }
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAll();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!sectionEl.contains(e.target)) closeAll();
+    });
+
+    if (backdrop) backdrop.addEventListener('click', closeAll);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Header custom",
+  "tag": "section",
+  "class": "section-header-custom",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Title settings"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "title_font_family",
+      "label": "Font family",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "heading"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "title_padding_y",
+      "label": "Title vertical padding",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_padding_x",
+      "label": "Title horizontal padding",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Title alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "title_letter_spacing",
+      "label": "Letter spacing",
+      "min": -1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Dropdown settings"
+    },
+    {
+      "type": "text",
+      "id": "navigation_label",
+      "label": "Navigation aria label",
+      "default": "Main navigation"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "primary"
+    },
+    {
+      "type": "header",
+      "content": "Utilities"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search icon",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account icon",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart icon",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_group",
+      "name": "Navigation Group",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Navigation title",
+          "default": "Menu Item"
+        },
+        {
+          "type": "text",
+          "id": "group_id",
+          "label": "Group ID",
+          "default": "group-1",
+          "info": "Unique identifier for this dropdown (e.g. \"shop\", \"gifts\"). Assign Group Content, Link Item, and Image Item blocks the same Group ID to display them in this dropdown."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Direct link",
+          "info": "If set and no matching content blocks exist, clicking the title navigates here instead of opening a dropdown."
+        },
+        {
+          "type": "header",
+          "content": "Dropdown layout"
+        },
+        {
+          "type": "range",
+          "id": "columns",
+          "label": "Columns for this Navigation Group",
+          "info": "Each menu can have a different column layout.",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "select",
+          "id": "layout_type",
+          "label": "Layout type",
+          "options": [
+            { "value": "grid", "label": "Grid" },
+            { "value": "full", "label": "Full width" }
+          ],
+          "default": "grid"
+        },
+        {
+          "type": "range",
+          "id": "column_gap",
+          "label": "Column gap",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 28
+        },
+        {
+          "type": "range",
+          "id": "row_gap",
+          "label": "Row gap",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 40
+        },
+        {
+          "type": "checkbox",
+          "id": "center_content",
+          "label": "Center grid content",
+          "info": "Horizontally centers the column grid when columns don't fill the full width.",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "group_content",
+      "name": "Group Content (column)",
+      "limit": 40,
+      "settings": [
+        {
+          "type": "text",
+          "id": "group_id",
+          "label": "Group ID (match Navigation Group)",
+          "info": "Enter the same group_id as the Navigation Group this column belongs to (e.g. \"shop\"). If blank or no match, this block will not be displayed."
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column (1 = left)",
+          "info": "Which column in the dropdown this block appears in. Use same group_id as Navigation Group and choose column to control layout.",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "header",
+          "content": "Content (all optional — render what is filled in)"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "rich_text",
+          "label": "Rich text"
+        },
+        {
+          "type": "html",
+          "id": "code",
+          "label": "Custom HTML"
+        }
+      ]
+    },
+    {
+      "type": "link_item",
+      "name": "Link Item",
+      "limit": 1000,
+      "settings": [
+        {
+          "type": "text",
+          "id": "group_id",
+          "label": "Group ID (match Navigation Group)",
+          "info": "Enter the same group_id as the Navigation Group to display this link in the correct dropdown. If blank or no match, this block will not be displayed."
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column (1 = left)",
+          "info": "Which column in the dropdown this link appears in. Use same group_id as Navigation Group and choose column to control layout.",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link text",
+          "default": "Link"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        },
+        {
+          "type": "header",
+          "content": "Text style"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "hover_color",
+          "label": "Hover text color",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Font size",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "Font weight",
+          "options": [
+            { "value": "300", "label": "Light (300)" },
+            { "value": "400", "label": "Normal (400)" },
+            { "value": "500", "label": "Medium (500)" },
+            { "value": "600", "label": "Semi-bold (600)" },
+            { "value": "700", "label": "Bold (700)" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "select",
+          "id": "font_family",
+          "label": "Font family",
+          "options": [
+            { "value": "heading", "label": "Heading" },
+            { "value": "body", "label": "Body" },
+            { "value": "accent", "label": "Accent" }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "range",
+          "id": "letter_spacing",
+          "label": "Letter spacing",
+          "min": -2,
+          "max": 10,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "checkbox",
+          "id": "remove_underline",
+          "label": "Remove underline",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Hover effect"
+        },
+        {
+          "type": "select",
+          "id": "hover_effect",
+          "label": "Hover effect",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "underline", "label": "Underline" },
+            { "value": "fade", "label": "Fade" },
+            { "value": "slide", "label": "Slide underline" }
+          ],
+          "default": "underline"
+        },
+        {
+          "type": "header",
+          "content": "Icons (optional)"
+        },
+        {
+          "type": "text",
+          "id": "icon_before",
+          "label": "Icon before link text",
+          "info": "Paste an emoji, symbol, or single character (e.g. \"→\", \"★\")"
+        },
+        {
+          "type": "text",
+          "id": "icon_after",
+          "label": "Icon after link text",
+          "info": "Paste an emoji, symbol, or single character (e.g. \"→\", \"★\")"
+        }
+      ]
+    },
+    {
+      "type": "image_item",
+      "name": "Image Item",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "text",
+          "id": "group_id",
+          "label": "Group ID (match Navigation Group)",
+          "info": "Enter the same group_id as the Navigation Group to display this image in the correct dropdown. If blank or no match, this block will not be displayed."
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column (1 = left)",
+          "info": "Which column in the dropdown this image appears in. Use same group_id as Navigation Group and choose column to control layout.",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "Image link"
+        }
+      ]
+    },
+    {
+      "type": "text_item",
+      "name": "Text Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "group_id",
+          "label": "Group ID (match Navigation Group)",
+          "info": "Enter the same group_id as the Navigation Group to display this text in the correct dropdown. If blank or no match, this block will not be displayed."
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column (1 = left)",
+          "info": "Which column in the dropdown this text appears in.",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Content",
+          "default": "<p>Your text here</p>"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#111111"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Font size",
+          "min": 10,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "Font weight",
+          "options": [
+            { "value": "300", "label": "Light (300)" },
+            { "value": "400", "label": "Normal (400)" },
+            { "value": "500", "label": "Medium (500)" },
+            { "value": "600", "label": "Semi-bold (600)" },
+            { "value": "700", "label": "Bold (700)" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "select",
+          "id": "font_family",
+          "label": "Font family",
+          "options": [
+            { "value": "heading", "label": "Heading" },
+            { "value": "body", "label": "Body" },
+            { "value": "accent", "label": "Accent" }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Text alignment",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "label": "Max width",
+          "info": "Maximum width in pixels. Set to 0 to disable.",
+          "min": 0,
+          "max": 800,
+          "step": 20,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "Margin bottom",
+          "min": 0,
+          "max": 60,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header custom",
+      "blocks": [
+        {
+          "type": "nav_group",
+          "settings": { "title": "Shop", "group_id": "shop" }
+        },
+        {
+          "type": "group_content",
+          "settings": { "group_id": "shop", "column": 1, "heading": "All Products" }
+        },
+        {
+          "type": "link_item",
+          "settings": { "group_id": "shop", "column": 1, "link_text": "New Arrivals", "link_url": "/collections/new" }
+        },
+        {
+          "type": "link_item",
+          "settings": { "group_id": "shop", "column": 1, "link_text": "Best Sellers", "link_url": "/collections/best-sellers" }
+        },
+        {
+          "type": "group_content",
+          "settings": { "group_id": "shop", "column": 2, "rich_text": "<p>Discover our latest collections.</p>" }
+        },
+        {
+          "type": "image_item",
+          "settings": { "group_id": "shop", "column": 2, "image_link": "/collections/all" }
+        },
+        {
+          "type": "nav_group",
+          "settings": { "title": "Collections", "group_id": "collections" }
+        },
+        {
+          "type": "group_content",
+          "settings": { "group_id": "collections", "column": 1, "heading": "Browse" }
+        },
+        {
+          "type": "link_item",
+          "settings": { "group_id": "collections", "column": 1, "link_text": "Fragrance", "link_url": "/collections/fragrance" }
+        },
+        {
+          "type": "link_item",
+          "settings": { "group_id": "collections", "column": 1, "link_text": "Home", "link_url": "/collections/home" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
