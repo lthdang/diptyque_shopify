@@ -398,7 +398,7 @@
         "tabs_padding_right": 0,
         "layout_type": "carousel",
         "carousel_on_mobile": false,
-        "max_products": 8,
+        "max_products": 10,
         "columns": 4,
         "mobile_columns": "2",
         "mobile_card_size": "44cqw",
@@ -854,6 +854,16 @@
                   "name": "t:names.product_recommendations",
                   "settings": {
                     "recommendation_type": "related",
+                    "recommended_products": [
+                      "the-collection-snowboard-liquid",
+                      "3月5日新登場-限定版-fleur-de-cerisier-フルール-ド-スリジエ-サクラ-クラシックキャンドル",
+                      "baies-べ-カーディフューザー-セット",
+                      "the-inventory-not-tracked-snowboard",
+                      "baies-べ-ルーム-スプレー",
+                      "selling-plans-ski-wax",
+                      "gift-card",
+                      "the-out-of-stock-snowboard"
+                    ],
                     "layout_type": "carousel",
                     "carousel_on_mobile": true,
                     "max_products": 4,
@@ -891,7 +901,7 @@
                         "product_card_gallery_zCGzyt": {
                           "type": "_product-card-gallery",
                           "settings": {
-                            "image_ratio": "adapt",
+                            "image_ratio": "square",
                             "border": "none",
                             "border_width": 1,
                             "border_opacity": 100,
@@ -937,7 +947,7 @@
                             "show_tax_info": false,
                             "type_preset": "h6",
                             "width": "100%",
-                            "alignment": "left",
+                            "alignment": "center",
                             "font": "var(--font-body--family)",
                             "font_size": "1rem",
                             "line_height": "normal",
@@ -966,12 +976,14 @@
                           "blocks": {
                             "quantity": {
                               "type": "quantity",
+                              "disabled": true,
                               "static": true,
                               "settings": {},
                               "blocks": {}
                             },
                             "add-to-cart": {
                               "type": "add-to-cart",
+                              "disabled": true,
                               "static": true,
                               "settings": {
                                 "style_class": "button-secondary"
