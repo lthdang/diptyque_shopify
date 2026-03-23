@@ -33,7 +33,7 @@
   data-section-id="{{ section.id }}"
   data-product-id="{{ closest.product.id }}"
   data-intent="{{ block_settings.recommendation_type }}"
-  data-recommendations-performed="{{ recommendations.performed }}"
+  data-recommendations-performed="{% if block_settings.recommended_products != blank %}true{% else %}{{ recommendations.performed }}{% endif %}"
   {% if request.visual_preview_mode %}
     data-shopify-editor-preview
   {% endif %}
@@ -60,12 +60,14 @@
       {% content_for 'blocks' %}
     </div>
 
-    {%- if recommendations.performed or closest.product == blank -%}
+    {%- if block_settings.recommended_products != blank or recommendations.performed or closest.product == blank -%}
       {% liquid
-        assign products = recommendations.products
-
-        if closest.product == blank
+        if block_settings.recommended_products != blank
+          # Manual override: use editor-selected products
+          assign products = block_settings.recommended_products
+        elsif closest.product == blank
           # Onboarding mode: Show placeholder products
+          assign products = blank
           for i in (1..block_settings.max_products)
             assign products = products | append: ', '
             assign products = products | split: ','
@@ -131,7 +133,7 @@
             {% render 'resource-list-carousel',
               ref: 'resourceListCarousel',
               slides: slides,
-              slide_count: recommendations.products.size,
+              slide_count: products.size,
               settings: block_settings
             %}
         {% endcase %}
@@ -152,7 +154,7 @@
           {% render 'resource-list-carousel',
             ref: 'resourceListCarouselMobile',
             slides: slides,
-            slide_count: recommendations.products.size,
+            slide_count: products.size,
             settings: block_settings
           %}
         </div>
@@ -227,6 +229,16 @@
     {
       "type": "paragraph",
       "content": "t:content.complementary_products"
+    },
+    {
+      "type": "header",
+      "content": "Manual product selection"
+    },
+    {
+      "type": "product_list",
+      "id": "recommended_products",
+      "label": "Select related products",
+      "info": "Overrides automatic recommendations. Leave empty to use Shopify recommendations."
     },
     {
       "type": "header",
