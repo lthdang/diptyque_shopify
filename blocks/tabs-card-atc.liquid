@@ -85,49 +85,120 @@ assign btn_text_available = block.settings.button_text_available
 
 {% javascript %}
   (function () {
-    document.addEventListener('click', async function (e) {
-      const btn = e.target.closest('.tabs-card-atc__btn');
+    /* ---- Toast helpers (singleton, injected once into <body>) ---- */
+    var _hideTimer;
+
+    function ensureToast() {
+      var existing = document.getElementById('atc-toast');
+      if (existing) return existing;
+
+      var toast = document.createElement('div');
+      toast.id = 'atc-toast';
+      toast.className = 'atc-toast atc-toast--hidden';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.innerHTML =
+        '<div class="atc-toast__content">' +
+          '<span class="atc-toast__check" aria-hidden="true">&#x2714;</span>' +
+          '<div class="atc-toast__info">' +
+            '<p class="atc-toast__title">Added to cart</p>' +
+            '<p class="atc-toast__product"></p>' +
+          '</div>' +
+          '<button class="atc-toast__close" aria-label="Close notification">&#x00D7;</button>' +
+        '</div>';
+
+      document.body.appendChild(toast);
+
+      toast.querySelector('.atc-toast__close').addEventListener('click', function () {
+        hideToast();
+      });
+
+      return toast;
+    }
+
+    function showToast(productTitle) {
+      var toast = ensureToast();
+      var productEl = toast.querySelector('.atc-toast__product');
+      productEl.textContent = productTitle || '';
+      productEl.style.display = productTitle ? '' : 'none';
+      toast.classList.remove('atc-toast--hidden');
+      clearTimeout(_hideTimer);
+      _hideTimer = setTimeout(hideToast, 4000);
+    }
+
+    function hideToast() {
+      var toast = document.getElementById('atc-toast');
+      if (toast) toast.classList.add('atc-toast--hidden');
+    }
+
+    /* ---- Cart count updater ---- */
+    function refreshCartCount() {
+      fetch('/cart.js')
+        .then(function (r) { return r.json(); })
+        .then(function (cart) {
+          /* Fire theme event for cart drawers etc. */
+          document.dispatchEvent(new CustomEvent('cart:update', {
+            bubbles: true,
+            detail: { data: { itemCount: cart.item_count } }
+          }));
+          /* Update any visible count badge */
+          document.querySelectorAll(
+            '.cart-count, [data-cart-count], .header-custom__cart-count'
+          ).forEach(function (el) {
+            el.textContent = cart.item_count;
+          });
+        })
+        .catch(function () {});
+    }
+
+    /* ---- Click handler (event delegation) ---- */
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.tabs-card-atc__btn');
       if (!btn || btn.disabled) return;
       e.preventDefault();
 
-      const card = btn.closest('[data-selected-variant]');
-      const variantId = (card && card.dataset.selectedVariant) || btn.dataset.variantId;
+      /* Prefer variant selected by a variant-picker on the card, else use the rendered default */
+      var card = btn.closest('[data-selected-variant]');
+      var variantId = (card && card.dataset.selectedVariant) || btn.dataset.variantId;
       if (!variantId) return;
 
-      const originalText = btn.textContent.trim();
+      var originalText = btn.textContent.trim();
       btn.disabled = true;
-      btn.textContent = '\u2026';
+      btn.setAttribute('aria-busy', 'true');
+      btn.textContent = '\u2026'; /* … */
 
-      try {
-        const addRes = await fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: variantId, quantity: 1 })
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: Number(variantId), quantity: 1 })
+      })
+        .then(function (res) {
+          if (!res.ok) {
+            return res.json().then(function (body) {
+              throw new Error(body.description || 'cart/add failed');
+            });
+          }
+          return res.json();
+        })
+        .then(function (item) {
+          refreshCartCount();
+          showToast(item.product_title);
+          btn.textContent = '\u2713'; /* ✓ */
+          setTimeout(function () {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+          }, 2000);
+        })
+        .catch(function (err) {
+          console.error('[tabs-card-atc]', err);
+          btn.textContent = 'Error';
+          setTimeout(function () {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+          }, 2000);
         });
-
-        if (!addRes.ok) throw new Error('cart/add failed');
-
-        const cartRes = await fetch('/cart.js');
-        const cart = await cartRes.json();
-
-        document.dispatchEvent(new CustomEvent('cart:update', {
-          bubbles: true,
-          detail: { data: { itemCount: cart.item_count } }
-        }));
-
-        btn.textContent = '\u2713';
-        setTimeout(function () {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 2000);
-      } catch (err) {
-        console.error('[tabs-card-atc]', err);
-        btn.textContent = 'Error';
-        setTimeout(function () {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 2000);
-      }
     });
   })();
 {% endjavascript %}
@@ -172,12 +243,107 @@ assign btn_text_available = block.settings.button_text_available
     transform: scale(1.05);
   }
 
-  /* Disabled state */
+  /* Disabled / loading state */
   .tabs-card-atc__btn--disabled,
   .tabs-card-atc__btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
     pointer-events: none;
+  }
+
+  /* ================================================================
+     ATC TOAST NOTIFICATION
+     ================================================================ */
+  .atc-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 300px;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+    padding: 14px 16px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
+    visibility: visible;
+  }
+
+  .atc-toast--hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .atc-toast__content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .atc-toast__check {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  .atc-toast__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .atc-toast__title {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #111;
+    line-height: 1.4;
+  }
+
+  .atc-toast__product {
+    margin: 2px 0 0;
+    font-size: 0.75rem;
+    color: #555;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .atc-toast__close {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+    margin-top: -1px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .atc-toast__close:hover {
+    color: #111;
+    background: rgba(0, 0, 0, 0.06);
   }
 {% endstylesheet %}
 
