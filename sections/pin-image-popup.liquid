@@ -1,0 +1,895 @@
+{%- comment -%}
+  Pin Image Popup
+  A full-width image with positioned pin buttons that each open a popup/modal.
+{%- endcomment -%}
+
+<div
+  class="pin-image-popup section section--{{ section.settings.section_width | default: 'full-width' }}"
+  id="pin-image-popup-{{ section.id }}"
+  style="
+    --pin-popup-desktop-height: {{ section.settings.desktop_height }};
+    --pin-popup-mobile-height: {{ section.settings.mobile_height }};
+    --pin-popup-overlay: {{ section.settings.overlay_color }};
+  "
+>
+  {%- assign image_mode = section.settings.image_size_mode | default: 'fit' -%}
+  {%- assign desktop_width_mode = section.settings.desktop_image_width_mode | default: 'fit' -%}
+  {%- assign image_align = section.settings.image_alignment | default: 'center' -%}
+  <div
+    class="pin-image-popup__image-wrapper pin-image--{{ image_mode }} pin-image-popup__image--{{ desktop_width_mode }}"
+    style="
+      --image-height: {%- case section.settings.image_height -%}{%- when 'small' -%}300px{%- when 'medium' -%}500px{%- when 'large' -%}700px{%- else -%}auto{%- endcase -%};
+      {%- unless section.settings.image_aspect_ratio == 'auto' or section.settings.image_aspect_ratio == blank -%}--image-aspect-ratio: {{ section.settings.image_aspect_ratio }};{%- endunless -%}
+      {%- if image_mode == 'custom' -%}max-width: {{ section.settings.image_custom_width }}%; margin-inline: auto; --custom-image-height: {{ section.settings.custom_image_height }}px;{%- endif -%}
+      --desktop-custom-width: {{ section.settings.desktop_image_width_custom | default: 600 }}px;
+      --image-align: {%- if image_align == 'left' -%}flex-start{%- elsif image_align == 'right' -%}flex-end{%- else -%}center{%- endif -%};
+      --custom-margin-start: {%- if image_align == 'left' -%}0{%- else -%}auto{%- endif -%};
+      --custom-margin-end: {%- if image_align == 'right' -%}0{%- else -%}auto{%- endif -%};
+    "
+  >
+    {%- if section.settings.main_image != blank -%}
+      {% render 'image', image: section.settings.main_image, class: 'pin-image-popup__image' %}
+    {%- else -%}
+      {{ 'hero-apparel-1' | placeholder_svg_tag: 'pin-image-popup__image pin-image-popup__image--placeholder' }}
+    {%- endif -%}
+
+    <div class="pin-image-popup__overlay" aria-hidden="true"></div>
+
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'pin' -%}
+        <button
+          class="pin-image-popup__pin"
+          aria-label="{{ block.settings.title | default: 'View details' | escape }}"
+          aria-expanded="false"
+          aria-controls="pin-popup-{{ section.id }}-{{ block.id }}"
+          data-pin-trigger="{{ block.id }}"
+          style="
+            top: {{ block.settings.padding_top }}%;
+            left: {{ block.settings.padding_left }}%;
+            --pin-bg: {{ block.settings.background_color }};
+            --pin-icon-color: {{ block.settings.icon_color }};
+            --pin-border-radius: {{ block.settings.border_radius }}px;
+          "
+          {{ block.shopify_attributes }}
+        >
+          {%- case block.settings.icon_type -%}
+            {%- when 'dot' -%}
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                <circle cx="5" cy="5" r="5" fill="currentColor"/>
+              </svg>
+            {%- when 'arrow' -%}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            {%- when 'custom' -%}
+              {%- if block.settings.custom_svg != blank -%}
+                {{ block.settings.custom_svg }}
+              {%- else -%}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+              {%- endif -%}
+            {%- else -%}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+          {%- endcase -%}
+        </button>
+
+        <div
+          class="pin-image-popup__popup"
+          id="pin-popup-{{ section.id }}-{{ block.id }}"
+          role="dialog"
+          aria-modal="true"
+          aria-label="{{ block.settings.title | default: 'Details' | escape }}"
+          data-pin-popup="{{ block.id }}"
+          hidden
+        >
+          <div class="pin-image-popup__popup-inner">
+            <button class="pin-image-popup__close" aria-label="Close" data-pin-close>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+
+            {%- if block.settings.title != blank -%}
+              <h3 class="pin-image-popup__popup-title">{{ block.settings.title | escape }}</h3>
+            {%- endif -%}
+
+            {%- if block.settings.popup_image != blank -%}
+              <div class="pin-image-popup__popup-image-wrapper">
+                {% render 'image', image: block.settings.popup_image, class: 'pin-image-popup__popup-image' %}
+              </div>
+            {%- endif -%}
+
+            {%- if block.settings.description != blank -%}
+              <div class="pin-image-popup__popup-description rte">{{ block.settings.description }}</div>
+            {%- endif -%}
+
+            {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+              <a href="{{ block.settings.button_link }}" class="pin-image-popup__popup-button">
+                {{ block.settings.button_label | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  <div class="pin-image-popup__backdrop" aria-hidden="true" data-pin-backdrop></div>
+</div>
+
+{% stylesheet %}
+  .pin-image-popup {
+    position: relative;
+  }
+
+  /* ── Section width ── */
+  .pin-image-popup.section--page-width .pin-image-popup__image-wrapper {
+    max-width: var(--page-width, 1200px);
+    margin-inline: auto;
+    padding-inline: var(--page-margin, 20px);
+  }
+
+  .pin-image-popup.section--full-width .pin-image-popup__image-wrapper {
+    max-width: 100%;
+    padding-inline: 0;
+  }
+
+  /* ── Image wrapper ── */
+  .pin-image-popup__image-wrapper {
+    position: relative;
+    width: 100%;
+    height: var(--image-height, var(--pin-popup-mobile-height, 40vh));
+    overflow: hidden;
+
+    @media screen and (min-width: 750px) {
+      height: var(--image-height, var(--pin-popup-desktop-height, 60vh));
+    }
+
+    /* When image-height is auto, image sizes naturally via aspect-ratio */
+    &:has(> .pin-image-popup__image[style*='position: static']) {
+      height: auto;
+    }
+  }
+
+  /* Auto height: let image define container size */
+  .pin-image-popup__image-wrapper[style*='--image-height: auto'] {
+    height: auto;
+
+    & .pin-image-popup__image {
+      position: relative;
+      inset: unset;
+      height: auto;
+      max-height: none;
+    }
+  }
+
+  /* ── Aspect ratio ── */
+  .pin-image-popup__image-wrapper[style*='--image-aspect-ratio'] {
+    aspect-ratio: var(--image-aspect-ratio);
+    height: auto;
+  }
+
+  /* ── Image size modes ── */
+
+  /* Fit: natural height, image contained */
+  .pin-image--fit {
+    height: auto;
+
+    & .pin-image-popup__image {
+      position: relative;
+      inset: unset;
+      height: auto;
+      object-fit: contain;
+    }
+  }
+
+  /* Fill: fixed viewport height, image cropped to fill */
+  .pin-image--fill {
+    @media screen and (min-width: 750px) {
+      height: 70vh;
+    }
+
+    & .pin-image-popup__image {
+      object-fit: cover;
+    }
+  }
+
+  /* Custom: merchant-defined px height on desktop */
+  .pin-image--custom {
+    @media screen and (min-width: 750px) {
+      height: var(--custom-image-height, 600px);
+    }
+
+    & .pin-image-popup__image {
+      object-fit: cover;
+    }
+  }
+
+  /* Mobile: all modes fall back to auto so image isn't cropped */
+  @media screen and (max-width: 749px) {
+    .pin-image--fit,
+    .pin-image--fill,
+    .pin-image--custom {
+      height: auto;
+      max-width: 100% !important;
+      margin-inline: 0 !important;
+    }
+
+    .pin-image--fill .pin-image-popup__image,
+    .pin-image--custom .pin-image-popup__image {
+      position: relative;
+      inset: unset;
+      height: auto;
+    }
+  }
+
+  .pin-image-popup__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .pin-image-popup__image--placeholder {
+    background: rgb(var(--color-foreground-rgb) / 0.05);
+  }
+
+  /* ── Desktop width modes (≥ 990px only) ── */
+  @media screen and (min-width: 990px) {
+    .pin-image-popup__image--fit {
+      display: flex;
+      justify-content: var(--image-align, center);
+      align-items: flex-start;
+
+      & .pin-image-popup__image {
+        position: relative;
+        inset: unset;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+
+    .pin-image-popup__image--fill {
+      & .pin-image-popup__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .pin-image-popup__image--custom {
+      max-width: var(--desktop-custom-width, 600px);
+      margin-inline-start: var(--custom-margin-start, auto);
+      margin-inline-end: var(--custom-margin-end, auto);
+
+      & .pin-image-popup__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
+  /* Desktop width mobile reset */
+  @media screen and (max-width: 989px) {
+    .pin-image-popup__image--fit,
+    .pin-image-popup__image--fill,
+    .pin-image-popup__image--custom {
+      max-width: 100% !important;
+      margin-inline: 0 !important;
+    }
+  }
+
+  .pin-image-popup__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--pin-popup-overlay, transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Pin button ── */
+  .pin-image-popup__pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--pin-border-radius, 50%);
+    background: var(--pin-bg, rgb(0 0 0 / 0.6));
+    color: var(--pin-icon-color, #fff);
+    border: 2px solid rgb(255 255 255 / 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    & svg {
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+
+    &:hover,
+    &:focus-visible {
+      transform: translate(-50%, -50%) scale(1.15);
+      box-shadow: 0 0 0 5px rgb(255 255 255 / 0.25);
+      outline: none;
+    }
+
+    &[aria-expanded='true'] {
+      transform: translate(-50%, -50%) scale(1.1);
+      background: rgb(255 255 255 / 0.95);
+      color: #000;
+    }
+  }
+
+  /* Pulse ring */
+  .pin-image-popup__pin::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: inherit;
+    border: 2px solid var(--pin-bg, rgb(0 0 0 / 0.4));
+    opacity: 0;
+    animation: pin-pulse 2.5s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pin-pulse {
+    0% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.7);
+    }
+  }
+
+  /* ── Backdrop ── */
+  .pin-image-popup__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 0.5);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .pin-image-popup__backdrop.is-active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ── Popup ── */
+  .pin-image-popup__popup {
+    position: fixed;
+    inset: 0;
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    pointer-events: none;
+
+    &[hidden] {
+      display: none;
+    }
+
+    &.is-open {
+      pointer-events: all;
+      display: flex;
+    }
+  }
+
+  .pin-image-popup__popup-inner {
+    position: relative;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    border-radius: 12px;
+    padding: 28px 24px 24px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 85dvh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 0.2);
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+
+    @media screen and (min-width: 750px) {
+      padding: 36px 32px 32px;
+      max-width: 480px;
+    }
+  }
+
+  .pin-image-popup__popup.is-open .pin-image-popup__popup-inner {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  /* ── Close button ── */
+  .pin-image-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgb(var(--color-foreground-rgb) / 0.08);
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: rgb(var(--color-foreground-rgb) / 0.15);
+      outline: none;
+    }
+  }
+
+  /* ── Popup content ── */
+  .pin-image-popup__popup-title {
+    margin: 0 0 14px;
+    font-size: 1.2rem;
+    line-height: 1.3;
+    padding-right: 32px;
+  }
+
+  .pin-image-popup__popup-image-wrapper {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+  }
+
+  .pin-image-popup__popup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .pin-image-popup__popup-description {
+    margin-bottom: 20px;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: rgb(var(--color-foreground-rgb) / 0.75);
+  }
+
+  .pin-image-popup__popup-button {
+    display: inline-block;
+    text-decoration: none;
+    padding: 11px 24px;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    transition: opacity 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.8;
+      outline: none;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    var sectionEl = document.getElementById('pin-image-popup-{{ section.id }}');
+    if (!sectionEl) return;
+
+    var backdrop = sectionEl.querySelector('[data-pin-backdrop]');
+    var activePopup = null;
+    var activeTrigger = null;
+
+    function openPopup(trigger) {
+      if (activePopup) closePopup(false);
+
+      var pinId = trigger.getAttribute('data-pin-trigger');
+      var popup = sectionEl.querySelector('[data-pin-popup="' + pinId + '"]');
+      if (!popup) return;
+
+      popup.removeAttribute('hidden');
+      popup.offsetHeight; // force reflow for transition
+      popup.classList.add('is-open');
+      backdrop.classList.add('is-active');
+      trigger.setAttribute('aria-expanded', 'true');
+
+      activePopup = popup;
+      activeTrigger = trigger;
+
+      var firstFocusable = popup.querySelector('button, a[href], [tabindex]:not([tabindex="-1"])');
+      if (firstFocusable) firstFocusable.focus();
+    }
+
+    function closePopup(returnFocus) {
+      if (!activePopup) return;
+
+      activePopup.classList.remove('is-open');
+      backdrop.classList.remove('is-active');
+
+      if (activeTrigger) {
+        activeTrigger.setAttribute('aria-expanded', 'false');
+        if (returnFocus !== false) activeTrigger.focus();
+      }
+
+      var popupToHide = activePopup;
+      activePopup = null;
+      activeTrigger = null;
+
+      setTimeout(function () {
+        popupToHide.setAttribute('hidden', '');
+      }, 260);
+    }
+
+    // Pin trigger clicks
+    sectionEl.querySelectorAll('[data-pin-trigger]').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        var pinId = trigger.getAttribute('data-pin-trigger');
+        var popup = sectionEl.querySelector('[data-pin-popup="' + pinId + '"]');
+        if (popup && popup.classList.contains('is-open')) {
+          closePopup(true);
+        } else {
+          openPopup(trigger);
+        }
+      });
+    });
+
+    // Close button inside popup
+    sectionEl.addEventListener('click', function (e) {
+      if (e.target.closest('[data-pin-close]')) closePopup(true);
+    });
+
+    // Backdrop click
+    if (backdrop) {
+      backdrop.addEventListener('click', function () { closePopup(true); });
+    }
+
+    // ESC key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && activePopup) closePopup(true);
+    });
+
+    // Focus trap
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab' || !activePopup) return;
+
+      var focusable = Array.from(activePopup.querySelectorAll(
+        'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ));
+      if (focusable.length === 0) return;
+
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Pin image popup",
+  "tag": "section",
+  "class": "section-pin-image-popup",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Main image"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        { "value": "full-width", "label": "t:options.full" },
+        { "value": "page-width", "label": "t:options.page" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "label": "Image height",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "small", "label": "Small (300px)" },
+        { "value": "medium", "label": "Medium (500px)" },
+        { "value": "large", "label": "Large (700px)" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "image_size_mode",
+      "label": "Image size (Desktop)",
+      "options": [
+        { "value": "fit", "label": "Fit" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "range",
+      "id": "image_custom_width",
+      "label": "Custom width (%)",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Only applies when Image size = Custom"
+    },
+    {
+      "type": "range",
+      "id": "custom_image_height",
+      "label": "Custom height (px)",
+      "min": 300,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "default": 600,
+      "info": "Only applies when Image size = Custom",
+      "visible_if": "{{ section.settings.image_size_mode == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "1 / 1", "label": "1:1 (Square)" },
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "16 / 9", "label": "16:9 (Widescreen)" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_width_mode",
+      "label": "Image size (Desktop)",
+      "options": [
+        { "value": "fit", "label": "Fit" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom width" }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "range",
+      "id": "desktop_image_width_custom",
+      "label": "Custom image width",
+      "min": 200,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 600,
+      "info": "Only applies when Image size = Custom width",
+      "visible_if": "{{ section.settings.desktop_image_width_mode == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "image_alignment",
+      "label": "Image alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Height"
+    },
+    {
+      "type": "select",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "options": [
+        { "value": "40vh", "label": "Small (40vh)" },
+        { "value": "60vh", "label": "Medium (60vh)" },
+        { "value": "80vh", "label": "Large (80vh)" },
+        { "value": "100vh", "label": "Full screen" }
+      ],
+      "default": "60vh"
+    },
+    {
+      "type": "select",
+      "id": "mobile_height",
+      "label": "Mobile height",
+      "options": [
+        { "value": "30vh", "label": "Small (30vh)" },
+        { "value": "40vh", "label": "Medium (40vh)" },
+        { "value": "60vh", "label": "Large (60vh)" },
+        { "value": "80vh", "label": "Full screen" }
+      ],
+      "default": "40vh"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "alpha": true,
+      "default": "#00000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pin",
+      "name": "Pin button",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Position"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Vertical position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "padding_left",
+          "label": "Horizontal position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Style"
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "label": "Border radius",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "default": 50
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color",
+          "alpha": true,
+          "default": "#00000099"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "header",
+          "content": "Icon"
+        },
+        {
+          "type": "select",
+          "id": "icon_type",
+          "label": "Icon",
+          "options": [
+            { "value": "plus", "label": "Plus" },
+            { "value": "dot", "label": "Dot" },
+            { "value": "arrow", "label": "Arrow" },
+            { "value": "custom", "label": "Custom SVG" }
+          ],
+          "default": "plus"
+        },
+        {
+          "type": "html",
+          "id": "custom_svg",
+          "label": "Custom SVG markup",
+          "info": "Used when Icon is set to \"Custom SVG\"."
+        },
+        {
+          "type": "header",
+          "content": "Popup content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "popup_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pin image popup",
+      "blocks": [
+        {
+          "type": "pin",
+          "settings": {
+            "padding_top": 40,
+            "padding_left": 35,
+            "title": "Pin 1",
+            "description": "<p>Add a description for this pin.</p>"
+          }
+        },
+        {
+          "type": "pin",
+          "settings": {
+            "padding_top": 60,
+            "padding_left": 65,
+            "title": "Pin 2",
+            "description": "<p>Add a description for this pin.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
