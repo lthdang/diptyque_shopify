@@ -1,0 +1,254 @@
+{%- comment -%}
+  Parallax Image
+  A full-width or page-width image section with a parallax scrolling effect.
+{%- endcomment -%}
+
+<section
+  class="parallax-image section section--{{ section.settings.section_width }}"
+  id="parallax-image-{{ section.id }}"
+  data-speed="{{ section.settings.parallax_speed }}"
+>
+  <div
+    class="parallax-image__wrapper"
+    style="height: {{ section.settings.section_height }}px;"
+  >
+    <div class="parallax-image__media parallax-image__media--{{ section.settings.image_size }}">
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 2000
+          | image_tag:
+            class: 'parallax-image__img',
+            loading: 'lazy',
+            widths: '375, 750, 1100, 1500, 1780, 2000',
+            sizes: '100vw'
+        }}
+      {%- else -%}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'parallax-image__img parallax-image__img--placeholder' }}
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.image_overlay_opacity > 0 -%}
+      <div
+        class="parallax-image__overlay"
+        style="background: rgba(0,0,0,{{ section.settings.image_overlay_opacity | divided_by: 100.0 }});"
+        aria-hidden="true"
+      ></div>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank or section.settings.text != blank -%}
+      <div class="parallax-image__content">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="parallax-image__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="parallax-image__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .parallax-image {
+    position: relative;
+  }
+
+  .parallax-image__wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .parallax-image__media {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .parallax-image__img {
+    width: 100%;
+    height: 120%;
+    display: block;
+  }
+
+  .parallax-image__media--cover .parallax-image__img,
+  .parallax-image__media--fill .parallax-image__img {
+    object-fit: cover;
+  }
+
+  .parallax-image__media--fit .parallax-image__img {
+    object-fit: contain;
+  }
+
+  .parallax-image__img--placeholder {
+    object-fit: cover;
+  }
+
+  .parallax-image__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .parallax-image__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: #fff;
+  }
+
+  .parallax-image__heading {
+    margin: 0 0 1rem;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .parallax-image__text {
+    max-width: 60ch;
+  }
+
+  @media (max-width: 749px) {
+    .parallax-image__media {
+      transform: none !important;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    function initParallax() {
+      var sections = document.querySelectorAll('.parallax-image');
+      if (!sections.length) return;
+
+      function onScroll() {
+        sections.forEach(function (section) {
+          var media = section.querySelector('.parallax-image__media');
+          if (!media) return;
+
+          var speed = parseFloat(section.dataset.speed) || 0.5;
+          var rect = section.getBoundingClientRect();
+
+          // Only animate when the section is in/near the viewport
+          if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+          var offset = rect.top * speed;
+          media.style.transform = 'translateY(' + offset + 'px)';
+        });
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initParallax);
+    } else {
+      initParallax();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Parallax image",
+  "tag": "section",
+  "class": "section-parallax-image",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full width" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Section height",
+      "min": 300,
+      "max": 900,
+      "step": 50,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "select",
+      "id": "image_size",
+      "label": "Image size",
+      "options": [
+        { "value": "fit", "label": "Fit" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "cover", "label": "Cover" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Parallax"
+    },
+    {
+      "type": "range",
+      "id": "parallax_speed",
+      "label": "Parallax speed",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.5
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Parallax image"
+    }
+  ]
+}
+{% endschema %}
