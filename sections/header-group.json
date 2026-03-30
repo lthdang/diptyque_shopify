@@ -221,7 +221,7 @@
             "group_id": "1",
             "column": 1,
             "link_text": "オンラインストア フレグランス刻印サービス",
-            "link_url": "/collections/best-sellers",
+            "link_url": "shopify://pages/diptyque-personalised-engraving",
             "text_color": "#717171",
             "hover_color": "#000000",
             "font_size": 12,
