@@ -44,10 +44,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "heading",
-        "page-content"
-      ],
+      "block_order": ["heading", "page-content"],
       "disabled": true,
       "settings": {
         "content_direction": "column",
@@ -145,10 +142,7 @@
           }
         }
       },
-      "block_order": [
-        "video_RaM7xN",
-        "overlay_button_NqhGcz"
-      ],
+      "block_order": ["video_RaM7xN", "overlay_button_NqhGcz"],
       "name": "Video With Overlay Button",
       "settings": {
         "section_width": "page-width",
@@ -226,9 +220,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_WBGTPA"
-          ]
+          "block_order": ["text_WBGTPA"]
         },
         "text_GHghAm": {
           "type": "text",
@@ -257,10 +249,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "group_LDDRHb",
-        "text_GHghAm"
-      ],
+      "block_order": ["group_LDDRHb", "text_GHghAm"],
       "name": "t:names.rich_text_section",
       "settings": {
         "content_direction": "column",
@@ -448,9 +437,7 @@
           ]
         }
       },
-      "block_order": [
-        "text_QXGNBa"
-      ],
+      "block_order": ["text_QXGNBa"],
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "baies-べ-ルーム-スプレー",
@@ -580,9 +567,7 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "text_JywXMq"
-              ]
+              "block_order": ["text_JywXMq"]
             },
             "text_EpPp99": {
               "type": "text",
@@ -683,10 +668,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "group_P6VKd7",
-        "image_yF4mUc"
-      ],
+      "block_order": ["group_P6VKd7", "image_yF4mUc"],
       "name": "t:names.image_with_text",
       "settings": {
         "content_direction": "row",
@@ -823,9 +805,7 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "image_XWT8Yf"
-              ]
+              "block_order": ["image_XWT8Yf"]
             },
             "group_WqED8U": {
               "type": "group",
@@ -920,21 +900,13 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "text_6w8JHY",
-                "text_C68nXn"
-              ]
+              "block_order": ["text_6w8JHY", "text_C68nXn"]
             }
           },
-          "block_order": [
-            "group_4Vrwrh",
-            "group_WqED8U"
-          ]
+          "block_order": ["group_4Vrwrh", "group_WqED8U"]
         }
       },
-      "block_order": [
-        "group_nwN84J"
-      ],
+      "block_order": ["group_nwN84J"],
       "name": "t:names.multicolumn",
       "settings": {
         "content_direction": "row",
@@ -1034,10 +1006,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "text_qqgh8M",
-        "text_zf3w63"
-      ],
+      "block_order": ["text_qqgh8M", "text_zf3w63"],
       "name": "t:names.rich_text_section",
       "settings": {
         "content_direction": "column",
@@ -1370,10 +1339,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "text_zGVEtg",
-        "text_miVhhn"
-      ],
+      "block_order": ["text_zGVEtg", "text_miVhhn"],
       "name": "t:names.rich_text_section",
       "settings": {
         "content_direction": "column",
@@ -1706,10 +1672,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "text_yNYJzx",
-        "text_pYdbyE"
-      ],
+      "block_order": ["text_yNYJzx", "text_pYdbyE"],
       "name": "t:names.rich_text_section",
       "settings": {
         "content_direction": "column",
@@ -1782,7 +1745,7 @@
               "settings": {
                 "text": "<h3>{{ closest.collection.title }}</h3>",
                 "width": "fit-content",
-                "max_width": "none",
+                "max_width": "normal",
                 "alignment": "left",
                 "type_preset": "rte",
                 "font": "var(--font-body--family)",
@@ -1790,7 +1753,7 @@
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
-                "wrap": "nowrap",
+                "wrap": "pretty",
                 "color": "var(--color-foreground)",
                 "background": false,
                 "background_color": "#00000026",
@@ -1801,10 +1764,25 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "product_list_button_qpqpD9": {
+              "type": "_product-list-button",
+              "name": "t:names.product_list_button",
+              "settings": {
+                "label": "View all",
+                "open_in_new_tab": false,
+                "style_class": "link",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
             }
           },
           "block_order": [
-            "product_list_text_NFgGj4"
+            "product_list_text_NFgGj4",
+            "product_list_button_qpqpD9"
           ]
         },
         "static-product-card": {
@@ -2241,10 +2219,7 @@
           ]
         }
       },
-      "block_order": [
-        "group_hGXhxe",
-        "group_mAjBWL"
-      ],
+      "block_order": ["group_hGXhxe", "group_mAjBWL"],
       "name": "t:names.multicolumn",
       "settings": {
         "content_direction": "row",
@@ -2424,10 +2399,7 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "image_kfUXWa",
-                "link_block_cKygVy"
-              ]
+              "block_order": ["image_kfUXWa", "link_block_cKygVy"]
             },
             "group_BHxWfy": {
               "type": "group",
@@ -2510,10 +2482,7 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "image_hyG3fV",
-                "link_block_wiJzFr"
-              ]
+              "block_order": ["image_hyG3fV", "link_block_wiJzFr"]
             },
             "group_76De39": {
               "type": "group",
@@ -2596,10 +2565,7 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "image_HMEQqh",
-                "link_block_YX4Htx"
-              ]
+              "block_order": ["image_HMEQqh", "link_block_YX4Htx"]
             },
             "group_q6paiX": {
               "type": "group",
@@ -2682,10 +2648,7 @@
                   "blocks": {}
                 }
               },
-              "block_order": [
-                "image_VWN4fR",
-                "link_block_jcRJ3q"
-              ]
+              "block_order": ["image_VWN4fR", "link_block_jcRJ3q"]
             }
           },
           "block_order": [
@@ -2696,10 +2659,7 @@
           ]
         }
       },
-      "block_order": [
-        "text_VyDfWH",
-        "group_gD9nti"
-      ],
+      "block_order": ["text_VyDfWH", "group_gD9nti"],
       "name": "t:names.multicolumn",
       "settings": {
         "content_direction": "column",
