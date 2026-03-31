@@ -1,0 +1,313 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "Title",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-primary--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "section_p4iTJi": {
+      "type": "section",
+      "blocks": {
+        "text_kF7WxM": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h1>公式オンラインストア特典</h1>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "custom",
+            "font": "var(--font-body--family)",
+            "font_size": "2rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "text_TQMLHj": {
+          "type": "text",
+          "name": "t:names.text",
+          "settings": {
+            "text": "<p>期間限定のご購入特典やサンプル、会員限定特典をご覧ください。<br/>オンラインストアのギフトラッピングサービスやご利用ガイドもご紹介いたします。</p>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "text_kF7WxM",
+        "text_TQMLHj"
+      ],
+      "name": "t:names.rich_text_section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 25,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 10,
+        "padding-block-end": 10
+      }
+    },
+    "tab_list_scroll_78hkyX": {
+      "type": "tab-list-scroll",
+      "blocks": {
+        "tab_fcN7QK": {
+          "type": "tab",
+          "settings": {
+            "title": "サンプル",
+            "tab_key": "section-1",
+            "layout_type": "layout_1",
+            "heading": "サンプル",
+            "text": "",
+            "bg_color": "",
+            "padding_top": 48,
+            "padding_bottom": 48,
+            "l1_title": "サンプル サービス",
+            "l1_title_font_family": "heading",
+            "l1_title_font_size": 32,
+            "l1_title_color": "#111111",
+            "l1_title_background": "",
+            "l1_title_alignment": "center",
+            "l1_title_position": "top",
+            "left_image": "shopify://shop_images/3.jpg",
+            "left_text": "<p> お試し用フレグランスサンプル<br/>フレグランスをご注文いただくと、同じフレグランスのサンプルもご一緒にお送りいたします。まずはサンプルをお試しいただき、商品を開封される前にお客様の肌で香りをご確認ください。<br/></p>",
+            "left_link_label": "詳細はこちら",
+            "left_link_url": "shopify://blogs/news",
+            "left_button_label": "",
+            "left_button_url": "",
+            "right_image": "shopify://shop_images/4.jpg",
+            "right_text": "<p>ご購入時に無料サンプルプレゼント<br/>ご購入されたお客様にはご希望のサンプル1点をプレゼントいたします。ショッピングバッグページにてご希望のサンプルをお選びください。サンプル提供のみのご要望は受け付けておりません。</p>",
+            "right_link_label": "ベストセラーをみる",
+            "right_link_url": "shopify://blogs/news",
+            "right_button_label": "",
+            "right_button_url": "",
+            "image_alignment": "center",
+            "image_overlay_enable": false,
+            "image_overlay_color": "#000000",
+            "image_border_radius": 0,
+            "link_color": "#111111",
+            "link_font_size": 14,
+            "link_background": "",
+            "link_hover_effect": "background",
+            "link_padding": 0,
+            "button_color": "#111111",
+            "button_text_color": "#ffffff",
+            "button_font_size": 14,
+            "button_padding": 12,
+            "button_hover_effect": "color_shift"
+          }
+        },
+        "tab_Tjz3AX": {
+          "type": "tab",
+          "settings": {
+            "title": "ギフトラッピング",
+            "tab_key": "section-2",
+            "layout_type": "layout_1",
+            "heading": "ギフトラッピング",
+            "text": "<p>Add your content here.</p>",
+            "bg_color": "",
+            "padding_top": 48,
+            "padding_bottom": 48,
+            "l1_title": "ギフトラッピングオプション",
+            "l1_title_font_family": "heading",
+            "l1_title_font_size": 32,
+            "l1_title_color": "#111111",
+            "l1_title_background": "",
+            "l1_title_alignment": "center",
+            "l1_title_position": "top",
+            "left_image": "shopify://shop_images/2.jpg",
+            "left_text": "",
+            "left_link_label": "",
+            "left_link_url": "",
+            "left_button_label": "",
+            "left_button_url": "",
+            "right_image": "shopify://shop_images/CHARTE___ILLUSTRATION___POCHON-CADEAU___FOND-GRIS___2142x2142px.avif",
+            "right_text": "",
+            "right_link_label": "",
+            "right_link_url": "",
+            "right_button_label": "",
+            "right_button_url": "",
+            "image_alignment": "center",
+            "image_overlay_enable": false,
+            "image_overlay_color": "#000000",
+            "image_border_radius": 0,
+            "link_color": "#111111",
+            "link_font_size": 14,
+            "link_background": "",
+            "link_hover_effect": "underline",
+            "link_padding": 0,
+            "button_color": "#111111",
+            "button_text_color": "#ffffff",
+            "button_font_size": 14,
+            "button_padding": 12,
+            "button_hover_effect": "color_shift"
+          }
+        },
+        "tab_XtC4Tn": {
+          "type": "tab",
+          "settings": {
+            "title": "Section 3",
+            "tab_key": "section-3",
+            "layout_type": "layout_1",
+            "heading": "Section 3 heading",
+            "text": "<p>Add your content here.</p>",
+            "bg_color": "",
+            "padding_top": 48,
+            "padding_bottom": 48,
+            "l1_title": "",
+            "l1_title_font_family": "heading",
+            "l1_title_font_size": 32,
+            "l1_title_color": "#111111",
+            "l1_title_background": "",
+            "l1_title_alignment": "left",
+            "l1_title_position": "top",
+            "left_text": "",
+            "left_link_label": "",
+            "left_link_url": "",
+            "left_button_label": "",
+            "left_button_url": "",
+            "right_text": "",
+            "right_link_label": "",
+            "right_link_url": "",
+            "right_button_label": "",
+            "right_button_url": "",
+            "image_alignment": "center",
+            "image_overlay_enable": false,
+            "image_overlay_color": "#000000",
+            "image_border_radius": 0,
+            "link_color": "#111111",
+            "link_font_size": 14,
+            "link_background": "",
+            "link_hover_effect": "underline",
+            "link_padding": 0,
+            "button_color": "#111111",
+            "button_text_color": "#ffffff",
+            "button_font_size": 14,
+            "button_padding": 12,
+            "button_hover_effect": "color_shift"
+          }
+        }
+      },
+      "block_order": [
+        "tab_fcN7QK",
+        "tab_Tjz3AX",
+        "tab_XtC4Tn"
+      ],
+      "name": "Tab list scroll",
+      "settings": {
+        "section_width": "page-width",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "section_gap": 0,
+        "tab_alignment": "center",
+        "tab_text_color": "#111111",
+        "tab_bg_color": "#ffffff",
+        "tab_font_size": 13,
+        "tab_padding": 12
+      }
+    }
+  },
+  "order": [
+    "main",
+    "section_p4iTJi",
+    "tab_list_scroll_78hkyX"
+  ]
+}
