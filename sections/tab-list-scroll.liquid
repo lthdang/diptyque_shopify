@@ -1,0 +1,1321 @@
+{%- comment -%}
+  Section: Tab List Scroll
+  Purpose: Horizontal sticky tab navigation that smooth-scrolls to linked content panels.
+  Each "tab" block defines one tab button + its content panel (heading, rich text, image, CTA).
+{%- endcomment -%}
+
+{%- liquid
+  assign sid = section.id
+  assign s   = section.settings
+-%}
+
+<tab-list-scroll
+  class="tab-list-scroll section section--{{ s.section_width }}"
+  data-section-id="{{ sid }}"
+  style="
+    --tls-pt: {{ s.padding_top }}px;
+    --tls-pb: {{ s.padding_bottom }}px;
+    --tls-gap: {{ s.section_gap }}px;
+    --tls-tab-color: {{ s.tab_text_color }};
+    --tls-tab-bg: {{ s.tab_bg_color }};
+    --tls-tab-size: {{ s.tab_font_size }}px;
+    --tls-tab-pad: {{ s.tab_padding }}px;
+    --tls-tab-align:
+      {%- if s.tab_alignment == 'left' -%}flex-start
+      {%- elsif s.tab_alignment == 'right' -%}flex-end
+      {%- else -%}center{%- endif -%};
+  "
+  {{ section.shopify_attributes }}
+>
+  {%- if section.blocks.size > 0 -%}
+    {%- comment -%}
+      Single wrapper so CSS `position: sticky` on the bar is contained within the
+      section height — it naturally "unsticks" when the section scrolls out of view.
+    {%- endcomment -%}
+    <div class="tab-list-scroll__wrap">
+
+      {%- comment -%}── Sticky tab bar ──────────────────────────────────────{%- endcomment -%}
+      <div class="tab-list-scroll__bar" data-tls-bar>
+        <div class="tab-list-scroll__bar-body">
+          <nav aria-label="Tab navigation">
+            <ul class="tab-list-scroll__track" role="tablist" data-tls-track>
+
+              {%- for block in section.blocks -%}
+                {%- liquid
+                  assign raw_key = block.settings.tab_key | strip
+                  if raw_key != blank
+                    assign tab_key = raw_key
+                  else
+                    assign tab_key = block.settings.title | handleize
+                    if tab_key == blank
+                      assign tab_key = 'tab-' | append: forloop.index
+                    endif
+                  endif
+                  assign panel_id = 'tls-' | append: sid | append: '-' | append: tab_key
+                -%}
+                <li role="presentation" {{ block.shopify_attributes }}>
+                  <button
+                    type="button"
+                    class="tab-list-scroll__btn{% if forloop.first %} is-active{% endif %}"
+                    role="tab"
+                    aria-selected="{{ forloop.first }}"
+                    aria-controls="{{ panel_id }}"
+                    data-tls-btn="{{ panel_id }}"
+                  >
+                    {{- block.settings.title | default: 'Tab' | escape -}}
+                  </button>
+                </li>
+              {%- endfor -%}
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {%- comment -%}── Content panels ───────────────────────────────────────{%- endcomment -%}
+      <div class="tab-list-scroll__panels" data-tls-panels>
+
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign raw_key = block.settings.tab_key | strip
+            if raw_key != blank
+              assign tab_key = raw_key
+            else
+              assign tab_key = block.settings.title | handleize
+              if tab_key == blank
+                assign tab_key = 'tab-' | append: forloop.index
+              endif
+            endif
+            assign panel_id  = 'tls-' | append: sid | append: '-' | append: tab_key
+            assign layout    = block.settings.layout | default: 'stack'
+            assign has_img   = false
+            if block.settings.image != blank
+              assign has_img = true
+            endif
+            assign has_bg = false
+            if block.settings.bg_color != blank and block.settings.bg_color != 'rgba(0,0,0,0)'
+              assign has_bg = true
+            endif
+          -%}
+
+          <div
+            id="{{ panel_id }}"
+            class="tab-list-scroll__panel"
+            role="tabpanel"
+            aria-labelledby="{{ panel_id }}"
+            data-tls-panel
+            style="
+              padding-top: {{ block.settings.padding_top | default: 48 }}px;
+              padding-bottom: {{ block.settings.padding_bottom | default: 48 }}px;
+              {%- if has_bg -%}background-color: {{ block.settings.bg_color }};{%- endif -%}
+            "
+          >
+            <div class="tab-list-scroll__panel-inner">
+
+              {%- case block.settings.layout_type %}
+
+              {%- when 'layout_1' -%}
+                {%- liquid
+                  assign l1_has_left_img  = false
+                  if block.settings.left_image != blank
+                    assign l1_has_left_img = true
+                  endif
+                  assign l1_has_right_img = false
+                  if block.settings.right_image != blank
+                    assign l1_has_right_img = true
+                  endif
+                  assign l1_title_pos   = block.settings.l1_title_position | default: 'top'
+                  assign l1_title_align = block.settings.l1_title_alignment | default: 'left'
+                  assign l1_link_hover  = block.settings.link_hover_effect | default: 'underline'
+                  assign l1_btn_hover   = block.settings.button_hover_effect | default: 'color_shift'
+                -%}
+                <div
+                  class="tab-layout tab-layout--1 tab-layout--1--title-{{ l1_title_pos }}"
+                  style="
+                    --tl1-link-size: {{ block.settings.link_font_size | default: 14 }}px;
+                    --tl1-link-pad: {{ block.settings.link_padding | default: 0 }}px;
+                    --tl1-btn-size: {{ block.settings.button_font_size | default: 14 }}px;
+                    --tl1-btn-pad: {{ block.settings.button_padding | default: 12 }}px;
+                    --tl1-img-radius: {{ block.settings.image_border_radius | default: 0 }}px;
+                    {%- if block.settings.link_color != blank -%}--tl1-link-color: {{ block.settings.link_color }};{%- endif -%}
+                    {%- unless block.settings.link_background == blank or block.settings.link_background == 'rgba(0,0,0,0)' -%}--tl1-link-bg: {{ block.settings.link_background }};{%- endunless -%}
+                    {%- if block.settings.button_color != blank -%}--tl1-btn-color: {{ block.settings.button_color }};{%- endif -%}
+                    {%- if block.settings.button_text_color != blank -%}--tl1-btn-text-color: {{ block.settings.button_text_color }};{%- endif -%}
+                    {%- if block.settings.image_overlay_enable and block.settings.image_overlay_color != blank -%}--tl1-overlay-color: {{ block.settings.image_overlay_color }};{%- endif -%}
+                  "
+                >
+                  {%- if block.settings.l1_title != blank -%}
+                    <div
+                      class="tab-layout--1__title tab-layout--1__title--align-{{ l1_title_align }}"
+                      style="
+                        font-size: {{ block.settings.l1_title_font_size | default: 32 }}px;
+                        {%- if block.settings.l1_title_font_family == 'body' -%}font-family: var(--font-paragraph--family);{%- else -%}font-family: var(--font-h1--family);{%- endif -%}
+                        {%- if block.settings.l1_title_color != blank -%}color: {{ block.settings.l1_title_color }};{%- endif -%}
+                        {%- unless block.settings.l1_title_background == blank or block.settings.l1_title_background == 'rgba(0,0,0,0)' -%}background-color: {{ block.settings.l1_title_background }};{%- endunless -%}
+                      "
+                    >
+                      <span>{{ block.settings.l1_title | escape }}</span>
+                    </div>
+                  {%- endif -%}
+
+                  <div class="tab-layout--1__grid">
+
+                    {%- comment -%}── Left column ──────────────────────────────{%- endcomment -%}
+                    <div class="tab-layout--1__col tab-layout--1__col--left">
+                      {%- if l1_has_left_img -%}
+                        <div
+                          class="tab-layout--1__img-wrap{% if block.settings.image_overlay_enable %} tab-layout--1__img-wrap--overlay{% endif %}"
+                          style="--tl1-img-align: {{ block.settings.image_alignment | default: 'center' }};"
+                        >
+                          {{- block.settings.left_image
+                            | image_url: width: 1200
+                            | image_tag:
+                              alt: block.settings.left_image.alt,
+                              loading: 'lazy',
+                              widths: '375, 600, 800, 1000, 1200',
+                              class: 'tab-layout--1__img'
+                          -}}
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.left_text != blank -%}
+                        <div class="tab-layout--1__text rte">{{ block.settings.left_text }}</div>
+                      {%- endif -%}
+                      {%- if block.settings.left_link_label != blank -%}
+                        <a
+                          href="{{ block.settings.left_link_url | default: '#' }}"
+                          class="tab-layout--1__link tab-layout--1__link--hover-{{ l1_link_hover }}"
+                        >
+                          {{- block.settings.left_link_label | escape -}}
+                        </a>
+                      {%- endif -%}
+                      {%- if block.settings.left_button_label != blank -%}
+                        <a
+                          href="{{ block.settings.left_button_url | default: '#' }}"
+                          class="tab-layout--1__btn tab-layout--1__btn--hover-{{ l1_btn_hover }}"
+                        >
+                          {{- block.settings.left_button_label | escape -}}
+                        </a>
+                      {%- endif -%}
+                    </div>
+
+                    {%- comment -%}── Right column ─────────────────────────────{%- endcomment -%}
+                    <div class="tab-layout--1__col tab-layout--1__col--right">
+                      {%- if l1_has_right_img -%}
+                        <div
+                          class="tab-layout--1__img-wrap{% if block.settings.image_overlay_enable %} tab-layout--1__img-wrap--overlay{% endif %}"
+                          style="--tl1-img-align: {{ block.settings.image_alignment | default: 'center' }};"
+                        >
+                          {{- block.settings.right_image
+                            | image_url: width: 1200
+                            | image_tag:
+                              alt: block.settings.right_image.alt,
+                              loading: 'lazy',
+                              widths: '375, 600, 800, 1000, 1200',
+                              class: 'tab-layout--1__img'
+                          -}}
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.right_text != blank -%}
+                        <div class="tab-layout--1__text rte">{{ block.settings.right_text }}</div>
+                      {%- endif -%}
+                      {%- if block.settings.right_link_label != blank -%}
+                        <a
+                          href="{{ block.settings.right_link_url | default: '#' }}"
+                          class="tab-layout--1__link tab-layout--1__link--hover-{{ l1_link_hover }}"
+                        >
+                          {{- block.settings.right_link_label | escape -}}
+                        </a>
+                      {%- endif -%}
+                      {%- if block.settings.right_button_label != blank -%}
+                        <a
+                          href="{{ block.settings.right_button_url | default: '#' }}"
+                          class="tab-layout--1__btn tab-layout--1__btn--hover-{{ l1_btn_hover }}"
+                        >
+                          {{- block.settings.right_button_label | escape -}}
+                        </a>
+                      {%- endif -%}
+                    </div>
+
+                  </div>
+                </div>
+
+              {%- else %}
+
+                {%- if layout == 'image-left' or layout == 'image-right' -%}
+                {%- comment -%} Side-by-side: image + copy {%- endcomment -%}
+                <div class="tab-list-scroll__row tab-list-scroll__row--{{ layout }}">
+
+                  {%- if has_img -%}
+                    <figure class="tab-list-scroll__fig">
+                      {{- block.settings.image
+                        | image_url: width: 1200
+                        | image_tag:
+                          alt: block.settings.image.alt,
+                          loading: 'lazy',
+                          widths: '375, 600, 800, 1000, 1200',
+                          class: 'tab-list-scroll__fig-img'
+                      -}}
+                    </figure>
+                  {%- endif -%}
+
+                  <div class="tab-list-scroll__copy">
+                    {%- if block.settings.heading != blank -%}
+                      <h2 class="tab-list-scroll__heading">{{ block.settings.heading | escape }}</h2>
+                    {%- endif -%}
+                    {%- if block.settings.text != blank -%}
+                      <div class="tab-list-scroll__text rte">{{ block.settings.text }}</div>
+                    {%- endif -%}
+                    {%- if block.settings.button_label != blank -%}
+                      <a
+                        href="{{ block.settings.button_link | default: '#' }}"
+                        class="button tab-list-scroll__cta"
+                      >
+                        {{- block.settings.button_label | escape -}}
+                      </a>
+                    {%- endif -%}
+                  </div>
+
+                </div>
+
+              {%- else -%}
+                {%- comment -%} Stacked: optional image on top, then copy {%- endcomment -%}
+                {%- if has_img -%}
+                  <figure class="tab-list-scroll__fig tab-list-scroll__fig--top">
+                    {{- block.settings.image
+                      | image_url: width: 1400
+                      | image_tag:
+                        alt: block.settings.image.alt,
+                        loading: 'lazy',
+                        widths: '375, 600, 800, 1000, 1200, 1400',
+                        class: 'tab-list-scroll__fig-img'
+                    -}}
+                  </figure>
+                {%- endif -%}
+
+                <div class="tab-list-scroll__copy">
+                  {%- if block.settings.heading != blank -%}
+                    <h2 class="tab-list-scroll__heading">{{ block.settings.heading | escape }}</h2>
+                  {%- endif -%}
+                  {%- if block.settings.text != blank -%}
+                    <div class="tab-list-scroll__text rte">{{ block.settings.text }}</div>
+                  {%- endif -%}
+                  {%- if block.settings.button_label != blank -%}
+                    <a
+                      href="{{ block.settings.button_link | default: '#' }}"
+                      class="button tab-list-scroll__cta"
+                    >
+                      {{- block.settings.button_label | escape -}}
+                    </a>
+                  {%- endif -%}
+                </div>
+
+              {%- endif -%}
+
+              {%- endcase -%}
+
+            </div>
+          </div>
+
+        {%- endfor -%}
+
+      </div>
+    </div>
+
+  {%- else -%}
+    {%- if request.design_mode -%}
+      <div class="tab-list-scroll__hint">
+        Add <strong>Tab</strong> blocks to build this section.
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+</tab-list-scroll>
+
+{% stylesheet %}
+
+/* ─────────────────────────────────────────────────────────
+   Root element
+────────────────────────────────────────────────────────── */
+tab-list-scroll {
+  display: block;
+  padding-top: var(--tls-pt, 0px);
+  padding-bottom: var(--tls-pb, 0px);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Single wrapper — this is the section's grid item.
+   position:sticky on the bar works because both the bar
+   and panels share the same block formatting context
+   inside this container.
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__wrap {
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Sticky tab bar
+   top: var(--header-height) keeps it flush below the header.
+   The bar naturally unsticks when the wrapper scrolls out
+   of view (no JS required for that behaviour).
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__bar {
+  position: sticky;
+  top: var(--header-height, 0px);
+  z-index: 50;
+  background-color: var(--tls-tab-bg, rgba(255, 255, 255, 0.97));
+  backdrop-filter: saturate(180%) blur(8px);
+  -webkit-backdrop-filter: saturate(180%) blur(8px);
+  box-shadow: 0 1px 0 rgba(0 0 0 / 0.08);
+  transition: box-shadow 0.2s;
+}
+
+.tab-list-scroll__bar-body {
+  max-width: var(--page-content-width, 100%);
+  margin-inline: auto;
+  padding-inline: var(--page-margin, 1.5rem);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Tab track — horizontally scrollable, hides scrollbar
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__track {
+  display: flex;
+  justify-content: var(--tls-tab-align, center);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.tab-list-scroll__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Tab button
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__btn {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding-block: var(--tls-tab-pad, 0.75rem);
+  padding-inline: calc(var(--tls-tab-pad, 0.75rem) * 1.5);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--tls-tab-color, currentColor);
+  font-family: inherit;
+  font-size: var(--tls-tab-size, 0.875rem);
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  scroll-snap-align: start;
+}
+
+.tab-list-scroll__btn:hover {
+  opacity: 0.7;
+}
+
+.tab-list-scroll__btn.is-active {
+  border-bottom-color: currentColor;
+  font-weight: 600;
+}
+
+.tab-list-scroll__btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Content panels
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__panels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tls-gap, 0px);
+}
+
+.tab-list-scroll__panel {
+  width: 100%;
+}
+
+.tab-list-scroll__panel-inner {
+  max-width: var(--page-content-width, 100%);
+  margin-inline: auto;
+  padding-inline: var(--page-margin, 1.5rem);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout: image-left / image-right (two-column grid)
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__row {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+
+@media screen and (min-width: 750px) {
+  .tab-list-scroll__row--image-left,
+  .tab-list-scroll__row--image-right {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tab-list-scroll__row--image-right .tab-list-scroll__fig {
+    order: 2;
+  }
+
+  .tab-list-scroll__row--image-right .tab-list-scroll__copy {
+    order: 1;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Figure / image
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__fig {
+  display: block;
+  margin: 0;
+}
+
+.tab-list-scroll__fig--top {
+  margin-bottom: 1.5rem;
+}
+
+.tab-list-scroll__fig-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Copy area
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__heading {
+  margin-top: 0;
+  margin-bottom: 0.875rem;
+}
+
+.tab-list-scroll__text {
+  margin-bottom: 1.5rem;
+}
+
+.tab-list-scroll__cta {
+  display: inline-flex;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Editor empty-state hint
+────────────────────────────────────────────────────────── */
+.tab-list-scroll__hint {
+  padding: 2rem;
+  text-align: center;
+  border: 2px dashed currentColor;
+  opacity: 0.35;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Mobile: always left-align tabs so overflowing tabs scroll
+────────────────────────────────────────────────────────── */
+@media screen and (max-width: 749px) {
+  .tab-list-scroll__track {
+    justify-content: flex-start;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — base wrapper
+────────────────────────────────────────────────────────── */
+.tab-layout {
+  width: 100%;
+}
+
+.tab-layout--1 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Title position modifiers */
+.tab-layout--1--title-bottom {
+  flex-direction: column-reverse;
+}
+
+.tab-layout--1--title-center {
+  align-items: center;
+}
+
+@media screen and (min-width: 750px) {
+  .tab-layout--1--title-left,
+  .tab-layout--1--title-right {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+
+  .tab-layout--1--title-right {
+    flex-direction: row-reverse;
+  }
+
+  .tab-layout--1--title-left > .tab-layout--1__title,
+  .tab-layout--1--title-right > .tab-layout--1__title {
+    flex: 0 0 28%;
+    max-width: 28%;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — title
+────────────────────────────────────────────────────────── */
+.tab-layout--1__title {
+  padding-block: 0.25rem;
+}
+
+.tab-layout--1__title--align-left   { text-align: left; }
+.tab-layout--1__title--align-center { text-align: center; }
+.tab-layout--1__title--align-right  { text-align: right; }
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — two-column grid
+────────────────────────────────────────────────────────── */
+.tab-layout--1__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  flex: 1 1 auto;
+}
+
+@media screen and (min-width: 750px) {
+  .tab-layout--1__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — column
+────────────────────────────────────────────────────────── */
+.tab-layout--1__col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — image
+────────────────────────────────────────────────────────── */
+.tab-layout--1__img-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tl1-img-radius, 0px);
+}
+
+.tab-layout--1__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: var(--tl1-img-align, center);
+  border-radius: var(--tl1-img-radius, 0px);
+}
+
+.tab-layout--1__img-wrap--overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--tl1-overlay-color, #000000);
+  opacity: 0.3;
+  pointer-events: none;
+  border-radius: var(--tl1-img-radius, 0px);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — link
+────────────────────────────────────────────────────────── */
+.tab-layout--1__link {
+  display: inline-flex;
+  align-self: flex-start;
+  color: var(--tl1-link-color, inherit);
+  font-size: var(--tl1-link-size, 0.875rem);
+  background-color: var(--tl1-link-bg, transparent);
+  padding: var(--tl1-link-pad, 0px);
+  text-decoration: none;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, text-decoration 0.2s ease;
+}
+
+/* Link hover effects */
+.tab-layout--1__link--hover-underline:hover {
+  text-decoration: underline;
+}
+
+.tab-layout--1__link--hover-background:hover {
+  background-color: var(--tl1-link-color, currentColor);
+  color: var(--tl1-link-bg, #ffffff);
+}
+
+.tab-layout--1__link--hover-translate:hover {
+  transform: translateY(-2px);
+}
+
+.tab-layout--1__link--hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.tab-layout--1__link--hover-shadow:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — button
+────────────────────────────────────────────────────────── */
+.tab-layout--1__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--tl1-btn-color, #111111);
+  color: var(--tl1-btn-text-color, #ffffff);
+  font-size: var(--tl1-btn-size, 0.875rem);
+  padding-block: var(--tl1-btn-pad, 12px);
+  padding-inline: calc(var(--tl1-btn-pad, 12px) * 2);
+  text-decoration: none;
+  border: 2px solid var(--tl1-btn-color, #111111);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease, outline-offset 0.25s ease;
+}
+
+/* Button hover effects */
+.tab-layout--1__btn--hover-color_shift:hover {
+  background-color: transparent;
+  color: var(--tl1-btn-color, #111111);
+}
+
+.tab-layout--1__btn--hover-translate:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.tab-layout--1__btn--hover-border_animation {
+  background-color: transparent;
+  color: var(--tl1-btn-color, #111111);
+}
+
+.tab-layout--1__btn--hover-border_animation:hover {
+  outline: 2px solid var(--tl1-btn-color, #111111);
+  outline-offset: 3px;
+}
+
+.tab-layout--1__btn--hover-scale:hover {
+  transform: scale(1.04);
+}
+
+.tab-layout--1__btn--hover-shadow:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+{% endstylesheet %}
+
+{% javascript %}
+
+class TabListScroll extends HTMLElement {
+  connectedCallback() {
+    this._bar    = this.querySelector('[data-tls-bar]');
+    this._track  = this.querySelector('[data-tls-track]');
+    this._panels = Array.from(this.querySelectorAll('[data-tls-panel]'));
+    this._btns   = Array.from(this.querySelectorAll('[data-tls-btn]'));
+
+    if (!this._btns.length) return;
+
+    this._onClick = this._handleClick.bind(this);
+    this._btns.forEach((btn) => btn.addEventListener('click', this._onClick));
+
+    if ('IntersectionObserver' in window && this._panels.length) {
+      this._initObserver();
+    }
+
+    // Restore active state from URL hash on page load
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const matched = this.querySelector('#' + CSS.escape(hash));
+      if (matched) this._setActive(hash);
+    }
+  }
+
+  disconnectedCallback() {
+    this._btns?.forEach((btn) => btn.removeEventListener('click', this._onClick));
+    this._observer?.disconnect();
+    window.removeEventListener('resize', this._onResize);
+  }
+
+  /** Total scroll offset = header height + sticky bar height */
+  _getOffset() {
+    const headerH = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '0'
+    );
+    const barH = this._bar ? this._bar.getBoundingClientRect().height : 0;
+    return Math.ceil(headerH + barH);
+  }
+
+  _handleClick(event) {
+    const btn     = event.currentTarget;
+    const panelId = btn.dataset.tlsBtn;
+    const target  = this.querySelector('#' + CSS.escape(panelId));
+    if (!target) return;
+
+    event.preventDefault();
+
+    const offset = this._getOffset();
+    const top    = window.scrollY + target.getBoundingClientRect().top - offset;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+
+    this._setActive(panelId);
+    history.replaceState(null, '', '#' + panelId);
+  }
+
+  _initObserver() {
+    const buildObserver = () => {
+      this._observer?.disconnect();
+      const offset = this._getOffset();
+
+      this._observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+          if (visible.length && visible[0].target.id) {
+            this._setActive(visible[0].target.id);
+          }
+        },
+        {
+          root: null,
+          // Top margin clears the header + sticky bar; bottom margin starts
+          // activating a tab when the panel is in the upper half of the viewport.
+          rootMargin: `-${offset}px 0px -50% 0px`,
+          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+        }
+      );
+
+      this._panels.forEach((panel) => this._observer.observe(panel));
+    };
+
+    buildObserver();
+
+    // Recalculate thresholds on resize (header height may change)
+    let resizeTimer;
+    this._onResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(buildObserver, 200);
+    };
+    window.addEventListener('resize', this._onResize, { passive: true });
+  }
+
+  /** Highlight the matching tab button and scroll it into view in the track */
+  _setActive(panelId) {
+    this._btns.forEach((btn) => {
+      const active = btn.dataset.tlsBtn === panelId;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', String(active));
+
+      if (active && this._track) {
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+  }
+}
+
+if (!customElements.get('tab-list-scroll')) {
+  customElements.define('tab-list-scroll', TabListScroll);
+}
+
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Tab list scroll",
+  "tag": "section",
+  "class": "shopify-section--tab-list-scroll",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full width" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_gap",
+      "label": "Gap between panels",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Tab bar"
+    },
+    {
+      "type": "select",
+      "id": "tab_alignment",
+      "label": "Tab alignment",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "tab_text_color",
+      "label": "Tab text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg_color",
+      "label": "Tab background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "tab_font_size",
+      "label": "Tab font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "tab_padding",
+      "label": "Tab vertical padding",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Tab button"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tab label",
+          "default": "Section"
+        },
+        {
+          "type": "text",
+          "id": "tab_key",
+          "label": "Anchor key",
+          "info": "Optional. Used as the URL anchor (#) and panel ID. Defaults to the tab label if left blank."
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "layout_type",
+          "label": "Layout type",
+          "options": [
+            { "value": "layout_1", "label": "Layout 1" },
+            { "value": "layout_2", "label": "Layout 2" },
+            { "value": "layout_3", "label": "Layout 3" }
+          ],
+          "default": "layout_1"
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background color"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Padding top",
+          "min": 0,
+          "max": 120,
+          "step": 4,
+          "unit": "px",
+          "default": 48
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Padding bottom",
+          "min": 0,
+          "max": 120,
+          "step": 4,
+          "unit": "px",
+          "default": 48
+        },
+        {
+          "type": "header",
+          "content": "Layout 1 — Title"
+        },
+        {
+          "type": "text",
+          "id": "l1_title",
+          "label": "Title"
+        },
+        {
+          "type": "select",
+          "id": "l1_title_font_family",
+          "label": "Title font family",
+          "options": [
+            { "value": "heading", "label": "Heading" },
+            { "value": "body",    "label": "Body" }
+          ],
+          "default": "heading"
+        },
+        {
+          "type": "range",
+          "id": "l1_title_font_size",
+          "label": "Title font size",
+          "min": 12,
+          "max": 72,
+          "step": 2,
+          "unit": "px",
+          "default": 32
+        },
+        {
+          "type": "color",
+          "id": "l1_title_color",
+          "label": "Title color",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "l1_title_background",
+          "label": "Title background color"
+        },
+        {
+          "type": "select",
+          "id": "l1_title_alignment",
+          "label": "Title text alignment",
+          "options": [
+            { "value": "left",   "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right",  "label": "Right" }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "select",
+          "id": "l1_title_position",
+          "label": "Title position",
+          "options": [
+            { "value": "top",    "label": "Top" },
+            { "value": "left",   "label": "Left" },
+            { "value": "right",  "label": "Right" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "center", "label": "Center" }
+          ],
+          "default": "top"
+        },
+        {
+          "type": "header",
+          "content": "Layout 1 — Left column"
+        },
+        {
+          "type": "image_picker",
+          "id": "left_image",
+          "label": "Left image"
+        },
+        {
+          "type": "richtext",
+          "id": "left_text",
+          "label": "Left text"
+        },
+        {
+          "type": "text",
+          "id": "left_link_label",
+          "label": "Left link label"
+        },
+        {
+          "type": "url",
+          "id": "left_link_url",
+          "label": "Left link URL"
+        },
+        {
+          "type": "text",
+          "id": "left_button_label",
+          "label": "Left button label"
+        },
+        {
+          "type": "url",
+          "id": "left_button_url",
+          "label": "Left button URL"
+        },
+        {
+          "type": "header",
+          "content": "Layout 1 — Right column"
+        },
+        {
+          "type": "image_picker",
+          "id": "right_image",
+          "label": "Right image"
+        },
+        {
+          "type": "richtext",
+          "id": "right_text",
+          "label": "Right text"
+        },
+        {
+          "type": "text",
+          "id": "right_link_label",
+          "label": "Right link label"
+        },
+        {
+          "type": "url",
+          "id": "right_link_url",
+          "label": "Right link URL"
+        },
+        {
+          "type": "text",
+          "id": "right_button_label",
+          "label": "Right button label"
+        },
+        {
+          "type": "url",
+          "id": "right_button_url",
+          "label": "Right button URL"
+        },
+        {
+          "type": "header",
+          "content": "Layout 1 — Images"
+        },
+        {
+          "type": "select",
+          "id": "image_alignment",
+          "label": "Image focal point",
+          "options": [
+            { "value": "top",    "label": "Top" },
+            { "value": "center", "label": "Center" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left",   "label": "Left" },
+            { "value": "right",  "label": "Right" }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_overlay_enable",
+          "label": "Enable image overlay",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "image_overlay_color",
+          "label": "Overlay color",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "image_border_radius",
+          "label": "Image border radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Layout 1 — Links"
+        },
+        {
+          "type": "color",
+          "id": "link_color",
+          "label": "Link color",
+          "default": "#111111"
+        },
+        {
+          "type": "range",
+          "id": "link_font_size",
+          "label": "Link font size",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "color",
+          "id": "link_background",
+          "label": "Link background color"
+        },
+        {
+          "type": "select",
+          "id": "link_hover_effect",
+          "label": "Link hover effect",
+          "options": [
+            { "value": "underline",  "label": "Underline" },
+            { "value": "background", "label": "Background" },
+            { "value": "translate",  "label": "Translate up" },
+            { "value": "scale",      "label": "Scale" },
+            { "value": "shadow",     "label": "Shadow" }
+          ],
+          "default": "underline"
+        },
+        {
+          "type": "range",
+          "id": "link_padding",
+          "label": "Link padding",
+          "min": 0,
+          "max": 24,
+          "step": 2,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Layout 1 — Buttons"
+        },
+        {
+          "type": "color",
+          "id": "button_color",
+          "label": "Button background color",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "button_font_size",
+          "label": "Button font size",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "button_padding",
+          "label": "Button padding",
+          "min": 4,
+          "max": 32,
+          "step": 2,
+          "unit": "px",
+          "default": 12
+        },
+        {
+          "type": "select",
+          "id": "button_hover_effect",
+          "label": "Button hover effect",
+          "options": [
+            { "value": "color_shift",      "label": "Color shift" },
+            { "value": "translate",        "label": "Translate up" },
+            { "value": "border_animation", "label": "Border animation" },
+            { "value": "scale",            "label": "Scale" },
+            { "value": "shadow",           "label": "Shadow" }
+          ],
+          "default": "color_shift"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tab list scroll",
+      "blocks": [
+        {
+          "type": "tab",
+          "settings": {
+            "title": "Section 1",
+            "tab_key": "section-1",
+            "heading": "Section 1 heading",
+            "text": "<p>Add your content here.<\/p>"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "title": "Section 2",
+            "tab_key": "section-2",
+            "heading": "Section 2 heading",
+            "text": "<p>Add your content here.<\/p>"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "title": "Section 3",
+            "tab_key": "section-3",
+            "heading": "Section 3 heading",
+            "text": "<p>Add your content here.<\/p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
