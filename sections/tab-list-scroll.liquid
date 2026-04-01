@@ -132,6 +132,7 @@
                 <div
                   class="tab-layout tab-layout--1 tab-layout--1--title-{{ l1_title_pos }}"
                   style="
+                    max-width: {{ block.settings.layout_width | default: 100 }}%; margin: 0 auto;
                     --tl1-link-size: {{ block.settings.link_font_size | default: 14 }}px;
                     --tl1-link-pad: {{ block.settings.link_padding | default: 0 }}px;
                     --tl1-btn-size: {{ block.settings.button_font_size | default: 14 }}px;
@@ -157,15 +158,33 @@
                       <span>{{ block.settings.l1_title | escape }}</span>
                     </div>
                   {%- endif -%}
+                  {%- if block.settings.l1_subtitle != blank -%}
+                    <div class="tab-layout--1__subtitle rte">{{ block.settings.l1_subtitle }}</div>
+                  {%- endif -%}
 
                   <div class="tab-layout--1__grid">
 
                     {%- comment -%}── Left column ──────────────────────────────{%- endcomment -%}
                     <div class="tab-layout--1__col tab-layout--1__col--left">
                       {%- if l1_has_left_img -%}
+                        {%- liquid
+                          assign left_img_size = block.settings.left_image_size | default: 'large'
+                          assign left_img_class = 'tab-layout--1__img-wrap'
+                          if block.settings.image_overlay_enable
+                            assign left_img_class = left_img_class | append: ' tab-layout--1__img-wrap--overlay'
+                          endif
+                          if left_img_size != 'custom'
+                            assign left_img_class = left_img_class | append: ' tab-layout--1__image--' | append: left_img_size
+                          endif
+                          assign left_img_ratio = block.settings.left_image_ratio | default: 'auto'
+                        -%}
                         <div
-                          class="tab-layout--1__img-wrap{% if block.settings.image_overlay_enable %} tab-layout--1__img-wrap--overlay{% endif %}"
-                          style="--tl1-img-align: {{ block.settings.image_alignment | default: 'center' }};"
+                          class="{{ left_img_class }}"
+                          style="
+                            --tl1-img-align: {{ block.settings.image_alignment | default: 'center' }};
+                            {%- unless left_img_ratio == 'auto' -%}aspect-ratio: {{ left_img_ratio }};{%- endunless -%}
+                            {%- if left_img_size == 'custom' -%}max-width: {{ block.settings.left_image_custom_width | default: 100 }}%;{%- endif -%}
+                          "
                         >
                           {{- block.settings.left_image
                             | image_url: width: 1200
@@ -176,6 +195,9 @@
                               class: 'tab-layout--1__img'
                           -}}
                         </div>
+                        {%- if block.settings.left_image_title != blank -%}
+                          <p class="tab-layout--1__image-title">{{ block.settings.left_image_title | escape }}</p>
+                        {%- endif -%}
                       {%- endif -%}
                       {%- if block.settings.left_text != blank -%}
                         <div class="tab-layout--1__text rte">{{ block.settings.left_text }}</div>
@@ -183,7 +205,7 @@
                       {%- if block.settings.left_link_label != blank -%}
                         <a
                           href="{{ block.settings.left_link_url | default: '#' }}"
-                          class="tab-layout--1__link tab-layout--1__link--hover-{{ l1_link_hover }}"
+                          class="tab-layout--1__link tab-layout--1__link--hover-{{ l1_link_hover }}{% if block.settings.left_link_show_underline %} link--underline{% endif %}"
                         >
                           {{- block.settings.left_link_label | escape -}}
                         </a>
@@ -201,9 +223,24 @@
                     {%- comment -%}── Right column ─────────────────────────────{%- endcomment -%}
                     <div class="tab-layout--1__col tab-layout--1__col--right">
                       {%- if l1_has_right_img -%}
+                        {%- liquid
+                          assign right_img_size = block.settings.right_image_size | default: 'large'
+                          assign right_img_class = 'tab-layout--1__img-wrap'
+                          if block.settings.image_overlay_enable
+                            assign right_img_class = right_img_class | append: ' tab-layout--1__img-wrap--overlay'
+                          endif
+                          if right_img_size != 'custom'
+                            assign right_img_class = right_img_class | append: ' tab-layout--1__image--' | append: right_img_size
+                          endif
+                          assign right_img_ratio = block.settings.right_image_ratio | default: 'auto'
+                        -%}
                         <div
-                          class="tab-layout--1__img-wrap{% if block.settings.image_overlay_enable %} tab-layout--1__img-wrap--overlay{% endif %}"
-                          style="--tl1-img-align: {{ block.settings.image_alignment | default: 'center' }};"
+                          class="{{ right_img_class }}"
+                          style="
+                            --tl1-img-align: {{ block.settings.image_alignment | default: 'center' }};
+                            {%- unless right_img_ratio == 'auto' -%}aspect-ratio: {{ right_img_ratio }};{%- endunless -%}
+                            {%- if right_img_size == 'custom' -%}max-width: {{ block.settings.right_image_custom_width | default: 100 }}%;{%- endif -%}
+                          "
                         >
                           {{- block.settings.right_image
                             | image_url: width: 1200
@@ -214,6 +251,9 @@
                               class: 'tab-layout--1__img'
                           -}}
                         </div>
+                        {%- if block.settings.right_image_title != blank -%}
+                          <p class="tab-layout--1__image-title">{{ block.settings.right_image_title | escape }}</p>
+                        {%- endif -%}
                       {%- endif -%}
                       {%- if block.settings.right_text != blank -%}
                         <div class="tab-layout--1__text rte">{{ block.settings.right_text }}</div>
@@ -221,7 +261,7 @@
                       {%- if block.settings.right_link_label != blank -%}
                         <a
                           href="{{ block.settings.right_link_url | default: '#' }}"
-                          class="tab-layout--1__link tab-layout--1__link--hover-{{ l1_link_hover }}"
+                          class="tab-layout--1__link tab-layout--1__link--hover-{{ l1_link_hover }}{% if block.settings.right_link_show_underline %} link--underline{% endif %}"
                         >
                           {{- block.settings.right_link_label | escape -}}
                         </a>
@@ -538,6 +578,7 @@ tab-list-scroll {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin: 0 auto;
 }
 
 /* Title position modifiers */
@@ -717,6 +758,37 @@ tab-list-scroll {
 
 .tab-layout--1__btn--hover-shadow:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — subtitle
+────────────────────────────────────────────────────────── */
+.tab-layout--1__subtitle {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — image size modifiers
+────────────────────────────────────────────────────────── */
+.tab-layout--1__image--small  { max-width: 50%; }
+.tab-layout--1__image--medium { max-width: 75%; }
+.tab-layout--1__image--large  { max-width: 100%; }
+
+/* ─────────────────────────────────────────────────────────
+   Layout 1 — image title
+────────────────────────────────────────────────────────── */
+.tab-layout--1__image-title {
+  font-weight: 600;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Utility — permanent underline on links
+────────────────────────────────────────────────────────── */
+.link--underline {
+  text-decoration: underline;
 }
 
 {% endstylesheet %}
@@ -1077,6 +1149,21 @@ if (!customElements.get('tab-list-scroll')) {
           "default": "top"
         },
         {
+          "type": "richtext",
+          "id": "l1_subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "range",
+          "id": "layout_width",
+          "label": "Layout width",
+          "min": 50,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 100
+        },
+        {
           "type": "header",
           "content": "Layout 1 — Left column"
         },
@@ -1084,6 +1171,45 @@ if (!customElements.get('tab-list-scroll')) {
           "type": "image_picker",
           "id": "left_image",
           "label": "Left image"
+        },
+        {
+          "type": "text",
+          "id": "left_image_title",
+          "label": "Left image title"
+        },
+        {
+          "type": "select",
+          "id": "left_image_size",
+          "label": "Left image size",
+          "options": [
+            { "value": "small",  "label": "Small (50%)" },
+            { "value": "medium", "label": "Medium (75%)" },
+            { "value": "large",  "label": "Large (100%)" },
+            { "value": "custom", "label": "Custom" }
+          ],
+          "default": "large"
+        },
+        {
+          "type": "select",
+          "id": "left_image_ratio",
+          "label": "Left image ratio",
+          "options": [
+            { "value": "1/1",  "label": "1:1" },
+            { "value": "4/3",  "label": "4:3" },
+            { "value": "16/9", "label": "16:9" },
+            { "value": "auto", "label": "Auto" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "range",
+          "id": "left_image_custom_width",
+          "label": "Left image custom width",
+          "min": 10,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 100
         },
         {
           "type": "richtext",
@@ -1099,6 +1225,12 @@ if (!customElements.get('tab-list-scroll')) {
           "type": "url",
           "id": "left_link_url",
           "label": "Left link URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "left_link_show_underline",
+          "label": "Show underline",
+          "default": false
         },
         {
           "type": "text",
@@ -1120,6 +1252,45 @@ if (!customElements.get('tab-list-scroll')) {
           "label": "Right image"
         },
         {
+          "type": "text",
+          "id": "right_image_title",
+          "label": "Right image title"
+        },
+        {
+          "type": "select",
+          "id": "right_image_size",
+          "label": "Right image size",
+          "options": [
+            { "value": "small",  "label": "Small (50%)" },
+            { "value": "medium", "label": "Medium (75%)" },
+            { "value": "large",  "label": "Large (100%)" },
+            { "value": "custom", "label": "Custom" }
+          ],
+          "default": "large"
+        },
+        {
+          "type": "select",
+          "id": "right_image_ratio",
+          "label": "Right image ratio",
+          "options": [
+            { "value": "1/1",  "label": "1:1" },
+            { "value": "4/3",  "label": "4:3" },
+            { "value": "16/9", "label": "16:9" },
+            { "value": "auto", "label": "Auto" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "range",
+          "id": "right_image_custom_width",
+          "label": "Right image custom width",
+          "min": 10,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 100
+        },
+        {
           "type": "richtext",
           "id": "right_text",
           "label": "Right text"
@@ -1133,6 +1304,12 @@ if (!customElements.get('tab-list-scroll')) {
           "type": "url",
           "id": "right_link_url",
           "label": "Right link URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "right_link_show_underline",
+          "label": "Show underline",
+          "default": false
         },
         {
           "type": "text",
