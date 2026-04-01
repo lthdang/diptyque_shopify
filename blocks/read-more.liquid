@@ -1,0 +1,273 @@
+
+{% liquid
+  assign collapsed_height = block.settings.collapsed_height | append: 'px'
+  assign label_expand   = block.settings.button_label_expand   | default: 'Read More'
+  assign label_collapse = block.settings.button_label_collapse | default: 'Show Less'
+%}
+
+<div
+  class="read-more-block"
+  style="--collapsed-height: {{ collapsed_height }};"
+  {{ block.shopify_attributes }}
+>
+  <div
+    class="read-more__content-wrapper"
+    id="read-more-content-{{ block.id }}"
+  >
+    <div class="read-more__content rte">
+      {{ block.settings.content }}
+    </div>
+
+    {% if block.settings.show_fade_overlay %}
+      <div class="read-more__fade" aria-hidden="true"></div>
+    {% endif %}
+  </div>
+
+  <div class="read-more__button-wrapper" style="text-align: {{ block.settings.button_alignment }};">
+    <button
+      type="button"
+      class="read-more__toggle"
+      aria-expanded="false"
+      aria-controls="read-more-content-{{ block.id }}"
+      data-label-expand="{{ label_expand | escape }}"
+      data-label-collapse="{{ label_collapse | escape }}"
+      data-show-icon="{{ block.settings.show_arrow_icon }}"
+    >
+      <span class="read-more__toggle-label">{{ label_expand }}</span>
+      {% if block.settings.show_arrow_icon %}
+        <span class="read-more__toggle-icon" aria-hidden="true"></span>
+      {% endif %}
+    </button>
+  </div>
+</div>
+
+{% stylesheet %}
+  .read-more-block {
+    position: relative;
+  }
+
+  /* Content wrapper — clamps height when collapsed */
+  .read-more__content-wrapper {
+    position: relative;
+    max-height: var(--collapsed-height, 120px);
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  /* When expanded, max-height is set to exact scrollHeight via JS;
+     2000px is a safe CSS-only fallback when JS hasn't run yet */
+  .read-more__content-wrapper.is-expanded {
+    max-height: 2000px;
+  }
+
+  /* Fade-out gradient hinting at hidden content */
+  .read-more__fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-background, #fff)
+    );
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Hide fade when expanded */
+  .read-more__content-wrapper.is-expanded .read-more__fade {
+    opacity: 0;
+  }
+
+  /* Toggle button */
+  .read-more__button-wrapper {
+    display: block;
+    width: 100%;
+    /* text-align applied inline via Liquid */
+  }
+
+  .read-more__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-primary, inherit);
+    font-size: inherit;
+    font-family: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Chevron icon — rotates when expanded */
+  .read-more__toggle-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .read-more__toggle[aria-expanded='true'] .read-more__toggle-icon {
+    transform: rotate(-135deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .read-more__content-wrapper,
+    .read-more__fade,
+    .read-more__toggle-icon {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    function initReadMore(root) {
+      var wrapper = root.querySelector('.read-more__content-wrapper');
+      var toggle  = root.querySelector('.read-more__toggle');
+      var label   = root.querySelector('.read-more__toggle-label');
+
+      if (!wrapper || !toggle) return;
+
+      var labelExpand   = toggle.dataset.labelExpand;
+      var labelCollapse = toggle.dataset.labelCollapse;
+
+      // Check if content actually overflows — hide button if not needed
+      var inner = wrapper.querySelector('.read-more__content');
+      if (inner && inner.scrollHeight <= wrapper.offsetHeight) {
+        toggle.style.display = 'none';
+        var fade = wrapper.querySelector('.read-more__fade');
+        if (fade) fade.style.display = 'none';
+        return;
+      }
+
+      toggle.addEventListener('click', function () {
+        var isExpanded = wrapper.classList.toggle('is-expanded');
+        var iconEl     = toggle.querySelector('.read-more__toggle-icon');
+
+        toggle.setAttribute('aria-expanded', String(isExpanded));
+        label.textContent = isExpanded ? labelCollapse : labelExpand;
+
+        // Respect show_arrow_icon schema setting
+        if (iconEl) {
+          iconEl.style.display = toggle.dataset.showIcon === 'true' ? '' : 'none';
+        }
+
+        if (isExpanded) {
+          // Set exact scrollHeight so transition animates to correct end point
+          wrapper.style.maxHeight = inner.scrollHeight + 'px';
+        } else {
+          // Remove inline max-height so CSS variable takes over again
+          wrapper.style.maxHeight = '';
+
+          // Scroll block back into view if it has scrolled above the viewport
+          var blockTop = root.getBoundingClientRect().top;
+          if (blockTop < 0) {
+            root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    }
+
+    function initAll() {
+      document.querySelectorAll('.read-more-block').forEach(initReadMore);
+    }
+
+    // Re-init on Theme Editor section reload
+    document.addEventListener('shopify:section:load', initAll);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+      initAll();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Read more",
+  "tag": null,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content",
+      "default": "<p>Add your content here. This block will collapse to a limited height and expand when the reader clicks \"Read More\".</p><p>You can add as much text as you need — the block will hide the overflow and reveal it on demand.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Collapse settings"
+    },
+    {
+      "type": "range",
+      "id": "collapsed_height",
+      "label": "Collapsed height",
+      "min": 0,
+      "max": 300,
+      "step": 20,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fade_overlay",
+      "label": "Show fade overlay",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Button labels"
+    },
+    {
+      "type": "text",
+      "id": "button_label_expand",
+      "label": "Expand label",
+      "default": "Read More"
+    },
+    {
+      "type": "text",
+      "id": "button_label_collapse",
+      "label": "Collapse label",
+      "default": "Show Less"
+    },
+    {
+      "type": "header",
+      "content": "Button appearance"
+    },
+    {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "Button alignment",
+      "default": "left",
+      "options": [
+        { "value": "left",   "label": "Left"   },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right"  }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow_icon",
+      "label": "Show arrow icon on button",
+      "default": true,
+      "info": "Displays an up/down arrow icon indicating expand/collapse state"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Read more",
+      "category": "t:categories.basic"
+    }
+  ]
+}
+{% endschema %}

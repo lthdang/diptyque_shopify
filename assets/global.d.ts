@@ -35,8 +35,16 @@ declare global {
     };
   }
 
+  interface SwiperInstance {
+    destroy(deleteInstance?: boolean, cleanStyles?: boolean): void;
+  }
+
+  declare const Swiper: new (container: Element, options?: object) => SwiperInstance;
+
   interface Window {
     Shopify: Shopify;
+    __swiperBlockRegistry: Map<string, SwiperInstance>;
+    __swiperBlockListenersSet: boolean;
   }
 
   declare const Shopify: Shopify;
@@ -57,7 +65,7 @@ declare global {
       element: Element,
       options?: {
         focusOnPlay?: boolean;
-      }
+      },
     ): ModelViewer;
     play(): void;
     pause(): void;

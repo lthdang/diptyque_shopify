@@ -1,0 +1,262 @@
+
+<button
+  type="button"
+  class="info-popup__trigger info-popup__trigger--{{ block.settings.button_style }}"
+  data-popup-id="popup-{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  <span>{{ block.settings.button_label }}</span>
+  {% if block.settings.show_arrow %}
+    <span class="info-popup__arrow" aria-hidden="true">→</span>
+  {% endif %}
+</button>
+
+<div
+  id="popup-{{ block.id }}"
+  class="info-popup__drawer"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ block.settings.popup_title | default: block.settings.button_label | escape }}"
+>
+  <div class="info-popup__overlay"></div>
+
+  <div class="info-popup__panel">
+    <button class="info-popup__close" aria-label="Close" type="button">&#x2715;</button>
+
+    {% if block.settings.popup_title != blank %}
+      <h3 class="info-popup__title">{{ block.settings.popup_title }}</h3>
+    {% endif %}
+
+    <div class="info-popup__content rte">
+      {{ block.settings.popup_content }}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .info-popup__trigger {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .info-popup__trigger--primary {
+    background: var(--color-button);
+    color: var(--color-button-text);
+    border: 1px solid var(--color-button);
+    padding: 0.75em 1.5em;
+    border-radius: var(--style-border-radius-buttons-primary, 4px);
+  }
+
+  .info-popup__trigger--secondary {
+    background: transparent;
+    color: var(--color-foreground);
+    border: 1px solid currentColor;
+    padding: 0.75em 1.5em;
+    border-radius: var(--style-border-radius-buttons-secondary, 4px);
+  }
+
+  .info-popup__arrow {
+    margin-left: 8px;
+  }
+
+  .no-scroll {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .info-popup__drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    /* Keep in stacking context at all times so z-index:9999 beats the header (z-index:8).
+       display:none removes the element from stacking, causing a flash-behind-header on open. */
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .info-popup__drawer.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .info-popup__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .info-popup__drawer.is-open .info-popup__overlay {
+    opacity: 1;
+  }
+
+  .info-popup__panel {
+    position: absolute;
+    top: 100px;
+    right: 0;
+    width: 400px;
+    max-width: 100%;
+    height: 100%;
+    background: var(--color-background, #fff);
+    padding: 48px 20px 20px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 768px) {
+    .info-popup__panel {
+      width: 100%;
+    }
+  }
+
+  .info-popup__drawer.is-open .info-popup__panel {
+    transform: translateX(0);
+  }
+
+  .info-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+    color: var(--color-foreground);
+  }
+
+  .info-popup__title {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .info-popup__panel,
+    .info-popup__overlay {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    function handleClick(e) {
+      var trigger = e.target.closest('.info-popup__trigger');
+      var closeBtn = e.target.closest('.info-popup__close');
+      var overlay = e.target.closest('.info-popup__overlay');
+
+      if (trigger) {
+        var popup = document.getElementById(trigger.dataset.popupId);
+        if (popup) {
+          popup.classList.add('is-open');
+          popup.setAttribute('aria-hidden', 'false');
+          document.body.classList.add('no-scroll');
+        }
+        return;
+      }
+
+      if (closeBtn || overlay) {
+        var drawer = e.target.closest('.info-popup__drawer');
+        if (drawer) {
+          drawer.classList.remove('is-open');
+          drawer.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('no-scroll');
+        }
+      }
+    }
+
+    function handleKeydown(e) {
+      if (e.key === 'Escape') {
+        var open = document.querySelector('.info-popup__drawer.is-open');
+        if (open) {
+          open.classList.remove('is-open');
+          open.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('no-scroll');
+        }
+      }
+    }
+
+    function init() {
+      if (window.__infoPopupInitialised) return;
+      window.__infoPopupInitialised = true;
+      document.addEventListener('click', handleClick);
+      document.addEventListener('keydown', handleKeydown);
+    }
+
+    // Reset on section reload (Theme Editor / hot reload)
+    document.addEventListener('shopify:section:load', function () {
+      window.__infoPopupInitialised = false;
+      init();
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Info popup button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shipping & Returns"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "text", "label": "Text" },
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow",
+      "label": "Show right arrow icon",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Popup content"
+    },
+    {
+      "type": "text",
+      "id": "popup_title",
+      "label": "Popup title",
+      "default": "Return policy"
+    },
+    {
+      "type": "richtext",
+      "id": "popup_content",
+      "label": "Popup content",
+      "default": "<p>Write your return policy here.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Info popup button",
+      "category": "t:categories.basic"
+    }
+  ]
+}
+{% endschema %}
