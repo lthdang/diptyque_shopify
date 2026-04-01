@@ -1,0 +1,213 @@
+/* ==========================================================================
+   swiper-block.css — all rules scoped under .swiper-block
+   ========================================================================== */
+
+/* ── Section wrapper ─────────────────────────────────────────────────────── */
+.swiper-block {
+  position: relative;
+  background-color: var(--swiper-block-bg, #ffffff);
+}
+
+/* ── Carousel container ──────────────────────────────────────────────────── */
+.swiper-block__carousel {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Individual slide ────────────────────────────────────────────────────── */
+.swiper-block__slide {
+  background-color: var(--swiper-slide-bg, #f5f5f5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: auto;
+}
+
+/* Whole-slide link wrapper */
+.swiper-block__slide-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Slide media ─────────────────────────────────────────────────────────── */
+.swiper-block__slide-media {
+  display: flex;
+  justify-content: var(--img-alignment, center);
+  width: 100%; /* always full slide width so alignment has room to work */
+  padding-top: var(--img-padding-top, 0px);
+  padding-bottom: var(--img-padding-bottom, 0px);
+  padding-left: var(--img-padding-left, 0px);
+  padding-right: var(--img-padding-right, 0px);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.swiper-block__slide-img {
+  width: var(--img-width, 100%); /* constrained width enables alignment */
+  flex-shrink: 0;
+  height: var(--img-height, 100%);
+  border-radius: var(--img-radius, 0px);
+  display: block;
+  transition: transform 0.4s ease;
+  /* object-fit and object-position are set inline via Liquid */
+}
+
+.swiper-block__slide-link:hover .swiper-block__slide-img {
+  transform: scale(1.03);
+}
+
+.swiper-block__slide-placeholder {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #e8e8e8;
+}
+
+/* ── Slide body ──────────────────────────────────────────────────────────── */
+.swiper-block__slide-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.swiper-block__slide-title {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.3;
+  color: var(--swiper-title-color, #1a1a1a);
+}
+
+.swiper-block__slide-content {
+  margin: 0;
+  color: var(--swiper-content-color, #555555);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.swiper-block__slide-cta {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--swiper-title-color, #1a1a1a);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+.swiper-block .swiper-pagination {
+  position: relative;
+  bottom: auto;
+  margin-top: 16px;
+}
+
+.swiper-block .swiper-pagination-bullet {
+  background: var(--swiper-title-color, #1a1a1a);
+  opacity: 0.3;
+}
+
+.swiper-block .swiper-pagination-bullet-active {
+  opacity: 1;
+}
+
+/* ── Navigation buttons — hover reveal ───────────────────────────────────── */
+.swiper-block__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+
+  /* Hidden by default; fade in when `.swiper-block` is hovered */
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    background-color 0.2s ease;
+
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Reveal on hover */
+.swiper-block:hover .swiper-block__btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.swiper-block__btn:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Swiper adds this class when nav is unavailable (loop off + at edge) */
+.swiper-block__btn.swiper-button-disabled {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.swiper-block__btn--prev {
+  left: 16px;
+}
+.swiper-block__btn--next {
+  right: 16px;
+}
+
+.swiper-block__btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+@media screen and (max-width: 749px) {
+  /* Always show buttons on touch devices — no hover available */
+  .swiper-block__btn {
+    opacity: 1;
+    pointer-events: auto;
+    width: 36px;
+    height: 36px;
+  }
+
+  .swiper-block__btn--prev {
+    left: 8px;
+  }
+  .swiper-block__btn--next {
+    right: 8px;
+  }
+
+  .swiper-block__slide-body {
+    padding: 12px;
+  }
+
+  .swiper-block__slide-title {
+    font-size: 1rem;
+  }
+
+  /* Image width must not exceed 100% on mobile regardless of setting */
+  .swiper-block__slide-img {
+    width: 100% !important;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .swiper-block__slide-img,
+  .swiper-block__btn {
+    transition: none;
+  }
+}
