@@ -1,0 +1,19 @@
+{% if block.settings.text != blank %}
+  <div class="tab-content-richtext rte" {{ block.shopify_attributes }}>
+    {{ block.settings.text }}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Rich text",
+  "tag": null,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    }
+  ]
+}
+{% endschema %}

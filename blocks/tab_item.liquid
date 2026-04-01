@@ -1,0 +1,26 @@
+{% comment %}
+  Navigation-only block.
+  The parent section renders tab items manually in the sticky tab bar,
+  so this block intentionally outputs nothing when the section calls content_for 'blocks'.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Tab Item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Tab title",
+      "default": "Section 1"
+    },
+    {
+      "type": "text",
+      "id": "tab_id",
+      "label": "Tab ID",
+      "default": "section-1"
+    }
+  ]
+}
+{% endschema %}

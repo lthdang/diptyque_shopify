@@ -1,0 +1,40 @@
+{% if block.settings.image != blank %}
+  <div class="tab-content-image" {{ block.shopify_attributes }}>
+    {{
+      block.settings.image
+      | image_url: width: 1200
+      | image_tag:
+        class: 'tab-content-image__asset',
+        widths: '480, 720, 960, 1200',
+        sizes: '(min-width: 990px) 960px, 100vw',
+        alt: block.settings.alt_text
+    }}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .tab-content-image__asset {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "alt_text",
+      "label": "Alt text"
+    }
+  ]
+}
+{% endschema %}

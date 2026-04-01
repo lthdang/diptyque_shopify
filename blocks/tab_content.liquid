@@ -1,0 +1,114 @@
+{%- liquid
+  assign section_id = block.settings.tab_id | strip
+  assign section_title = block.settings.title
+  assign background_color = block.settings.background_color
+-%}
+
+{% if section_id != blank %}
+  <section
+    id="{{ section_id }}"
+    class="tab-content-section"
+    data-tab-content-section
+    style="
+      --tab-content-background: {{ background_color | default: 'transparent' }};
+      --tab-content-padding-top: {{ block.settings.padding_top }}px;
+      --tab-content-padding-bottom: {{ block.settings.padding_bottom }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="tab-content-section__inner section section--page-width">
+      {% if section_title != blank %}
+        <h2 class="tab-content-section__title">{{ section_title }}</h2>
+      {% endif %}
+
+      <div class="tab-content-section__body">
+        {% if block.blocks.size > 0 %}
+          {% content_for 'blocks' %}
+        {% else %}
+          <div class="tab-content-section__empty">
+            Add rich text, image, or custom HTML blocks to this tab content.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+{% stylesheet %}
+  .tab-content-section {
+    background: var(--tab-content-background, transparent);
+    padding-top: var(--tab-content-padding-top, 40px);
+    padding-bottom: var(--tab-content-padding-bottom, 40px);
+    scroll-margin-top: calc(var(--tab-list-sticky-offset, 0px) + 5rem);
+  }
+
+  .tab-content-section__title {
+    margin: 0 0 1.5rem;
+  }
+
+  .tab-content-section__body {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .tab-content-section__empty {
+    padding: 1rem 1.25rem;
+    border: 1px dashed color-mix(in srgb, currentColor 20%, transparent);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Tab Content",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "tab_content_richtext"
+    },
+    {
+      "type": "tab_content_image"
+    },
+    {
+      "type": "tab_content_html"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "tab_id",
+      "label": "Tab ID",
+      "default": "section-1"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ]
+}
+{% endschema %}
