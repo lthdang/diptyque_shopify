@@ -1,0 +1,475 @@
+
+{% liquid
+  assign swiper_id = 'swiper-' | append: block.id
+
+  if block.settings.aspect_ratio == 'custom'
+    assign frame_style = '--swiper-frame-height: ' | append: block.settings.custom_height | append: 'px; --swiper-aspect-ratio: none;'
+  else
+    assign frame_style = '--swiper-aspect-ratio: ' | append: block.settings.aspect_ratio | append: '; --swiper-frame-height: auto;'
+  endif
+
+  if block.settings.width_type == 'custom'
+    assign width_style = 'max-width: ' | append: block.settings.custom_width | append: 'px; margin-inline: auto;'
+  else
+    assign width_style = ''
+  endif
+%}
+
+{% # theme-check-disable MissingAsset %}
+{{- 'swiper-block.css' | asset_url | stylesheet_tag -}}
+{% # theme-check-enable MissingAsset %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+<div
+  id="{{ swiper_id }}"
+  class="swiper-block"
+  style="
+    --swiper-block-bg: {{ block.settings.bg_color }};
+    --swiper-slide-bg: {{ block.settings.slide_bg_color }};
+    --swiper-title-color: {{ block.settings.title_color }};
+    --swiper-content-color: {{ block.settings.content_color }};
+    {{ frame_style }}
+    {{ width_style }}
+  "
+  data-slides-per-view="{{ block.settings.slides_per_view }}"
+  data-space-between="{{ block.settings.slides_spacing }}"
+  data-loop="{{ block.settings.loop_enabled }}"
+  data-autoplay="{{ block.settings.autoplay_enabled }}"
+  data-autoplay-delay="{{ block.settings.autoplay_delay }}"
+  data-pause-on-hover="{{ block.settings.pause_on_hover }}"
+  data-pagination="{{ block.settings.show_pagination }}"
+  {{ block.shopify_attributes }}
+>
+  <!-- Swiper carousel container -->
+  <div class="swiper-block__carousel swiper">
+    <div class="swiper-wrapper">
+      {% for i in (1..block.settings.slides_count) %}
+        {%- assign slide_image          = 'slide_' | append: i | append: '_image'          | default: '' -%}
+        {%- assign slide_title          = 'slide_' | append: i | append: '_title'          -%}
+        {%- assign slide_content        = 'slide_' | append: i | append: '_content'        -%}
+        {%- assign slide_link           = 'slide_' | append: i | append: '_link'           -%}
+        {%- assign slide_label          = 'slide_' | append: i | append: '_link_label'     -%}
+        {%- assign slide_img_width      = 'slide_' | append: i | append: '_image_width'    -%}
+        {%- assign slide_img_h_mode     = 'slide_' | append: i | append: '_image_height_mode'   -%}
+        {%- assign slide_img_h_fixed    = 'slide_' | append: i | append: '_image_fixed_height'  -%}
+        {%- assign slide_img_pad_top    = 'slide_' | append: i | append: '_image_padding_top'    -%}
+        {%- assign slide_img_pad_bot    = 'slide_' | append: i | append: '_image_padding_bottom' -%}
+        {%- assign slide_img_pad_left   = 'slide_' | append: i | append: '_image_padding_left'   -%}
+        {%- assign slide_img_pad_right  = 'slide_' | append: i | append: '_image_padding_right'  -%}
+        {%- assign slide_img_align      = 'slide_' | append: i | append: '_image_alignment'      -%}
+        {%- assign slide_img_fit        = 'slide_' | append: i | append: '_image_object_fit'     -%}
+        {%- assign slide_img_pos        = 'slide_' | append: i | append: '_image_object_position' -%}
+        {%- assign slide_img_radius     = 'slide_' | append: i | append: '_image_border_radius'  -%}
+        {%- assign slide_text_align     = 'slide_' | append: i | append: '_text_alignment'        -%}
+        {%- assign s_image          = block.settings[slide_image]        -%}
+        {%- assign s_title          = block.settings[slide_title]        -%}
+        {%- assign s_content        = block.settings[slide_content]      -%}
+        {%- assign s_link           = block.settings[slide_link]         -%}
+        {%- assign s_label          = block.settings[slide_label]        -%}
+        {%- assign s_img_width      = block.settings[slide_img_width]    | default: 100 -%}
+        {%- assign s_img_h_mode     = block.settings[slide_img_h_mode]   | default: 'aspect-ratio' -%}
+        {%- assign s_img_h_fixed    = block.settings[slide_img_h_fixed]  | default: 300 -%}
+        {%- assign s_img_pad_top    = block.settings[slide_img_pad_top]  | default: 0 -%}
+        {%- assign s_img_pad_bot    = block.settings[slide_img_pad_bot]  | default: 0 -%}
+        {%- assign s_img_pad_left   = block.settings[slide_img_pad_left] | default: 0 -%}
+        {%- assign s_img_pad_right  = block.settings[slide_img_pad_right]| default: 0 -%}
+        {%- assign s_img_align      = block.settings[slide_img_align]    | default: 'center' -%}
+        {%- assign s_img_fit        = block.settings[slide_img_fit]      | default: 'cover' -%}
+        {%- assign s_img_pos        = block.settings[slide_img_pos]      | default: 'center center' -%}
+        {%- assign s_img_radius     = block.settings[slide_img_radius]   | default: 0 -%}
+        {%- assign s_text_align     = block.settings[slide_text_align]   | default: 'left' -%}
+        {%- liquid
+          if s_img_h_mode == 'fixed'
+            assign s_img_height = s_img_h_fixed | append: 'px'
+          elsif s_img_h_mode == 'auto'
+            assign s_img_height = 'auto'
+          else
+            assign s_img_height = '100%'
+          endif
+        -%}
+        <div class="swiper-block__slide swiper-slide">
+
+          {% if s_link != blank %}
+            <a href="{{ s_link }}" class="swiper-block__slide-link">
+          {% endif %}
+
+          <!-- Slide image -->
+          <div
+            class="swiper-block__slide-media"
+            style="
+              --img-width: {{ s_img_width }}%;
+              --img-height: {{ s_img_height }};
+              --img-padding-top: {{ s_img_pad_top }}px;
+              --img-padding-bottom: {{ s_img_pad_bot }}px;
+              --img-padding-left: {{ s_img_pad_left }}px;
+              --img-padding-right: {{ s_img_pad_right }}px;
+              --img-alignment: {{ s_img_align }};
+              --img-radius: {{ s_img_radius }}px;
+            "
+          >
+            {%- assign s_img_style = 'object-fit: ' | append: s_img_fit | append: '; object-position: ' | append: s_img_pos | append: ';' -%}
+            {% if s_image != blank %}
+              {{
+                s_image
+                | image_url: width: 1200
+                | image_tag:
+                  loading: 'lazy',
+                  class: 'swiper-block__slide-img',
+                  alt: s_title,
+                  widths: '400,600,900,1200',
+                  sizes: '(max-width: 749px) 100vw, 50vw',
+                  style: s_img_style
+              }}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'swiper-block__slide-placeholder' }}
+            {% endif %}
+          </div>
+
+          <!-- Slide body -->
+          {% if s_title != blank or s_content != blank or s_label != blank %}
+            <div class="swiper-block__slide-body" style="text-align: {{ s_text_align }};">
+              {% if s_title != blank %}
+                <h3 class="swiper-block__slide-title">{{ s_title }}</h3>
+              {% endif %}
+
+              {% if s_content != blank %}
+                <div class="swiper-block__slide-content rte">
+                  {{ s_content }}
+                </div>
+              {% endif %}
+
+              {% if s_link != blank and s_label != blank %}
+                <span class="swiper-block__slide-cta">{{ s_label }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if s_link != blank %}
+            </a>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination dots (managed by Swiper, must be inside .swiper) -->
+    {% if block.settings.show_pagination %}
+      <div class="swiper-pagination"></div>
+    {% endif %}
+  </div>
+
+  <!-- Navigation buttons — outside .swiper so CSS hover on .swiper-block works -->
+  <button
+    type="button"
+    class="swiper-block__btn swiper-block__btn--prev"
+    aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+  >
+    <span class="svg-wrapper">{{- 'icon-chevron-left.svg' | inline_asset_content -}}</span>
+  </button>
+
+  <button
+    type="button"
+    class="swiper-block__btn swiper-block__btn--next"
+    aria-label="{{ 'accessibility.slideshow_next' | t }}"
+  >
+    <span class="svg-wrapper">{{- 'icon-chevron-right.svg' | inline_asset_content -}}</span>
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+{% # theme-check-disable MissingAsset %}
+<script src="{{ 'swiper-block.js' | asset_url }}" defer></script>
+{% # theme-check-enable MissingAsset %}
+
+{% schema %}
+{
+  "name": "Swiper",
+  "tag": null,
+  "settings": [{
+      "type": "range",
+      "id": "slides_count",
+      "label": "Number of Slides",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Slide 1"
+    },
+    { "type": "image_picker", "id": "slide_1_image",      "label": "Image" },
+    { "type": "text",         "id": "slide_1_title",      "label": "Title",      "default": "Slide One" },
+    { "type": "richtext",     "id": "slide_1_content",    "label": "Content",    "default": "<p>Slide description.</p>" },
+    { "type": "url",          "id": "slide_1_link",       "label": "Link" },
+    { "type": "text",         "id": "slide_1_link_label", "label": "Link Label", "default": "Learn More" },
+    { "type": "header",       "content": "Slide 1 — Image Settings" },
+    { "type": "range",  "id": "slide_1_image_width",           "label": "Image Width (%)",          "min": 10, "max": 100, "step": 5,  "default": 100 },
+    { "type": "select", "id": "slide_1_image_height_mode",      "label": "Image Height Mode",        "default": "aspect-ratio", "options": [{"value":"aspect-ratio","label":"Use Aspect Ratio"},{"value":"fixed","label":"Fixed Height (px)"},{"value":"auto","label":"Auto (natural size)"}] },
+    { "type": "range",  "id": "slide_1_image_fixed_height",    "label": "Fixed Image Height (px)",  "min": 50, "max": 800, "step": 10, "default": 300, "info": "Only applies when Image Height Mode is Fixed Height" },
+    { "type": "range",  "id": "slide_1_image_padding_top",     "label": "Image Padding Top (px)",   "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_1_image_padding_bottom",  "label": "Image Padding Bottom (px)","min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_1_image_padding_left",    "label": "Image Padding Left (px)",  "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_1_image_padding_right",   "label": "Image Padding Right (px)", "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "select", "id": "slide_1_image_alignment",       "label": "Image Horizontal Alignment","default": "center", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}] },
+    { "type": "select", "id": "slide_1_image_object_fit",      "label": "Image Fit",                 "default": "cover",  "options": [{"value":"cover","label":"Cover (crop to fill)"},{"value":"contain","label":"Contain (no crop)"},{"value":"fill","label":"Fill (stretch)"},{"value":"none","label":"None (original size)"}] },
+    { "type": "select", "id": "slide_1_image_object_position", "label": "Image Focus Point",         "default": "center center", "options": [{"value":"top left","label":"Top Left"},{"value":"top center","label":"Top Center"},{"value":"top right","label":"Top Right"},{"value":"center left","label":"Middle Left"},{"value":"center center","label":"Middle Center"},{"value":"center right","label":"Middle Right"},{"value":"bottom left","label":"Bottom Left"},{"value":"bottom center","label":"Bottom Center"},{"value":"bottom right","label":"Bottom Right"}] },
+    { "type": "range",  "id": "slide_1_image_border_radius",  "label": "Image Border Radius (px)",  "min": 0,  "max": 60,  "step": 2,  "default": 0 },
+    { "type": "select", "id": "slide_1_text_alignment", "label": "Text Alignment", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}] },
+    {
+      "type": "header",
+      "content": "Slide 2"
+    },
+    { "type": "image_picker", "id": "slide_2_image",      "label": "Image" },
+    { "type": "text",         "id": "slide_2_title",      "label": "Title",      "default": "Slide Two" },
+    { "type": "richtext",     "id": "slide_2_content",    "label": "Content",    "default": "<p>Slide description.</p>" },
+    { "type": "url",          "id": "slide_2_link",       "label": "Link" },
+    { "type": "text",         "id": "slide_2_link_label", "label": "Link Label", "default": "Learn More" },
+    { "type": "header",       "content": "Slide 2 — Image Settings" },
+    { "type": "range",  "id": "slide_2_image_width",           "label": "Image Width (%)",          "min": 10, "max": 100, "step": 5,  "default": 100 },
+    { "type": "select", "id": "slide_2_image_height_mode",      "label": "Image Height Mode",        "default": "aspect-ratio", "options": [{"value":"aspect-ratio","label":"Use Aspect Ratio"},{"value":"fixed","label":"Fixed Height (px)"},{"value":"auto","label":"Auto (natural size)"}] },
+    { "type": "range",  "id": "slide_2_image_fixed_height",    "label": "Fixed Image Height (px)",  "min": 50, "max": 800, "step": 10, "default": 300, "info": "Only applies when Image Height Mode is Fixed Height" },
+    { "type": "range",  "id": "slide_2_image_padding_top",     "label": "Image Padding Top (px)",   "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_2_image_padding_bottom",  "label": "Image Padding Bottom (px)","min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_2_image_padding_left",    "label": "Image Padding Left (px)",  "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_2_image_padding_right",   "label": "Image Padding Right (px)", "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "select", "id": "slide_2_image_alignment",       "label": "Image Horizontal Alignment","default": "center", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}] },
+    { "type": "select", "id": "slide_2_image_object_fit",      "label": "Image Fit",                 "default": "cover",  "options": [{"value":"cover","label":"Cover (crop to fill)"},{"value":"contain","label":"Contain (no crop)"},{"value":"fill","label":"Fill (stretch)"},{"value":"none","label":"None (original size)"}] },
+    { "type": "select", "id": "slide_2_image_object_position", "label": "Image Focus Point",         "default": "center center", "options": [{"value":"top left","label":"Top Left"},{"value":"top center","label":"Top Center"},{"value":"top right","label":"Top Right"},{"value":"center left","label":"Middle Left"},{"value":"center center","label":"Middle Center"},{"value":"center right","label":"Middle Right"},{"value":"bottom left","label":"Bottom Left"},{"value":"bottom center","label":"Bottom Center"},{"value":"bottom right","label":"Bottom Right"}] },
+    { "type": "range",  "id": "slide_2_image_border_radius",  "label": "Image Border Radius (px)",  "min": 0,  "max": 60,  "step": 2,  "default": 0 },
+    { "type": "select", "id": "slide_2_text_alignment", "label": "Text Alignment", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}] },
+    {
+      "type": "header",
+      "content": "Slide 3"
+    },
+    { "type": "image_picker", "id": "slide_3_image",      "label": "Image" },
+    { "type": "text",         "id": "slide_3_title",      "label": "Title",      "default": "Slide Three" },
+    { "type": "richtext",     "id": "slide_3_content",    "label": "Content",    "default": "<p>Slide description.</p>" },
+    { "type": "url",          "id": "slide_3_link",       "label": "Link" },
+    { "type": "text",         "id": "slide_3_link_label", "label": "Link Label", "default": "Learn More" },
+    { "type": "header",       "content": "Slide 3 — Image Settings" },
+    { "type": "range",  "id": "slide_3_image_width",           "label": "Image Width (%)",          "min": 10, "max": 100, "step": 5,  "default": 100 },
+    { "type": "select", "id": "slide_3_image_height_mode",      "label": "Image Height Mode",        "default": "aspect-ratio", "options": [{"value":"aspect-ratio","label":"Use Aspect Ratio"},{"value":"fixed","label":"Fixed Height (px)"},{"value":"auto","label":"Auto (natural size)"}] },
+    { "type": "range",  "id": "slide_3_image_fixed_height",    "label": "Fixed Image Height (px)",  "min": 50, "max": 800, "step": 10, "default": 300, "info": "Only applies when Image Height Mode is Fixed Height" },
+    { "type": "range",  "id": "slide_3_image_padding_top",     "label": "Image Padding Top (px)",   "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_3_image_padding_bottom",  "label": "Image Padding Bottom (px)","min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_3_image_padding_left",    "label": "Image Padding Left (px)",  "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_3_image_padding_right",   "label": "Image Padding Right (px)", "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "select", "id": "slide_3_image_alignment",       "label": "Image Horizontal Alignment","default": "center", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}] },
+    { "type": "select", "id": "slide_3_image_object_fit",      "label": "Image Fit",                 "default": "cover",  "options": [{"value":"cover","label":"Cover (crop to fill)"},{"value":"contain","label":"Contain (no crop)"},{"value":"fill","label":"Fill (stretch)"},{"value":"none","label":"None (original size)"}] },
+    { "type": "select", "id": "slide_3_image_object_position", "label": "Image Focus Point",         "default": "center center", "options": [{"value":"top left","label":"Top Left"},{"value":"top center","label":"Top Center"},{"value":"top right","label":"Top Right"},{"value":"center left","label":"Middle Left"},{"value":"center center","label":"Middle Center"},{"value":"center right","label":"Middle Right"},{"value":"bottom left","label":"Bottom Left"},{"value":"bottom center","label":"Bottom Center"},{"value":"bottom right","label":"Bottom Right"}] },
+    { "type": "range",  "id": "slide_3_image_border_radius",  "label": "Image Border Radius (px)",  "min": 0,  "max": 60,  "step": 2,  "default": 0 },
+    { "type": "select", "id": "slide_3_text_alignment", "label": "Text Alignment", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}] },
+    {
+      "type": "header",
+      "content": "Slide 4"
+    },
+    { "type": "image_picker", "id": "slide_4_image",      "label": "Image" },
+    { "type": "text",         "id": "slide_4_title",      "label": "Title",      "default": "Slide Four" },
+    { "type": "richtext",     "id": "slide_4_content",    "label": "Content",    "default": "<p>Slide description.</p>" },
+    { "type": "url",          "id": "slide_4_link",       "label": "Link" },
+    { "type": "text",         "id": "slide_4_link_label", "label": "Link Label", "default": "Learn More" },
+    { "type": "header",       "content": "Slide 4 — Image Settings" },
+    { "type": "range",  "id": "slide_4_image_width",           "label": "Image Width (%)",          "min": 10, "max": 100, "step": 5,  "default": 100 },
+    { "type": "select", "id": "slide_4_image_height_mode",      "label": "Image Height Mode",        "default": "aspect-ratio", "options": [{"value":"aspect-ratio","label":"Use Aspect Ratio"},{"value":"fixed","label":"Fixed Height (px)"},{"value":"auto","label":"Auto (natural size)"}] },
+    { "type": "range",  "id": "slide_4_image_fixed_height",    "label": "Fixed Image Height (px)",  "min": 50, "max": 800, "step": 10, "default": 300, "info": "Only applies when Image Height Mode is Fixed Height" },
+    { "type": "range",  "id": "slide_4_image_padding_top",     "label": "Image Padding Top (px)",   "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_4_image_padding_bottom",  "label": "Image Padding Bottom (px)","min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_4_image_padding_left",    "label": "Image Padding Left (px)",  "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_4_image_padding_right",   "label": "Image Padding Right (px)", "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "select", "id": "slide_4_image_alignment",       "label": "Image Horizontal Alignment","default": "center", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}] },
+    { "type": "select", "id": "slide_4_image_object_fit",      "label": "Image Fit",                 "default": "cover",  "options": [{"value":"cover","label":"Cover (crop to fill)"},{"value":"contain","label":"Contain (no crop)"},{"value":"fill","label":"Fill (stretch)"},{"value":"none","label":"None (original size)"}] },
+    { "type": "select", "id": "slide_4_image_object_position", "label": "Image Focus Point",         "default": "center center", "options": [{"value":"top left","label":"Top Left"},{"value":"top center","label":"Top Center"},{"value":"top right","label":"Top Right"},{"value":"center left","label":"Middle Left"},{"value":"center center","label":"Middle Center"},{"value":"center right","label":"Middle Right"},{"value":"bottom left","label":"Bottom Left"},{"value":"bottom center","label":"Bottom Center"},{"value":"bottom right","label":"Bottom Right"}] },
+    { "type": "range",  "id": "slide_4_image_border_radius",  "label": "Image Border Radius (px)",  "min": 0,  "max": 60,  "step": 2,  "default": 0 },
+    { "type": "select", "id": "slide_4_text_alignment", "label": "Text Alignment", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}] },
+    {
+      "type": "header",
+      "content": "Slide 5"
+    },
+    { "type": "image_picker", "id": "slide_5_image",      "label": "Image" },
+    { "type": "text",         "id": "slide_5_title",      "label": "Title",      "default": "Slide Five" },
+    { "type": "richtext",     "id": "slide_5_content",    "label": "Content",    "default": "<p>Slide description.</p>" },
+    { "type": "url",          "id": "slide_5_link",       "label": "Link" },
+    { "type": "text",         "id": "slide_5_link_label", "label": "Link Label", "default": "Learn More" },
+    { "type": "header",       "content": "Slide 5 — Image Settings" },
+    { "type": "range",  "id": "slide_5_image_width",           "label": "Image Width (%)",          "min": 10, "max": 100, "step": 5,  "default": 100 },
+    { "type": "select", "id": "slide_5_image_height_mode",      "label": "Image Height Mode",        "default": "aspect-ratio", "options": [{"value":"aspect-ratio","label":"Use Aspect Ratio"},{"value":"fixed","label":"Fixed Height (px)"},{"value":"auto","label":"Auto (natural size)"}] },
+    { "type": "range",  "id": "slide_5_image_fixed_height",    "label": "Fixed Image Height (px)",  "min": 50, "max": 800, "step": 10, "default": 300, "info": "Only applies when Image Height Mode is Fixed Height" },
+    { "type": "range",  "id": "slide_5_image_padding_top",     "label": "Image Padding Top (px)",   "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_5_image_padding_bottom",  "label": "Image Padding Bottom (px)","min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_5_image_padding_left",    "label": "Image Padding Left (px)",  "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_5_image_padding_right",   "label": "Image Padding Right (px)", "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "select", "id": "slide_5_image_alignment",       "label": "Image Horizontal Alignment","default": "center", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}] },
+    { "type": "select", "id": "slide_5_image_object_fit",      "label": "Image Fit",                 "default": "cover",  "options": [{"value":"cover","label":"Cover (crop to fill)"},{"value":"contain","label":"Contain (no crop)"},{"value":"fill","label":"Fill (stretch)"},{"value":"none","label":"None (original size)"}] },
+    { "type": "select", "id": "slide_5_image_object_position", "label": "Image Focus Point",         "default": "center center", "options": [{"value":"top left","label":"Top Left"},{"value":"top center","label":"Top Center"},{"value":"top right","label":"Top Right"},{"value":"center left","label":"Middle Left"},{"value":"center center","label":"Middle Center"},{"value":"center right","label":"Middle Right"},{"value":"bottom left","label":"Bottom Left"},{"value":"bottom center","label":"Bottom Center"},{"value":"bottom right","label":"Bottom Right"}] },
+    { "type": "range",  "id": "slide_5_image_border_radius",  "label": "Image Border Radius (px)",  "min": 0,  "max": 60,  "step": 2,  "default": 0 },
+    { "type": "select", "id": "slide_5_text_alignment", "label": "Text Alignment", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}] },
+    {
+      "type": "header",
+      "content": "Slide 6"
+    },
+    { "type": "image_picker", "id": "slide_6_image",      "label": "Image" },
+    { "type": "text",         "id": "slide_6_title",      "label": "Title",      "default": "Slide Six" },
+    { "type": "richtext",     "id": "slide_6_content",    "label": "Content",    "default": "<p>Slide description.</p>" },
+    { "type": "url",          "id": "slide_6_link",       "label": "Link" },
+    { "type": "text",         "id": "slide_6_link_label", "label": "Link Label", "default": "Learn More" },
+    { "type": "header",       "content": "Slide 6 — Image Settings" },
+    { "type": "range",  "id": "slide_6_image_width",           "label": "Image Width (%)",          "min": 10, "max": 100, "step": 5,  "default": 100 },
+    { "type": "select", "id": "slide_6_image_height_mode",      "label": "Image Height Mode",        "default": "aspect-ratio", "options": [{"value":"aspect-ratio","label":"Use Aspect Ratio"},{"value":"fixed","label":"Fixed Height (px)"},{"value":"auto","label":"Auto (natural size)"}] },
+    { "type": "range",  "id": "slide_6_image_fixed_height",    "label": "Fixed Image Height (px)",  "min": 50, "max": 800, "step": 10, "default": 300, "info": "Only applies when Image Height Mode is Fixed Height" },
+    { "type": "range",  "id": "slide_6_image_padding_top",     "label": "Image Padding Top (px)",   "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_6_image_padding_bottom",  "label": "Image Padding Bottom (px)","min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_6_image_padding_left",    "label": "Image Padding Left (px)",  "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "range",  "id": "slide_6_image_padding_right",   "label": "Image Padding Right (px)", "min": 0,  "max": 80,  "step": 4,  "default": 0 },
+    { "type": "select", "id": "slide_6_image_alignment",       "label": "Image Horizontal Alignment","default": "center", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}] },
+    { "type": "select", "id": "slide_6_image_object_fit",      "label": "Image Fit",                 "default": "cover",  "options": [{"value":"cover","label":"Cover (crop to fill)"},{"value":"contain","label":"Contain (no crop)"},{"value":"fill","label":"Fill (stretch)"},{"value":"none","label":"None (original size)"}] },
+    { "type": "select", "id": "slide_6_image_object_position", "label": "Image Focus Point",         "default": "center center", "options": [{"value":"top left","label":"Top Left"},{"value":"top center","label":"Top Center"},{"value":"top right","label":"Top Right"},{"value":"center left","label":"Middle Left"},{"value":"center center","label":"Middle Center"},{"value":"center right","label":"Middle Right"},{"value":"bottom left","label":"Bottom Left"},{"value":"bottom center","label":"Bottom Center"},{"value":"bottom right","label":"Bottom Right"}] },
+    { "type": "range",  "id": "slide_6_image_border_radius",  "label": "Image Border Radius (px)",  "min": 0,  "max": 60,  "step": 2,  "default": 0 },
+    { "type": "select", "id": "slide_6_text_alignment", "label": "Text Alignment", "default": "left", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}] },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "slide_bg_color",
+      "label": "Slide Card Background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "content_color",
+      "label": "Content Text Color",
+      "default": "#555555"
+    },
+    {
+      "type": "header",
+      "content": "Frame & Layout"
+    },
+    {
+      "type": "select",
+      "id": "width_type",
+      "label": "Width",
+      "default": "full",
+      "options": [
+        { "value": "full",   "label": "Full width" },
+        { "value": "custom", "label": "Custom width" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "Custom Width",
+      "info": "Only used when Width is set to Custom",
+      "min": 320,
+      "max": 1600,
+      "step": 40,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Slide Aspect Ratio",
+      "default": "16/9",
+      "options": [
+        { "value": "16/9",   "label": "16:9 (Widescreen)" },
+        { "value": "4/3",    "label": "4:3 (Standard)" },
+        { "value": "1/1",    "label": "1:1 (Square)" },
+        { "value": "3/4",    "label": "3:4 (Portrait)" },
+        { "value": "custom", "label": "Custom Height" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "custom_height",
+      "label": "Custom Height",
+      "info": "Only used when Aspect Ratio is set to Custom",
+      "min": 80,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view",
+      "label": "Slides Per View",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "slides_spacing",
+      "label": "Space Between Slides",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Autoplay"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay_enabled",
+      "label": "Enable Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "label": "Autoplay Delay",
+      "min": 1000,
+      "max": 8000,
+      "step": 500,
+      "unit": "ms",
+      "default": 3000
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on Hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pagination",
+      "label": "Show Pagination Dots",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop_enabled",
+      "label": "Enable Loop",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swiper",
+      "category": "t:categories.basic"
+    }
+  ]
+}
+{% endschema %}
