@@ -271,7 +271,8 @@
     "items_added_to_cart": {
       "one": "1個のアイテムがカートに追加されました",
       "other": "{{ count }}個のアイテムがカートに追加されました"
-    }
+    },
+    "or": "または"
   },
   "gift_cards": {
     "issued": {
@@ -337,6 +338,54 @@
       "post": "コメントを投稿する",
       "success_moderated": "コメントを投稿しました。承認待ちです",
       "success": "コメントを投稿しました"
+    }
+  },
+  "customer": {
+    "login": {
+      "title": "ログイン",
+      "email": "Eメールアドレス",
+      "password": "パスワード",
+      "remember_me": "パスワードを保存する",
+      "forgot_password": "パスワードをお忘れですか?",
+      "sign_in": "ログイン",
+      "account_exists": "アカウントをお持ちの方はこちら",
+      "benefits_title": "サプライズをご用意しています",
+      "benefits_body": "ディブティックでは、お客様へ感謝の気持ちを込めて、そして時を重ねるごとに、各種イベントや会員様限定キャンペーンへのご招待特典をご用意しております。アカウントを作成して是非メゾンの世界をお楽しみください。",
+      "show_password": "パスワードを表示",
+      "login_failed": "メールアドレスまたはパスワードが正しくありません。",
+      "login_network_error": "ネットワークエラーです。接続を確認して再度お試しください。",
+      "login_unknown_error": "予期せぬエラーが発生しました。再度お試しください。"
+    },
+    "register": {
+      "title": "アカウントを作成する",
+      "last_name": "姓",
+      "first_name": "名",
+      "last_name_kana": "フリガナ（姓）",
+      "first_name_kana": "フリガナ（名）",
+      "birthdate": "生年月日",
+      "birthdate_help": "誕生日情報はアカウントページで設定できます",
+      "phone": "電話番号",
+      "email": "Eメールアドレス",
+      "password": "パスワード",
+      "password_confirm": "パスワードを確定してください",
+      "newsletter_title": "ディブティックの最新情報や特別なご案内のお受け取り方法をお選びください",
+      "newsletter_email": "メールで",
+      "newsletter_sms": "SMS/電話で",
+      "newsletter_mail": "郵送で",
+      "submit": "アカウントを作成する",
+      "success": "アカウントが作成されました。ログインしてください。",
+      "email_exists": "このメールアドレスのアカウントは既に存在します。ログインしてください。",
+      "api_error": "エラーが発生しました。再度お試しください。",
+      "network_error": "ネットワークエラーです。接続を確認して再度お試しください。",
+      "errors": {
+        "required": "必須項目です。",
+        "email": "有効なメールアドレスを入力してください。",
+        "kana": "全角カタカナで入力してください。",
+        "date": "有効な日付を入力してください（YYYY/MM/DD）。",
+        "phone": "有効な電話番号を入力してください。",
+        "password_min": "パスワードは8文字以上で入力してください。",
+        "password_mismatch": "パスワードが一致しません。"
+      }
     }
   }
 }
