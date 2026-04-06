@@ -1,0 +1,807 @@
+<div id="account-modal-overlay" class="account-modal-overlay" aria-hidden="true"></div>
+
+<div
+  id="account-modal"
+  class="account-modal color-{{ settings.popover_color_scheme }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ 'content.account_title' | t }}"
+  data-storefront-endpoint="https://{{ shop.permanent_domain | default: 'diptyque-remake.myshopify.com' }}/api/2026-04/graphql.json"
+  data-storefront-token="{{ settings.storefront_access_token }}"
+  hidden
+>
+  <div class="account-modal__inner">
+    <div class="account-modal__header">
+      <span class="account-modal__title">{{ 'content.account_title' | t }}</span>
+      <button
+        type="button"
+        class="account-modal__close button-unstyled"
+        id="account-modal-close"
+        aria-label="{{ 'actions.close_dialog' | t }}"
+      >
+        <span class="svg-wrapper">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+
+    <div class="account-modal__body">
+      {%- comment -%} LOGIN PANEL {%- endcomment -%}
+      <div id="account-panel-login" class="account-modal__panel account-modal__panel--active">
+        <h2 class="account-modal__heading">{{ 'customer.login.title' | t }}</h2>
+
+        {%- form 'customer_login', id: 'CustomerLoginForm', novalidate: 'novalidate' -%}
+          <p class="account-modal__form-errors" hidden></p>
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-CustomerEmail">
+              {{ 'customer.login.email' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              class="account-modal__input"
+              autocomplete="email"
+              type="email"
+              name="customer[email]"
+              id="modal-CustomerEmail"
+              autocorrect="off"
+              autocapitalize="off"
+              required
+            >
+            <p class="account-modal__error" data-error-for="modal-CustomerEmail" hidden></p>
+          </div>
+
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-CustomerPassword">
+              {{ 'customer.login.password' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <div class="account-modal__input-wrapper">
+              <input
+                class="account-modal__input"
+                autocomplete="current-password"
+                type="password"
+                name="customer[password]"
+                id="modal-CustomerPassword"
+                required
+              >
+              <button
+                type="button"
+                class="account-modal__password-toggle button-unstyled"
+                aria-label="{{ 'customer.login.show_password' | t }}"
+              >
+                <span class="svg-wrapper account-modal__eye">
+                  {{- 'icon-eye.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            </div>
+            <p class="account-modal__error" data-error-for="modal-CustomerPassword" hidden></p>
+          </div>
+
+          <div class="account-modal__remember-row">
+            <label class="account-modal__checkbox-label">
+              <input type="checkbox" name="customer[remember_me]" class="account-modal__checkbox">
+              <span>{{ 'customer.login.remember_me' | t }}</span>
+            </label>
+          </div>
+
+          <a
+            href="{{ routes.root_url }}account/login#recover"
+            class="account-modal__link account-modal__forgot-link"
+          >
+            {{ 'customer.login.forgot_password' | t }}
+          </a>
+
+          <button type="submit" class="account-modal__submit button">
+            {{ 'customer.login.sign_in' | t }}
+          </button>
+        {%- endform -%}
+
+        <div class="account-modal__or">
+          <span>{{ 'content.or' | t }}</span>
+        </div>
+
+        <button
+          type="button"
+          id="account-modal-go-register"
+          class="account-modal__secondary-btn button button--secondary"
+        >
+          {{ 'customer.register.title' | t }}
+        </button>
+
+        <div class="account-modal__benefits">
+          <p class="account-modal__benefits-title">
+            {{ 'customer.login.benefits_title' | t }}
+          </p>
+          <p class="account-modal__benefits-body">
+            {{ 'customer.login.benefits_body' | t }}
+          </p>
+        </div>
+      </div>
+
+      {%- comment -%} REGISTER PANEL {%- endcomment -%}
+      <div id="account-panel-register" class="account-modal__panel" hidden>
+        <h2 class="account-modal__heading">{{ 'customer.register.title' | t }}</h2>
+
+        <p class="account-modal__subheading-link">
+          <a href="#" id="account-modal-go-login" class="account-modal__link">
+            {{ 'customer.login.account_exists' | t }}
+          </a>
+        </p>
+
+        {%- form 'create_customer', id: 'CustomerRegisterForm', novalidate: 'novalidate' -%}
+          <p class="account-modal__form-errors" hidden></p>
+
+          <div class="account-modal__row account-modal__row--2col">
+            <div class="account-modal__field">
+              <label class="account-modal__label" for="modal-RegisterLastName">
+                {{ 'customer.register.last_name' | t }} <span aria-hidden="true">*</span>
+              </label>
+              <input
+                class="account-modal__input"
+                type="text"
+                name="customer[last_name]"
+                id="modal-RegisterLastName"
+                autocomplete="family-name"
+                required
+              >
+              <p class="account-modal__error" data-error-for="modal-RegisterLastName" hidden></p>
+            </div>
+            <div class="account-modal__field">
+              <label class="account-modal__label" for="modal-RegisterFirstName">
+                {{ 'customer.register.first_name' | t }} <span aria-hidden="true">*</span>
+              </label>
+              <input
+                class="account-modal__input"
+                type="text"
+                name="customer[first_name]"
+                id="modal-RegisterFirstName"
+                autocomplete="given-name"
+                required
+              >
+              <p class="account-modal__error" data-error-for="modal-RegisterFirstName" hidden></p>
+            </div>
+          </div>
+
+          <div class="account-modal__row account-modal__row--2col">
+            <div class="account-modal__field">
+              <label class="account-modal__label" for="modal-RegisterLastNameKana">
+                {{ 'customer.register.last_name_kana' | t }} <span aria-hidden="true">*</span>
+              </label>
+              <input
+                class="account-modal__input"
+                type="text"
+                id="modal-RegisterLastNameKana"
+                data-meta-key="last_name_kana"
+                required
+              >
+              <p class="account-modal__error" data-error-for="modal-RegisterLastNameKana" hidden></p>
+            </div>
+            <div class="account-modal__field">
+              <label class="account-modal__label" for="modal-RegisterFirstNameKana">
+                {{ 'customer.register.first_name_kana' | t }} <span aria-hidden="true">*</span>
+              </label>
+              <input
+                class="account-modal__input"
+                type="text"
+                id="modal-RegisterFirstNameKana"
+                data-meta-key="first_name_kana"
+                required
+              >
+              <p class="account-modal__error" data-error-for="modal-RegisterFirstNameKana" hidden></p>
+            </div>
+          </div>
+
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-RegisterBirthdate">
+              {{ 'customer.register.birthdate' | t }}
+              <span class="account-modal__help-icon" tabindex="0" aria-label="{{ 'customer.register.birthdate_help' | t }}">?</span>
+            </label>
+            <div class="account-modal__input-wrapper">
+              <input
+                class="account-modal__input"
+                type="text"
+                id="modal-RegisterBirthdate"
+                data-meta-key="birthdate"
+                placeholder="YYYY/MM/DD"
+                autocomplete="off"
+                readonly
+              >
+              <button
+                type="button"
+                id="modal-RegisterBirthdateToggle"
+                class="account-modal__calendar-btn button-unstyled"
+                aria-label="{{ 'customer.register.birthdate' | t }}"
+                tabindex="-1"
+              >
+                <span class="account-modal__calendar-icon svg-wrapper">
+                  {{- 'icon-calendar.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            </div>
+            <p class="account-modal__error" data-error-for="modal-RegisterBirthdate" hidden></p>
+          </div>
+
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-RegisterPhone">
+              {{ 'customer.register.phone' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              class="account-modal__input"
+              type="tel"
+              name="customer[phone]"
+              id="modal-RegisterPhone"
+              autocomplete="tel"
+              required
+            >
+            <p class="account-modal__error" data-error-for="modal-RegisterPhone" hidden></p>
+          </div>
+
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-RegisterEmail">
+              {{ 'customer.register.email' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              class="account-modal__input"
+              type="email"
+              name="customer[email]"
+              id="modal-RegisterEmail"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              required
+            >
+            <p class="account-modal__error" data-error-for="modal-RegisterEmail" hidden></p>
+          </div>
+
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-RegisterPassword">
+              {{ 'customer.register.password' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <div class="account-modal__input-wrapper">
+              <input
+                class="account-modal__input"
+                type="password"
+                name="customer[password]"
+                id="modal-RegisterPassword"
+                autocomplete="new-password"
+                required
+              >
+              <button
+                type="button"
+                class="account-modal__password-toggle button-unstyled"
+                aria-label="{{ 'customer.login.show_password' | t }}"
+              >
+                <span class="svg-wrapper account-modal__eye">
+                  {{- 'icon-eye.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            </div>
+            <p class="account-modal__error" data-error-for="modal-RegisterPassword" hidden></p>
+          </div>
+
+          <div class="account-modal__field">
+            <label class="account-modal__label" for="modal-RegisterPasswordConfirm">
+              {{ 'customer.register.password_confirm' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <div class="account-modal__input-wrapper">
+              <input
+                class="account-modal__input"
+                type="password"
+                name="customer[password_confirmation]"
+                id="modal-RegisterPasswordConfirm"
+                autocomplete="new-password"
+                required
+              >
+              <button
+                type="button"
+                class="account-modal__password-toggle button-unstyled"
+                aria-label="{{ 'customer.login.show_password' | t }}"
+              >
+                <span class="svg-wrapper account-modal__eye">
+                  {{- 'icon-eye.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            </div>
+            <p class="account-modal__error" data-error-for="modal-RegisterPasswordConfirm" hidden></p>
+          </div>
+
+          <div class="account-modal__newsletter-section">
+            <p class="account-modal__newsletter-title">
+              {{ 'customer.register.newsletter_title' | t }}
+            </p>
+            <div class="account-modal__newsletter-options">
+              <label class="account-modal__checkbox-label">
+                <input type="checkbox" name="customer[accepts_marketing]" class="account-modal__checkbox" value="true">
+                <span>{{ 'customer.register.newsletter_email' | t }}</span>
+              </label>
+              <label class="account-modal__checkbox-label">
+                <input type="checkbox" class="account-modal__checkbox" id="modal-RegisterSmsOptIn" data-meta-key="sms_opt_in">
+                <span>{{ 'customer.register.newsletter_sms' | t }}</span>
+              </label>
+              <label class="account-modal__checkbox-label">
+                <input type="checkbox" class="account-modal__checkbox" id="modal-RegisterMailOptIn" data-meta-key="mail_opt_in">
+                <span>{{ 'customer.register.newsletter_mail' | t }}</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="account-modal__submit button">
+            {{ 'customer.register.submit' | t }}
+          </button>
+        {%- endform -%}
+
+        <div class="account-modal__register-legal">
+          <p>
+            Diptyque Japan株式会社は、当社の最新情報や特別なご案内をニュースレター、SMS、または郵便にてお届けいたします。ご希望の場合は受け取り方法をお選びください。
+          </p>
+          <p>
+            ニュースレターの配信変更/停止については、マイページよりいつでも設定の変更が可能です。
+          </p>
+          <p>
+            お客様の個人情報に対する当社の考え方および慣行、ならびに当社の個人情報の取扱方法につきましては、<a href="/pages/privacy-policy" class="account-modal__link">プライバシーポリシー</a>をご覧ください。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* ===== Account Modal ===== */
+  .account-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .account-modal-overlay.is-open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .account-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 420px;
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    background: var(--color-background);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .account-modal:not([hidden]) {
+    display: block;
+  }
+
+  .account-modal[hidden] {
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .account-modal.is-open {
+    transform: translateX(0);
+  }
+
+  .account-modal__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .account-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+    position: relative;
+  }
+
+  .account-modal__title {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+  }
+
+  .account-modal__close {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+  }
+
+  .account-modal__close .svg-wrapper svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .account-modal__body {
+    flex: 1;
+    padding: 0 24px 32px;
+    overflow-y: auto;
+  }
+
+  .account-modal__panel {
+    display: block;
+  }
+
+  .account-modal__panel[hidden] {
+    display: none;
+  }
+
+  .account-modal__heading {
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-align: center;
+    margin: 24px 0 6px;
+    color: var(--color-foreground);
+  }
+
+  .account-modal__subheading-link {
+    text-align: center;
+    margin: 0 0 20px;
+    font-size: 0.8rem;
+  }
+
+  .account-modal__field {
+    margin-bottom: 16px;
+  }
+
+  .account-modal__label {
+    display: block;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+    color: var(--color-foreground);
+  }
+
+  .account-modal__label span[aria-hidden] {
+    color: var(--color-foreground);
+  }
+
+  .account-modal__input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border, #ccc);
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 0.875rem;
+    outline: none;
+    box-sizing: border-box;
+    appearance: none;
+    border-radius: 0;
+  }
+
+  .account-modal__input:focus {
+    border-color: var(--color-foreground);
+  }
+
+  .account-modal__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .account-modal__input-wrapper .account-modal__input {
+    padding-right: 40px;
+  }
+
+  .account-modal__password-toggle {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+  }
+
+  .account-modal__eye svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .account-modal__calendar-icon {
+    display: flex;
+    align-items: center;
+    color: var(--color-foreground);
+    opacity: 0.8;
+  }
+
+  .account-modal__calendar-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  .account-modal__help-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--color-foreground);
+    font-size: 0.7rem;
+    cursor: pointer;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .account-modal__remember-row {
+    margin-bottom: 12px;
+  }
+
+  .account-modal__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--color-foreground);
+  }
+
+  .account-modal__checkbox {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 1px solid var(--color-border, #ccc);
+    appearance: none;
+    position: relative;
+    background: var(--color-background);
+  }
+
+  .account-modal__checkbox:checked::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--color-foreground);
+  }
+
+  .account-modal__forgot-link {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+  }
+
+  .account-modal__submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--color-button, #333);
+    color: var(--color-button-text, #fff);
+    border: none;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .account-modal__submit:hover {
+    opacity: 0.85;
+  }
+
+  .account-modal__or {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 14px;
+    color: var(--color-foreground);
+    font-size: 0.8rem;
+  }
+
+  .account-modal__or::before,
+  .account-modal__or::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border, #ccc);
+  }
+
+  .account-modal__secondary-btn {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: var(--color-foreground);
+    border: 1px solid var(--color-foreground);
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .account-modal__secondary-btn:hover {
+    background: var(--color-foreground);
+    color: var(--color-background);
+  }
+
+  .account-modal__benefits {
+    background: #2d4a3e;
+    color: #fff;
+    padding: 20px;
+  }
+
+  .account-modal__benefits-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .account-modal__benefits-body {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .account-modal__row--2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .account-modal__newsletter-section {
+    margin: 20px 0;
+  }
+
+  .account-modal__newsletter-title {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    color: var(--color-foreground);
+  }
+
+  .account-modal__newsletter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+  }
+
+  .account-modal__register-legal {
+    margin-top: 20px;
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: var(--color-foreground);
+    opacity: 0.75;
+  }
+
+  .account-modal__register-legal p {
+    margin-bottom: 10px;
+  }
+
+  .account-modal__link {
+    color: var(--color-foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .account-modal__link:hover {
+    opacity: 0.7;
+  }
+
+  /* ---- Calendar icon toggle button ---- */
+  .account-modal__calendar-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+    color: var(--color-foreground);
+  }
+
+  .account-modal__calendar-btn svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  /* ---- Flatpickr theme overrides ---- */
+  .flatpickr-calendar {
+    font-family: inherit !important;
+    border: 1px solid var(--color-border, #ccc) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    border-radius: 0 !important;
+  }
+
+  .flatpickr-calendar.open {
+    z-index: 9999 !important;
+  }
+
+  .flatpickr-day.selected,
+  .flatpickr-day.selected:hover {
+    background: var(--color-foreground) !important;
+    border-color: var(--color-foreground) !important;
+    color: var(--color-background) !important;
+  }
+
+  .flatpickr-day:hover {
+    background: rgba(0,0,0,0.06) !important;
+  }
+
+  .flatpickr-day.today {
+    border-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-day.today:hover {
+    background: rgba(0,0,0,0.06) !important;
+    color: inherit !important;
+  }
+
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    fill: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+    border-bottom-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+    border-top-color: var(--color-foreground) !important;
+  }
+
+  .account-modal__input.is-invalid {
+    border-color: rgb(var(--color-error, 221, 75, 57));
+  }
+
+  .account-modal__error {
+    margin-top: 6px;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: red;
+  }
+
+  @media screen and (max-width: 480px) {
+    .account-modal {
+      max-width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+<script type="application/json" id="account-modal-i18n">
+  {
+    "required": {{ 'customer.register.errors.required' | t | json }},
+    "email": {{ 'customer.register.errors.email' | t | json }},
+    "kana": {{ 'customer.register.errors.kana' | t | json }},
+    "date": {{ 'customer.register.errors.date' | t | json }},
+    "phone": {{ 'customer.register.errors.phone' | t | json }},
+    "password_min": {{ 'customer.register.errors.password_min' | t | json }},
+    "password_mismatch": {{ 'customer.register.errors.password_mismatch' | t | json }},
+    "register_success": {{ 'customer.register.success' | t | json }},
+    "email_exists": {{ 'customer.register.email_exists' | t | json }},
+    "api_error": {{ 'customer.register.api_error' | t | json }},
+    "network_error": {{ 'customer.register.network_error' | t | json }},
+    "login_failed": {{ 'customer.login.login_failed' | t | json }},
+    "login_network_error": {{ 'customer.login.login_network_error' | t | json }},
+    "login_unknown_error": {{ 'customer.login.login_unknown_error' | t | json }}
+  }
+</script>
+
+<link rel="stylesheet" href="{{ 'flatpickr.min.css' | asset_url }}">
+<script src="{{ 'flatpickr.min.js' | asset_url }}" defer></script>
+<script src="{{ 'flatpickr-l10n-ja.js' | asset_url }}" defer></script>
+<script src="{{ 'account-modal.js' | asset_url }}" type="module" defer></script>

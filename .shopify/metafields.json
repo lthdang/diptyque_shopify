@@ -138,6 +138,36 @@
         "name": "list.product_reference",
         "category": "REFERENCE"
       }
+    },
+    {
+      "key": "shape",
+      "namespace": "shopify",
+      "name": "Shape",
+      "description": "Describes the geometric form or shape of a product, such as round or heart",
+      "type": {
+        "name": "list.metaobject_reference",
+        "category": "REFERENCE"
+      }
+    },
+    {
+      "key": "occasion",
+      "namespace": "shopify",
+      "name": "Occasion",
+      "description": "Specifies the suitable event or setting for a product, e.g. casual, formal",
+      "type": {
+        "name": "list.metaobject_reference",
+        "category": "REFERENCE"
+      }
+    },
+    {
+      "key": "season",
+      "namespace": "shopify",
+      "name": "Season",
+      "description": "Indicates the season the product is best suited for, such as summer or fall",
+      "type": {
+        "name": "list.metaobject_reference",
+        "category": "REFERENCE"
+      }
     }
   ],
   "variant": [],
