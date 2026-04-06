@@ -79,6 +79,7 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
+    "storefront_access_token": "60e8e0f4ad3be9fea1cb45de1c051ec3",
     "content_for_index": [],
     "color_schemes": {
       "scheme-1": {
@@ -633,6 +634,7 @@
           }
         }
       }
-    }
+    },
+    "storefront_access_token": "60e8e0f4ad3be9fea1cb45de1c051ec3"
   }
 }

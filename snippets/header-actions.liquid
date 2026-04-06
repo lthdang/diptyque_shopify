@@ -31,7 +31,6 @@
     height="17"
     viewBox="0 0 15 17"
     fill="none"
-    slot="signed-out-avatar"
     class="account-button__icon"
   >
     <path
@@ -70,32 +69,37 @@
     %}
     <div
       class="account-button header-actions__action{% if display_style == 'text' %} account-button--text{% endif %} color-{{ settings.popover_color_scheme }}"
+      {% if account_actions_style != blank %}style="{{ account_actions_style }}"{% endif %}
     >
-      <shopify-account
-        menu="{{ customer_account_menu }}"
-        {% if account_actions_style != blank %}
-          style="{{ account_actions_style }}"
-        {% endif %}
-      >
-        {% if customer %}
-          <div class="account-button__fallback"></div>
-        {% else %}
-          <span
-            slot="signed-out-avatar"
-            class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}"
-          >
+      {% if customer %}
+        <a
+          href="{{ routes.account_url }}"
+          class="button-unstyled"
+          aria-label="{{ 'accessibility.account' | t }}"
+        >
+          <span class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
             {{ 'content.account_title' | t }}
           </span>
-
-          <span
-            slot="signed-out-avatar"
-            class="{% if display_style != 'icon' %}desktop:hidden{% endif %}"
-            aria-hidden="true"
-          >
+          <span class="{% if display_style != 'icon' %}desktop:hidden{% endif %}" aria-hidden="true">
             {{ account_icon }}
           </span>
-        {% endif %}
-      </shopify-account>
+        </a>
+      {% else %}
+        <button
+          type="button"
+          class="button-unstyled"
+          data-open-account-modal="login"
+          aria-label="{{ 'accessibility.account' | t }}"
+          aria-haspopup="dialog"
+        >
+          <span class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
+            {{ 'content.account_title' | t }}
+          </span>
+          <span class="{% if display_style != 'icon' %}desktop:hidden{% endif %}" aria-hidden="true">
+            {{ account_icon }}
+          </span>
+        </button>
+      {% endif %}
     </div>
   {% endif %}
 
