@@ -1,0 +1,93 @@
+<div
+  id="auth-callback-app"
+  data-shop-id="{{ shop.id }}"
+  data-shop-domain="{{ shop.permanent_domain }}"
+  data-client-id="{{ settings.customer_account_client_id }}"
+  data-msg-loading="{{ 'custom_account.loading' | t | default: 'ログイン中...' }}"
+  data-msg-error="{{ 'custom_account.auth_error' | t | default: 'ログインに失敗しました。もう一度お試しください。' }}"
+  style="display:flex;align-items:center;justify-content:center;min-height:50vh;font-family:var(--font-body-family,sans-serif);"
+>
+  <p id="auth-callback-msg"></p>
+</div>
+
+<script>
+(async function () {
+  var el       = document.getElementById('auth-callback-app');
+  var shopId   = el.dataset.shopId;
+  var domain   = el.dataset.shopDomain;
+  var clientId = el.dataset.clientId;
+  var msgEl    = document.getElementById('auth-callback-msg');
+  var msgError = el.dataset.msgError;
+
+  msgEl.textContent = el.dataset.msgLoading;
+
+  var params  = new URLSearchParams(window.location.search);
+  var code    = params.get('code');
+  var state   = params.get('state');
+
+  // Verify state (CSRF protection)
+  var savedState = sessionStorage.getItem('dp_oauth_state');
+  if (!code || !state || state !== savedState) {
+    msgEl.textContent = msgError;
+    setTimeout(function() { window.location.replace('/'); }, 3000);
+    return;
+  }
+
+  var verifier  = sessionStorage.getItem('dp_pkce_verifier');
+  var redirectUri = 'https://' + domain + '/pages/auth-callback';
+
+  try {
+    // Exchange code for token
+    var res = await fetch(
+      'https://shopify.com/authentication/' + shopId + '/oauth/token',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type:    'authorization_code',
+          client_id:     clientId,
+          redirect_uri:  redirectUri,
+          code:          code,
+          code_verifier: verifier,
+        }).toString(),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error('Token exchange failed: ' + res.status);
+    }
+
+    var data = await res.json();
+    var expiresAt = Date.now() + (data.expires_in || 3600) * 1000;
+
+    // Store token
+    sessionStorage.setItem('dp_ca_token', data.access_token);
+    sessionStorage.setItem('dp_ca_token_exp', expiresAt);
+    if (data.refresh_token) {
+      localStorage.setItem('dp_ca_refresh_token', data.refresh_token);
+    }
+
+    // Cleanup
+    sessionStorage.removeItem('dp_oauth_state');
+    sessionStorage.removeItem('dp_pkce_verifier');
+    sessionStorage.removeItem('dp_pkce_nonce');
+
+    // Redirect to my-account
+    var target = sessionStorage.getItem('dp_post_login_redirect') || '/pages/my-account';
+    sessionStorage.removeItem('dp_post_login_redirect');
+    window.location.replace(target);
+
+  } catch (err) {
+    console.error('[AuthCallback]', err);
+    msgEl.textContent = msgError;
+    setTimeout(function() { window.location.replace('/'); }, 3000);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Auth Callback",
+  "settings": []
+}
+{% endschema %}

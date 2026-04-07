@@ -6,8 +6,9 @@
   role="dialog"
   aria-modal="true"
   aria-label="{{ 'content.account_title' | t }}"
-  data-storefront-endpoint="https://{{ shop.permanent_domain | default: 'diptyque-remake.myshopify.com' }}/api/2026-04/graphql.json"
-  data-storefront-token="{{ settings.storefront_access_token }}"
+  data-shop-id="{{ shop.id }}"
+  data-shop-domain="{{ shop.permanent_domain }}"
+  data-client-id="{{ settings.customer_account_client_id }}"
   hidden
 >
   <div class="account-modal__inner">
@@ -31,17 +32,20 @@
         <h2 class="account-modal__heading">{{ 'customer.login.title' | t }}</h2>
 
         {%- form 'customer_login', id: 'CustomerLoginForm', novalidate: 'novalidate' -%}
+          <input type="hidden" name="return_to" value="/pages/my-account">
+          
           <p class="account-modal__form-errors" hidden></p>
+
           <div class="account-modal__field">
             <label class="account-modal__label" for="modal-CustomerEmail">
               {{ 'customer.login.email' | t }} <span aria-hidden="true">*</span>
             </label>
             <input
               class="account-modal__input"
-              autocomplete="email"
               type="email"
               name="customer[email]"
               id="modal-CustomerEmail"
+              autocomplete="email"
               autocorrect="off"
               autocapitalize="off"
               required
@@ -56,10 +60,10 @@
             <div class="account-modal__input-wrapper">
               <input
                 class="account-modal__input"
-                autocomplete="current-password"
                 type="password"
                 name="customer[password]"
                 id="modal-CustomerPassword"
+                autocomplete="current-password"
                 required
               >
               <button
@@ -76,20 +80,15 @@
           </div>
 
           <div class="account-modal__remember-row">
-            <label class="account-modal__checkbox-label">
-              <input type="checkbox" name="customer[remember_me]" class="account-modal__checkbox">
-              <span>{{ 'customer.login.remember_me' | t }}</span>
-            </label>
+             <a href="{{ routes.account_recover_url }}" class="account-modal__forgot-link account-modal__link">
+                {{ 'customer.login.forgot_password' | t }}
+             </a>
           </div>
 
-          <a
-            href="{{ routes.root_url }}account/login#recover"
-            class="account-modal__link account-modal__forgot-link"
+          <button
+            type="submit"
+            class="account-modal__submit button"
           >
-            {{ 'customer.login.forgot_password' | t }}
-          </a>
-
-          <button type="submit" class="account-modal__submit button">
             {{ 'customer.login.sign_in' | t }}
           </button>
         {%- endform -%}
@@ -110,9 +109,9 @@
           <p class="account-modal__benefits-title">
             {{ 'customer.login.benefits_title' | t }}
           </p>
-          <p class="account-modal__benefits-body">
+          <div class="account-modal__benefits-body">
             {{ 'customer.login.benefits_body' | t }}
-          </p>
+          </div>
         </div>
       </div>
 
@@ -638,6 +637,15 @@
     background: #2d4a3e;
     color: #fff;
     padding: 20px;
+  }
+
+  .account-modal__login-description {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--color-foreground);
+    opacity: 0.7;
+    margin: 0 0 20px;
   }
 
   .account-modal__benefits-title {

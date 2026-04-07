@@ -10,8 +10,9 @@ class AccountModal {
     this.panelRegister = document.getElementById('account-panel-register');
     this.goRegisterBtn = document.getElementById('account-modal-go-register');
     this.i18n = this.loadI18n();
-    this.storefrontEndpoint = this.modal?.dataset.storefrontEndpoint || '';
-    this.storefrontToken = this.modal?.dataset.storefrontToken || '';
+    this.shopId = this.modal?.dataset.shopId || '';
+    this.shopDomain = this.modal?.dataset.shopDomain || '';
+    this.clientId = this.modal?.dataset.clientId || '';
 
     if (!this.modal) return;
 
@@ -100,10 +101,6 @@ class AccountModal {
           e.preventDefault();
           e.stopImmediatePropagation();
           this._handleRegisterSubmit(form);
-        } else if (form.id === 'CustomerLoginForm') {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          this._handleLoginSubmit(form);
         }
       },
       true
@@ -125,7 +122,6 @@ class AccountModal {
     const panel = this.panelEmail;
     if (!emailInput) return;
 
-    // Clear previous errors
     this.clearFieldError(emailInput);
     const summaryEl = panel?.querySelector('.account-modal__form-errors');
     if (summaryEl) { summaryEl.textContent = ''; summaryEl.hidden = true; }
@@ -134,20 +130,11 @@ class AccountModal {
     const required = this.i18n.required || 'This field is required.';
     const emailMsg = this.i18n.email || 'Please enter a valid email address.';
 
-    if (!email) {
-      this.setFieldError(emailInput, required);
-      emailInput.focus();
-      return;
-    }
-    if (!this.isValidEmail(email)) {
-      this.setFieldError(emailInput, emailMsg);
-      emailInput.focus();
-      return;
-    }
+    if (!email) { this.setFieldError(emailInput, required); emailInput.focus(); return; }
+    if (!this.isValidEmail(email)) { this.setFieldError(emailInput, emailMsg); emailInput.focus(); return; }
 
-    // Move to login panel with email pre-filled
+    // Go straight to login panel (which now shows the redirect button)
     this.showPanel('login', email);
-    document.getElementById('modal-CustomerPassword')?.focus();
   }
 
   _handleRegisterSubmit(form) {
@@ -176,15 +163,10 @@ class AccountModal {
       let data = {};
       try { data = await response.json(); } catch { /* non-JSON body */ }
 
-      // Success
+      // Success — redirect via PKCE so checkout session is set correctly
       if (response.ok && data.success !== false) {
-        this.showPanel('login');
-        const loginForm = document.getElementById('CustomerLoginForm');
-        if (loginForm) {
-          this._displayServerErrors(loginForm, {
-            summary: this.i18n.register_success || data.message || 'Your account has been created. Please sign in.',
-          });
-        }
+        this.close();
+        await this.startPkceLogin();
         return;
       }
 
@@ -193,13 +175,8 @@ class AccountModal {
         response.status === 409 ||
         (data.message && /already.*exists|already.*taken|email.*taken|email.*exists/i.test(data.message))
       ) {
-        this.showPanel('login');
-        const loginForm = document.getElementById('CustomerLoginForm');
-        if (loginForm) {
-          this._displayServerErrors(loginForm, {
-            summary: this.i18n.email_exists || 'An account with this email already exists. Please sign in.',
-          });
-        }
+        // Show login panel — email already exists
+        this.showPanel('login', payload.email);
         return;
       }
 
@@ -271,212 +248,6 @@ class AccountModal {
     return errors;
   }
 
-  async _submitLoginForm(form) {
-    const email    = form.querySelector('#modal-CustomerEmail')?.value?.trim() || '';
-    const password = form.querySelector('#modal-CustomerPassword')?.value || '';
-
-    // Guard: config not set
-    if (!this.storefrontEndpoint || !this.storefrontToken) {
-      console.error('[AccountModal] Storefront endpoint or token not configured.', {
-        endpoint: this.storefrontEndpoint,
-        token: this.storefrontToken ? '(set)' : '(MISSING)',
-      });
-      this._displayServerErrors(form, {
-        summary: this.i18n.login_unknown_error || 'An unexpected error occurred. Please try again.',
-      });
-      this.setSubmitting(form, false);
-      return;
-    }
-
-    try {
-      const result = await this.createCustomerAccessToken(email, password);
-
-      if (result.userErrors?.length) {
-        // Map field-level errors from Storefront API
-        const fields = {};
-        for (const err of result.userErrors) {
-          const field = Array.isArray(err.field) ? err.field[0] : err.field;
-          if (field === 'email')    fields['modal-CustomerEmail']    = err.message;
-          else if (field === 'password') fields['modal-CustomerPassword'] = err.message;
-        }
-        const summary = Object.keys(fields).length === 0
-          ? (result.userErrors[0]?.message || this.i18n.login_failed || 'Invalid email or password.')
-          : (this.i18n.login_failed || 'Invalid email or password.');
-        this._displayServerErrors(form, { summary, fields });
-        this.setSubmitting(form, false);
-        return;
-      }
-
-      const { accessToken, expiresAt } = result.customerAccessToken;
-      const customer = await this.fetchCustomerProfile(accessToken);
-      this.setCustomerSession(accessToken, expiresAt, customer);
-      this.close();
-      window.dispatchEvent(new CustomEvent('customer:login', { detail: customer }));
-    } catch (err) {
-      console.error('[AccountModal] Login error:', {
-        message: err.message,
-        isNetwork: err instanceof TypeError,
-        isAuth: Boolean(err.isAuthError),
-        isGraphQL: Boolean(err.isGraphQLError),
-        status: err.status,
-      });
-      const isNetwork = err instanceof TypeError;
-      this._displayServerErrors(form, {
-        summary: isNetwork
-          ? (this.i18n.login_network_error || 'Network error. Please check your connection and try again.')
-          : (this.i18n.login_unknown_error  || 'An unexpected error occurred. Please try again.'),
-      });
-      this.setSubmitting(form, false);
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Storefront API helpers
-  // ---------------------------------------------------------------------------
-  async storefrontRequest(query, variables = {}) {
-    const response = await fetch(this.storefrontEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Shopify-Storefront-Access-Token': this.storefrontToken,
-      },
-      body: JSON.stringify({ query, variables }),
-    });
-
-    if (!response.ok) {
-      let body = '';
-      try { body = await response.text(); } catch { /* ignore */ }
-      console.error(`[AccountModal] Storefront API HTTP ${response.status}:`, body);
-
-      if (response.status === 401 || response.status === 403) {
-        throw Object.assign(
-          new Error(`Storefront API auth error ${response.status}`),
-          { isAuthError: true, status: response.status },
-        );
-      }
-      throw Object.assign(
-        new Error(`Storefront API HTTP ${response.status}`),
-        { status: response.status },
-      );
-    }
-
-    const json = await response.json();
-
-    if (json.errors?.length) {
-      console.error('[AccountModal] Storefront API GraphQL errors:', json.errors);
-      throw Object.assign(
-        new Error(json.errors[0]?.message || 'GraphQL error'),
-        { isGraphQLError: true, graphqlErrors: json.errors },
-      );
-    }
-
-    return json;
-  }
-
-  async createCustomerAccessToken(email, password) {
-    const mutation = `
-      mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
-        customerAccessTokenCreate(input: $input) {
-          customerAccessToken { accessToken expiresAt }
-          userErrors { field message }
-        }
-      }
-    `;
-    const data = await this.storefrontRequest(mutation, { input: { email, password } });
-    return (
-      data.data?.customerAccessTokenCreate || {
-        userErrors: [{ message: this.i18n.login_unknown_error || 'An unexpected error occurred.' }],
-      }
-    );
-  }
-
-  async fetchCustomerProfile(accessToken) {
-    const query = `
-      query getCustomer($token: String!) {
-        customer(customerAccessToken: $token) { firstName lastName email }
-      }
-    `;
-    const data = await this.storefrontRequest(query, { token: accessToken });
-    return data.data?.customer || {};
-  }
-
-  setCustomerSession(accessToken, expiresAt, customer) {
-    localStorage.setItem('shopifyCustomerAccessToken', accessToken);
-    localStorage.setItem('shopifyCustomerAccessTokenExpiresAt', expiresAt);
-    localStorage.setItem('shopifyCustomer', JSON.stringify(customer));
-  }
-
-  loadCustomerSession() {
-    const token     = localStorage.getItem('shopifyCustomerAccessToken');
-    const expiresAt = localStorage.getItem('shopifyCustomerAccessTokenExpiresAt');
-    if (!token || !expiresAt) return null;
-    if (new Date(expiresAt) <= new Date()) {
-      localStorage.removeItem('shopifyCustomerAccessToken');
-      localStorage.removeItem('shopifyCustomerAccessTokenExpiresAt');
-      localStorage.removeItem('shopifyCustomer');
-      return null;
-    }
-    const customer = JSON.parse(localStorage.getItem('shopifyCustomer') || 'null');
-    return { accessToken: token, expiresAt, customer };
-  }
-
-  _parseServerErrors(html) {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const errors = { summary: '', fields: {} };
-
-    // Try to find error summary (common Shopify patterns)
-    const summarySelectors = [
-      '.errors',
-      '.form-message--error',
-      '.error-message',
-      '#CustomerRegisterForm .errors',
-      '.customer-form .errors',
-    ];
-
-    for (const selector of summarySelectors) {
-      const el = doc.querySelector(selector);
-      if (el && el.textContent.trim()) {
-        errors.summary = el.textContent.trim();
-        break;
-      }
-    }
-
-    // Try to find field-specific errors
-    const fieldMappings = {
-      'customer[email]': 'modal-RegisterEmail',
-      'customer[password]': 'modal-RegisterPassword',
-      'customer[password_confirmation]': 'modal-RegisterPasswordConfirm',
-      'customer[first_name]': 'modal-RegisterFirstName',
-      'customer[last_name]': 'modal-RegisterLastName',
-      'customer[phone]': 'modal-RegisterPhone',
-    };
-
-    for (const [name, id] of Object.entries(fieldMappings)) {
-      const input = doc.querySelector(`input[name="${name}"]`);
-      if (input) {
-        const errorId = input.getAttribute('aria-describedby');
-        if (errorId) {
-          const errorEl = doc.getElementById(errorId) || doc.querySelector(`#${errorId}`);
-          if (errorEl && errorEl.textContent.trim()) {
-            errors.fields[id] = errorEl.textContent.trim();
-          }
-        }
-      }
-    }
-
-    // Fallback: look for any error messages near form
-    if (!errors.summary) {
-      const allErrors = doc.querySelectorAll('.error, .form-message--error, [class*="error"]');
-      const messages = Array.from(allErrors).map(el => el.textContent.trim()).filter(Boolean);
-      if (messages.length) {
-        errors.summary = messages.join(' ');
-      }
-    }
-
-    return errors;
-  }
-
   _displayServerErrors(form, errors) {
     // Clear previous errors
     form.querySelectorAll('.account-modal__error').forEach(el => {
@@ -508,16 +279,6 @@ class AccountModal {
       firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
       if (firstInvalid.tagName === 'INPUT') firstInvalid.focus();
     }
-  }
-
-  _handleLoginSubmit(form) {
-    const result = this.validateLoginForm(form);
-    if (!result.ok) {
-      result.firstInvalid?.focus();
-      return;
-    }
-    this.setSubmitting(form, true);
-    this._submitLoginForm(form);
   }
 
   // ---------------------------------------------------------------------------
@@ -556,34 +317,6 @@ class AccountModal {
     input.classList.remove('is-invalid');
     const el = this.getErrorEl(input);
     if (el) { el.textContent = ''; el.hidden = true; }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Login validation
-  // ---------------------------------------------------------------------------
-  validateLoginForm(form) {
-    const email = form.querySelector('#modal-CustomerEmail');
-    const password = form.querySelector('#modal-CustomerPassword');
-
-    [email, password].forEach((inp) => inp && this.clearFieldError(inp));
-
-    const required = this.i18n.required || 'This field is required.';
-    const emailMsg = this.i18n.email || 'Please enter a valid email address.';
-    const isBlank = (v) => !v || !String(v).trim();
-
-    const errors = [];
-    const push = (input, msg) => { errors.push(input); this.setFieldError(input, msg); };
-
-    if (isBlank(email?.value)) {
-      push(email, required);
-    } else if (!this.isValidEmail(email.value)) {
-      push(email, emailMsg);
-    }
-
-    if (isBlank(password?.value)) push(password, required);
-
-    if (errors.length) return { ok: false, firstInvalid: errors[0] };
-    return { ok: true };
   }
 
   // ---------------------------------------------------------------------------
@@ -806,6 +539,14 @@ class AccountModal {
   open(view = 'email') {
     if (!this.modal) return;
 
+    // If user has a valid CA token (PKCE session), go to account page directly
+    const caToken = sessionStorage.getItem('dp_ca_token');
+    const caExp   = parseInt(sessionStorage.getItem('dp_ca_token_exp') || '0', 10);
+    if (caToken && (!caExp || Date.now() < caExp)) {
+      window.location.href = '/pages/my-account';
+      return;
+    }
+
     // Check URL for panel state
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('view') === 'register') {
@@ -892,7 +633,7 @@ class AccountModal {
     document.body.style.overflow = '';
 
     // Re-enable submit buttons so reopening the modal works correctly
-    ['CustomerLoginForm', 'CustomerRegisterForm'].forEach((id) => {
+    ['CustomerRegisterForm'].forEach((id) => {
       const form = document.getElementById(id);
       if (form) this.setSubmitting(form, false);
     });
@@ -934,6 +675,65 @@ class AccountModal {
     if (this._birthdatePicker) {
       this._birthdatePicker.clear();
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // PKCE OAuth helpers
+  // ---------------------------------------------------------------------------
+
+  async startPkceLogin() {
+    if (!this.clientId || !this.shopId || !this.shopDomain) {
+      console.error('[PKCE] Missing clientId, shopId, or shopDomain. Check theme settings.');
+      return;
+    }
+
+    const verifier   = this._generateCodeVerifier();
+    const challenge  = await this._generateCodeChallenge(verifier);
+    const state      = this._randomString(32);
+    const nonce      = this._randomString(16);
+    const redirectUri = 'https://' + this.shopDomain + '/pages/auth-callback';
+
+    sessionStorage.setItem('dp_pkce_verifier', verifier);
+    sessionStorage.setItem('dp_oauth_state',   state);
+    sessionStorage.setItem('dp_pkce_nonce',    nonce);
+    sessionStorage.setItem('dp_post_login_redirect', '/pages/my-account');
+
+    const params = new URLSearchParams({
+      client_id:             this.clientId,
+      response_type:         'code',
+      redirect_uri:          redirectUri,
+      scope:                 'openid email',
+      state:                 state,
+      nonce:                 nonce,
+      code_challenge:        challenge,
+      code_challenge_method: 'S256',
+    });
+
+    window.location.href =
+      'https://shopify.com/authentication/' + this.shopId + '/oauth/authorize?' + params.toString();
+  }
+
+  _generateCodeVerifier() {
+    const arr = new Uint8Array(64);
+    crypto.getRandomValues(arr);
+    return btoa(String.fromCharCode(...arr))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+
+  async _generateCodeChallenge(verifier) {
+    const encoder = new TextEncoder();
+    const data    = encoder.encode(verifier);
+    const digest  = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+
+  _randomString(length) {
+    const arr = new Uint8Array(length);
+    crypto.getRandomValues(arr);
+    return btoa(String.fromCharCode(...arr))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+      .slice(0, length);
   }
 
   isOpen() {
