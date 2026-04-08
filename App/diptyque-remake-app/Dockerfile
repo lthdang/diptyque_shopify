@@ -15,6 +15,8 @@ COPY . .
 
 RUN npm run build
 
-RUN npx prisma generate
+# prisma generate only needs the schema, not a real DB connection.
+# Set a placeholder so schema validation passes at build time.
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost/placeholder" npx prisma generate
 
-CMD ["npm", "run", "docker-start"]
+CMD ["npm", "run", "start"]

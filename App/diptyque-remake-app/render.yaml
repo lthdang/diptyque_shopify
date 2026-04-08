@@ -6,6 +6,7 @@ services:
     branch: main
     plan: starter
     dockerfilePath: ./Dockerfile
+    preDeployCommand: "npx prisma migrate deploy"
     envVars:
       - key: NODE_ENV
         value: production
