@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: diptyque-shopify
+    runtime: docker
+    rootDir: App/diptyque-remake-app
+    branch: main
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SHOPIFY_API_KEY
+        value: f0164565c90177bfb6fccdac489fd38a
+      - key: SHOPIFY_API_SECRET
+        sync: false
+      - key: SHOPIFY_APP_URL
+        value: https://diptyque-shopify.onrender.com
+      - key: SCOPES
+        value: read_products,write_products,read_orders,read_customers
+      - key: DATABASE_URL
+        fromDatabase:
+          name: diptyque-db
+          property: connectionString
+
+databases:
+  - name: diptyque-db
+    plan: free
+    databaseName: diptyque_db
+    user: diptyque_user
