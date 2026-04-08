@@ -1,9 +1,0 @@
-{
-  "sections": {
-    "main": {
-      "type": "auth-callback",
-      "settings": {}
-    }
-  },
-  "order": ["main"]
-}

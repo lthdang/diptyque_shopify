@@ -2290,13 +2290,13 @@
     "settings": [
       {
         "type": "header",
-        "content": "Customer Account API (PKCE)"
+        "content": "Storefront API"
       },
       {
         "type": "text",
-        "id": "customer_account_client_id",
-        "label": "Customer Account Client ID",
-        "info": "Client ID from your Shopify Custom App (Headless channel). Required for New Customer Accounts OAuth PKCE login. Shopify Admin → Apps → Develop apps → [Your App] → Customer Account API."
+        "id": "storefront_access_token",
+        "label": "Storefront Access Token",
+        "info": "Public Storefront API access token. Shopify Admin → Apps → Develop apps → [Your App] → API credentials → Storefront API access token."
       }
     ]
   }
