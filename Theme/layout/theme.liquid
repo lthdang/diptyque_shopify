@@ -133,8 +133,10 @@
       {% render 'quick-add-modal' %}
     {% endif %}
 
-    {% unless customer %}
+    {% if customer %}
+      {% render 'account-panel-loggedin' %}
+    {% else %}
       {% render 'account-modal' %}
-    {% endunless %}
+    {% endif %}
   </body>
 </html>

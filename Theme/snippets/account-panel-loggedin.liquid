@@ -1,0 +1,375 @@
+<div id="account-loggedin-overlay" class="account-loggedin-overlay" aria-hidden="true"></div>
+
+<div
+  id="account-loggedin-panel"
+  class="account-loggedin-panel color-{{ settings.popover_color_scheme }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ 'accessibility.account' | t }}"
+  hidden
+>
+  <div class="account-loggedin-panel__inner">
+    {%- comment -%} HEADER {%- endcomment -%}
+    <div class="account-loggedin-panel__header">
+      <button
+        type="button"
+        class="account-loggedin-panel__close button-unstyled"
+        id="account-loggedin-close"
+        aria-label="{{ 'actions.close_dialog' | t }}"
+      >
+        <span class="svg-wrapper">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+
+    {%- comment -%} WELCOME {%- endcomment -%}
+    <div class="account-loggedin-panel__welcome">
+      <p class="account-loggedin-panel__brand">{{ shop.name }}</p>
+      <p class="account-loggedin-panel__welcome-text">{{ 'custom_account.welcome' | t }}</p>
+      <p class="account-loggedin-panel__name">{{ customer.last_name }}{{ customer.first_name }}{{ 'custom_account.name_suffix' | t }}</p>
+    </div>
+
+    {%- comment -%} MENU {%- endcomment -%}
+    <nav class="account-loggedin-panel__nav">
+      <a href="/pages/my-account" class="account-loggedin-panel__nav-item">
+        <span>{{ 'custom_account.nav_profile' | t }}</span>
+        <span class="account-loggedin-panel__nav-arrow">›</span>
+      </a>
+      <a href="/pages/my-account#orders" class="account-loggedin-panel__nav-item">
+        <span>{{ 'custom_account.nav_orders' | t }}</span>
+        <span class="account-loggedin-panel__nav-arrow">›</span>
+      </a>
+      <a href="/pages/my-account#addresses" class="account-loggedin-panel__nav-item">
+        <span>{{ 'custom_account.nav_addresses' | t }}</span>
+        <span class="account-loggedin-panel__nav-arrow">›</span>
+      </a>
+      <a href="/pages/my-account#cards" class="account-loggedin-panel__nav-item">
+        <span>{{ 'custom_account.nav_cards' | t }}</span>
+        <span class="account-loggedin-panel__nav-arrow">›</span>
+      </a>
+      <a href="/pages/my-account#shipping" class="account-loggedin-panel__nav-item">
+        <span>{{ 'custom_account.shipping' | t }}</span>
+        <span class="account-loggedin-panel__nav-arrow">›</span>
+      </a>
+    </nav>
+
+    {%- comment -%} SUPPORT {%- endcomment -%}
+    <div class="account-loggedin-panel__support">
+      <p class="account-loggedin-panel__support-title">{{ 'custom_account.support_title' | t }}</p>
+      <p class="account-loggedin-panel__support-body">
+        {{ 'custom_account.support_body' | t }}
+      </p>
+      <a href="/pages/contact" class="account-loggedin-panel__contact-btn">
+        {{ 'custom_account.contact_btn' | t }}
+      </a>
+      <div class="account-loggedin-panel__support-info">
+        <p class="account-loggedin-panel__support-info-label">{{ 'custom_account.cs_label' | t }}</p>
+        <p class="account-loggedin-panel__support-info-text">
+          {{ 'custom_account.cs_hours_label' | t }}<br>
+          {{ 'custom_account.cs_hours_mon_fri' | t }}<br>
+          {{ 'custom_account.cs_hours_time' | t }}<br>
+          {{ 'custom_account.cs_hours_note' | t }}
+        </p>
+        <a href="/pages/faq" class="account-loggedin-panel__help-link">
+          {{ 'custom_account.help_guide_link' | t }}
+        </a>
+      </div>
+    </div>
+
+    {%- comment -%} LOGOUT {%- endcomment -%}
+    <div class="account-loggedin-panel__footer">
+      <a
+        href="{{ routes.account_logout_url }}"
+        class="account-loggedin-panel__logout"
+        id="account-loggedin-logout"
+        data-logout-url="{{ routes.account_logout_url }}"
+      >
+        {{ 'custom_account.header_logout' | t }}
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const panel   = document.getElementById('account-loggedin-panel');
+  const overlay = document.getElementById('account-loggedin-overlay');
+  const closeBtn = document.getElementById('account-loggedin-close');
+  const trigger  = document.getElementById('account-loggedin-trigger');
+
+  function openPanel() {
+    panel.removeAttribute('hidden');
+    overlay.classList.add('is-open');
+    panel.offsetHeight; // force reflow
+    panel.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    closeBtn?.focus();
+  }
+
+  function closePanel() {
+    panel.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+    const onEnd = () => {
+      panel.setAttribute('hidden', '');
+      panel.removeEventListener('transitionend', onEnd);
+    };
+    panel.addEventListener('transitionend', onEnd);
+  }
+
+  trigger?.addEventListener('click', openPanel);
+  closeBtn?.addEventListener('click', closePanel);
+  overlay?.addEventListener('click', closePanel);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel && !panel.hasAttribute('hidden')) closePanel();
+  });
+
+  // Logout: clear PKCE + Storefront API tokens before native redirect
+  document.getElementById('account-loggedin-logout')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem('dp_ca_token');
+    sessionStorage.removeItem('dp_ca_token_exp');
+    localStorage.removeItem('dp_ca_refresh_token');
+    localStorage.removeItem('shopifyCustomerAccessToken');
+    localStorage.removeItem('shopifyCustomerAccessTokenExpiresAt');
+    localStorage.removeItem('shopifyCustomer');
+    window.location.href = e.currentTarget.href;
+  });
+})();
+</script>
+
+{% stylesheet %}
+  /* ===== Logged-in Account Panel ===== */
+  .account-loggedin-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .account-loggedin-overlay.is-open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .account-loggedin-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 340px;
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    background: var(--color-background);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .account-loggedin-panel[hidden] {
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .account-loggedin-panel:not([hidden]) {
+    display: block;
+  }
+
+  .account-loggedin-panel.is-open {
+    transform: translateX(0);
+  }
+
+  .account-loggedin-panel__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  /* Header / Close */
+  .account-loggedin-panel__header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 16px 0;
+  }
+
+  .account-loggedin-panel__close {
+    cursor: pointer;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+  }
+
+  .account-loggedin-panel__close .svg-wrapper svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Welcome */
+  .account-loggedin-panel__welcome {
+    text-align: center;
+    padding: 12px 24px 20px;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+  }
+
+  .account-loggedin-panel__brand {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.5;
+    margin: 0 0 6px;
+  }
+
+  .account-loggedin-panel__welcome-text {
+    font-size: 0.72rem;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    margin: 0 0 2px;
+  }
+
+  .account-loggedin-panel__name {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-foreground);
+    margin: 0;
+  }
+
+  /* Nav menu */
+  .account-loggedin-panel__nav {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+  }
+
+  .account-loggedin-panel__nav-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    font-size: 0.82rem;
+    color: var(--color-foreground);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+    transition: background 0.15s;
+  }
+
+  .account-loggedin-panel__nav-item:last-child {
+    border-bottom: none;
+  }
+
+  .account-loggedin-panel__nav-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  .account-loggedin-panel__nav-arrow {
+    font-size: 1.1rem;
+    opacity: 0.4;
+    line-height: 1;
+  }
+
+  /* Support section */
+  .account-loggedin-panel__support {
+    padding: 28px 24px 24px;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+    text-align: center;
+  }
+
+  .account-loggedin-panel__support-title {
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-foreground);
+    margin: 0 0 16px;
+    text-align: center;
+  }
+
+  .account-loggedin-panel__support-body {
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--color-foreground);
+    opacity: 0.7;
+    margin: 0 0 20px;
+    text-align: left;
+  }
+
+  .account-loggedin-panel__contact-btn {
+    display: block;
+    padding: 12px 16px;
+    border: 1px solid var(--color-foreground);
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .account-loggedin-panel__contact-btn:hover {
+    background: var(--color-foreground);
+    color: var(--color-background);
+  }
+
+  .account-loggedin-panel__support-info {
+    text-align: center;
+  }
+
+  .account-loggedin-panel__support-info-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--color-foreground);
+    margin: 0 0 4px;
+  }
+
+  .account-loggedin-panel__support-info-text {
+    font-size: 0.68rem;
+    line-height: 1.7;
+    color: var(--color-foreground);
+    opacity: 0.7;
+    margin: 0 0 10px;
+  }
+
+  .account-loggedin-panel__help-link {
+    font-size: 0.7rem;
+    color: var(--color-foreground);
+    opacity: 0.7;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Footer / Logout */
+  .account-loggedin-panel__footer {
+    padding: 24px;
+    margin-top: auto;
+    text-align: center;
+  }
+
+  .account-loggedin-panel__logout {
+    font-size: 0.78rem;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    letter-spacing: 0.04em;
+    transition: opacity 0.2s;
+  }
+
+  .account-loggedin-panel__logout:hover {
+    opacity: 1;
+  }
+
+  @media screen and (max-width: 480px) {
+    .account-loggedin-panel {
+      max-width: 100%;
+    }
+  }
+{% endstylesheet %}
