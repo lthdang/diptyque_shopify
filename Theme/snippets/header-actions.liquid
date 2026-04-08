@@ -72,10 +72,12 @@
       {% if account_actions_style != blank %}style="{{ account_actions_style }}"{% endif %}
     >
       {% if customer %}
-        <a
-          href="{{ routes.account_url }}"
+        <button
+          type="button"
+          id="account-loggedin-trigger"
           class="button-unstyled"
           aria-label="{{ 'accessibility.account' | t }}"
+          aria-haspopup="dialog"
         >
           <span class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
             {{ 'content.account_title' | t }}
@@ -83,7 +85,7 @@
           <span class="{% if display_style != 'icon' %}desktop:hidden{% endif %}" aria-hidden="true">
             {{ account_icon }}
           </span>
-        </a>
+        </button>
       {% else %}
         <button
           type="button"

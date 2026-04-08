@@ -1,0 +1,677 @@
+<div
+  id="my-account-app"
+  class="my-account page-width"
+  data-storefront-endpoint="https://{{ shop.permanent_domain | default: 'diptyque-remake.myshopify.com' }}/api/2026-04/graphql.json"
+  data-storefront-token="{{ settings.storefront_access_token }}"
+  data-shop-id="{{ shop.id }}"
+  data-logout-url="{{ routes.account_logout_url }}"
+  data-t-nav-profile="{{ 'custom_account.nav_profile' | t }}"
+  data-t-nav-orders="{{ 'custom_account.nav_orders' | t }}"
+  data-t-nav-addresses="{{ 'custom_account.nav_addresses' | t }}"
+  data-t-nav-cards="{{ 'custom_account.nav_cards' | t }}"
+  data-t-nav-shipping="{{ 'custom_account.shipping' | t }}"
+  data-t-profile-title="{{ 'custom_account.profile_title' | t }}"
+  data-t-last-name="{{ 'custom_account.last_name' | t }}"
+  data-t-first-name="{{ 'custom_account.first_name' | t }}"
+  data-t-furigana-last="{{ 'custom_account.furigana_last' | t }}"
+  data-t-furigana-first="{{ 'custom_account.furigana_first' | t }}"
+  data-t-dob="{{ 'custom_account.dob' | t }}"
+  data-t-phone="{{ 'custom_account.phone' | t }}"
+  data-t-email="{{ 'custom_account.email' | t }}"
+  data-t-required="{{ 'custom_account.required' | t }}"
+  data-t-submit="{{ 'custom_account.submit' | t }}"
+  data-t-login-info-title="{{ 'custom_account.login_info_title' | t }}"
+  data-t-password="{{ 'custom_account.password' | t }}"
+  data-t-new-password="{{ 'custom_account.new_password' | t }}"
+  data-t-password-hint="{{ 'custom_account.password_hint' | t }}"
+  data-t-password-confirm="{{ 'custom_account.password_confirm' | t }}"
+  data-t-benefits-title="{{ 'custom_account.benefits_title' | t }}"
+  data-t-benefits-subtitle="{{ 'custom_account.benefits_subtitle' | t }}"
+  data-t-benefit-1="{{ 'custom_account.benefit_1' | t }}"
+  data-t-benefit-2="{{ 'custom_account.benefit_2' | t }}"
+  data-t-benefit-3="{{ 'custom_account.benefit_3' | t }}"
+  data-t-logout="{{ 'custom_account.logout' | t }}"
+></div>
+
+<script id="my-account-translations" type="application/json">
+  {{ shop.metafields.translations.custom_account | json }}
+</script>
+
+{% if customer %}
+<script id="my-account-native-customer" type="application/json">
+  {
+    "id": {{ customer.id | json }},
+    "firstName": {{ customer.first_name | json }},
+    "lastName": {{ customer.last_name | json }},
+    "email": {{ customer.email | json }},
+    "phone": {{ customer.phone | json }},
+    "defaultAddress": {% if customer.default_address %}{
+      "id": {{ customer.default_address.id | json }},
+      "firstName": {{ customer.default_address.first_name | json }},
+      "lastName": {{ customer.default_address.last_name | json }},
+      "address1": {{ customer.default_address.address1 | json }},
+      "address2": {{ customer.default_address.address2 | json }},
+      "city": {{ customer.default_address.city | json }},
+      "province": {{ customer.default_address.province | json }},
+      "zip": {{ customer.default_address.zip | json }},
+      "country": {{ customer.default_address.country | json }},
+      "phone": {{ customer.default_address.phone | json }}
+    }{% else %}null{% endif %},
+    "addresses": { "edges": [
+      {% for address in customer.addresses %}
+      { "node": {
+        "id": {{ address.id | json }},
+        "firstName": {{ address.first_name | json }},
+        "lastName": {{ address.last_name | json }},
+        "address1": {{ address.address1 | json }},
+        "address2": {{ address.address2 | json }},
+        "city": {{ address.city | json }},
+        "province": {{ address.province | json }},
+        "zip": {{ address.zip | json }},
+        "country": {{ address.country | json }},
+        "phone": {{ address.phone | json }}
+      }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]},
+    "orders": { "edges": [
+      {% for order in customer.orders limit: 20 %}
+      { "node": {
+        "id": {{ order.id | json }},
+        "name": {{ order.name | json }},
+        "processedAt": {{ order.processed_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+        "financialStatus": {{ order.financial_status | upcase | json }},
+        "fulfillmentStatus": {{ order.fulfillment_status | upcase | json }},
+        "totalPrice": {
+          "amount": {{ order.total_price | money_without_currency | remove: ',' | json }},
+          "currencyCode": {{ order.currency | json }}
+        },
+        "lineItems": { "edges": [
+          {% for item in order.line_items %}
+          { "node": {
+            "title": {{ item.title | json }},
+            "quantity": {{ item.quantity }},
+            "variant": {
+              "title": {{ item.variant.title | json }},
+              "image": {% if item.image %}{ "url": {{ item.image | img_url: '240x' | prepend: 'https:' | json }} }{% else %}null{% endif %},
+              "price": {
+                "amount": {{ item.price | money_without_currency | remove: ',' | json }},
+                "currencyCode": {{ order.currency | json }}
+              }
+            }
+          }}{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ]}
+      }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]}
+  }
+</script>
+{% endif %}
+
+<script src="{{ 'my-account.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  /* ===== My Account Page ===== */
+  .my-account {
+    min-height: 60vh;
+    padding-top: 40px;
+    padding-bottom: 60px;
+    font-family: var(--font-body-family, sans-serif);
+  }
+
+  .my-account__layout {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+  }
+
+  /* --- Sidebar --- */
+  .my-account__sidebar {
+    width: 250px;
+    flex-shrink: 0;
+  }
+
+  .my-account__nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .my-account__nav-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 14px 0;
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--color-foreground, #000);
+    cursor: pointer;
+    border-bottom: 1px solid #efefef;
+    width: 100%;
+    letter-spacing: 0.02em;
+  }
+
+  .my-account__nav-item--active {
+    font-weight: 500;
+  }
+
+  .my-account__nav-logout {
+    color: #999;
+    margin-top: 8px;
+  }
+
+  .my-account__nav-item:hover .my-account__nav-arrow {
+    transform: translateX(3px);
+  }
+
+  .my-account__nav-arrow {
+    font-size: 0.6rem;
+    transition: transform 0.2s;
+  }
+
+  /* --- Main Content --- */
+  .my-account__main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .my-account__panel {
+    display: none;
+    animation: my-account-fade-in 0.3s ease;
+  }
+
+  .my-account__panel--active {
+    display: block;
+  }
+
+  @keyframes my-account-fade-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- Form Sections --- */
+  .my-account__form-section {
+    margin-bottom: 40px;
+  }
+
+  .my-account__section-heading {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 24px;
+  }
+
+  .my-account__form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .my-account__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .my-account__form-field--full {
+    grid-column: 1 / -1;
+  }
+
+  .my-account__form-field label {
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  .my-account__input {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 0.85rem;
+    width: 100%;
+    outline: none;
+    background: #fff;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .my-account__input:focus {
+    border-color: #000;
+  }
+
+  .my-account__date-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .my-account__calendar-icon {
+    position: absolute;
+    right: 16px;
+    color: #666;
+    pointer-events: none;
+    display: flex;
+  }
+
+  /* --- Benefits Banner --- */
+  .my-account__benefits-banner {
+    background: #2a4b38; /* Diptyque green */
+    color: #fff;
+    padding: 40px 32px;
+    text-align: center;
+    border-radius: 2px;
+  }
+
+  .my-account__benefits-title {
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 0 0 12px;
+    letter-spacing: 0.05em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .my-account__benefits-subtitle {
+    font-size: 0.85rem;
+    margin: 0 0 32px;
+    opacity: 0.9;
+  }
+
+  .my-account__benefits-icons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .my-account__benefit-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  .my-account__benefit-icon-wrapper {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  .my-account__benefit-icon-wrapper img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+  }
+
+  .my-account__benefit-text {
+    color: #fff;
+    max-width: 120px;
+  }
+
+  .my-account__info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    margin-left: 6px;
+    color: #999;
+    cursor: help;
+  }
+
+  /* --- Password Field --- */
+  .my-account__password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .my-account__password-input .my-account__input {
+    padding-right: 48px;
+  }
+
+  .my-account__password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+
+  .my-account__password-toggle:hover {
+    color: #000;
+  }
+
+  .my-account__submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #b3b3b3;
+    color: #fff;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .my-account__submit-btn:hover {
+    background: #000;
+  }
+
+  .my-account__password-hint {
+    font-size: 0.7rem;
+    color: #999;
+    margin: 8px 0 0;
+    line-height: 1.4;
+  }
+
+  .my-account__required-text {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 12px 0;
+  }
+
+  .mt-16 { margin-top: 16px; }
+  .mt-40 { margin-top: 40px; }
+
+  /* --- Loading State --- */
+  .my-account__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .my-account__spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e0e0e0;
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: my-account-spin 0.7s linear infinite;
+  }
+
+  @keyframes my-account-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* --- Not Logged In State --- */
+  .my-account__not-logged-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .my-account__not-logged-in-icon {
+    color: #ccc;
+    margin-bottom: 8px;
+  }
+
+  .my-account__not-logged-in h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .my-account__not-logged-in p {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0;
+  }
+
+  .my-account__login-btn {
+    margin-top: 8px;
+    padding: 12px 32px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: background 0.2s;
+  }
+
+  .my-account__login-btn:hover {
+    background: #333;
+  }
+
+  /* --- Orders --- */
+  .my-account__orders {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .my-account__order {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+  }
+
+  .my-account__order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .my-account__order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .my-account__order-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .my-account__order-date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .my-account__order-status {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .my-account__status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    background: #f0f0f0;
+    border-radius: 2px;
+  }
+
+  .my-account__status-badge--paid { background: #e6f4ea; color: #2a7a3b; }
+  .my-account__status-badge--pending { background: #fef9e7; color: #8a6d00; }
+  .my-account__status-badge--refunded { background: #fdecea; color: #c0392b; }
+  .my-account__status-badge--fulfilled { background: #e8f0fe; color: #1a56c4; }
+  .my-account__status-badge--unfulfilled { background: #f0f0f0; color: #555; }
+
+  .my-account__order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 12px;
+  }
+
+  .my-account__order-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .my-account__item-image {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #f0f0f0;
+  }
+
+  .my-account__item-image--placeholder {
+    background: #f5f5f5;
+  }
+
+  .my-account__item-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .my-account__item-title {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+
+  .my-account__item-variant,
+  .my-account__item-qty {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 0 0 2px;
+  }
+
+  .my-account__item-price {
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .my-account__order-total {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 12px;
+    margin-top: 12px;
+    font-size: 0.8rem;
+  }
+
+  .my-account__order-total-amount {
+    font-weight: 600;
+  }
+
+  /* --- Addresses --- */
+  .my-account__addresses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .my-account__address-card {
+    border: 1px solid #e0e0e0;
+    padding: 16px;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .my-account__address-card--default {
+    border-color: #000;
+  }
+
+  .my-account__default-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    background: #000;
+    color: #fff;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .my-account__address-name {
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+
+  /* --- Empty State --- */
+  .my-account__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 0;
+  }
+
+  .my-account__empty p {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0;
+  }
+
+  .my-account__shop-btn {
+    padding: 10px 24px;
+    background: #000;
+    color: #fff;
+    font-size: 0.8rem;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+
+  /* --- Responsive --- */
+  @media screen and (max-width: 749px) {
+    .my-account__layout {
+      flex-direction: column;
+      gap: 32px;
+    }
+    
+    .my-account__sidebar {
+      width: 100%;
+    }
+
+    .my-account__form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .my-account__addresses {
+      grid-template-columns: 1fr;
+    }
+
+    .my-account__benefits-icons {
+      flex-direction: column;
+      gap: 24px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "My Account",
+  "tag": "section",
+  "class": "section",
+  "settings": []
+}
+{% endschema %}

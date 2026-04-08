@@ -24,7 +24,13 @@
 >
   <div class="header-custom__backdrop" aria-hidden="true"></div>
   <div class="header-custom__wrap">
-    <div class="header-custom__inner section section--full-width-margin section--{{ section.settings.section_width }}">
+      <div class="header-custom__inner section section--full-width-margin section--{{ section.settings.section_width }}">
+        <script>
+          window.headerTranslations = {
+            myAccount: "{{ 'custom_account.header_my_account' | t }}",
+            logout: "{{ 'custom_account.header_logout' | t }}"
+          };
+        </script>
 
       <nav class="header-custom__top-row" aria-label="{{ section.settings.navigation_label | escape }}">
         {% if section.blocks.size > 0 %}
@@ -207,7 +213,7 @@
 
       <div class="header-custom__utilities">
         {% if section.settings.show_search %}
-          <button type="button" class="header-custom__util-btn header-custom__util-btn--search" aria-label="Search">
+          <button type="button" class="header-custom__util-btn header-custom__util-btn--search" aria-label="{{ 'general.search.search' | t }}">
             <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
@@ -215,13 +221,13 @@
         {% endif %}
         {% if section.settings.show_account %}
           {% if customer %}
-            <a href="{{ routes.account_url }}" class="header-custom__util-btn" aria-label="Account">
+            <a href="{{ routes.account_url }}" class="header-custom__util-btn" aria-label="{{ 'accessibility.account' | t }}">
               <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
             </a>
           {% else %}
-            <a href="{{ routes.account_login_url }}" class="header-custom__util-btn" aria-label="Sign in">
+            <a href="{{ routes.account_login_url }}" class="header-custom__util-btn" aria-label="{{ 'actions.log_in' | t }}">
               <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
@@ -229,7 +235,7 @@
           {% endif %}
         {% endif %}
         {% if section.settings.show_cart %}
-          <a href="{{ routes.cart_url }}" class="header-custom__util-btn header-custom__cart-btn" aria-label="Cart ({{ cart.item_count }})">
+          <a href="{{ routes.cart_url }}" class="header-custom__util-btn header-custom__cart-btn" aria-label="{{ 'templates.cart.cart' | t }} ({{ cart.item_count }})">
             <span class="header-custom__util-icon-wrap">
               <svg class="header-custom__util-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>

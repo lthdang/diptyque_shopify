@@ -2296,7 +2296,7 @@
         "type": "text",
         "id": "storefront_access_token",
         "label": "Storefront Access Token",
-        "info": "Public Storefront API token used for customer login. Generate in Shopify Admin → Apps → Storefront API."
+        "info": "Public Storefront API access token. Shopify Admin → Apps → Develop apps → [Your App] → API credentials → Storefront API access token."
       }
     ]
   }

@@ -5,13 +5,14 @@ class AccountModal {
     this.modal = document.getElementById('account-modal');
     this.overlay = document.getElementById('account-modal-overlay');
     this.closeBtn = document.getElementById('account-modal-close');
-    this.panelEmail = document.getElementById('account-panel-email');
     this.panelLogin = document.getElementById('account-panel-login');
     this.panelRegister = document.getElementById('account-panel-register');
     this.goRegisterBtn = document.getElementById('account-modal-go-register');
     this.i18n = this.loadI18n();
     this.storefrontEndpoint = this.modal?.dataset.storefrontEndpoint || '';
     this.storefrontToken = this.modal?.dataset.storefrontToken || '';
+    this.shopId = this.modal?.dataset.shopId || '';
+    this.shopDomain = this.modal?.dataset.shopDomain || '';
 
     if (!this.modal) return;
 
@@ -46,29 +47,22 @@ class AccountModal {
     // Overlay click closes modal
     this.overlay?.addEventListener('click', () => this.close());
 
-    // Email step: Continue button
-    document.getElementById('account-modal-email-continue')?.addEventListener('click', () => {
-      this._handleEmailContinue();
-    });
-
-    // Email step: Enter key on email input
-    document.getElementById('modal-EmailStep')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); this._handleEmailContinue(); }
-    });
-
-    // "Change email" buttons: go back to email panel
-    document.getElementById('account-modal-change-email-login')?.addEventListener('click', () => {
-      this.showPanel('email');
-    });
+    // "Change email" button on register panel: go back to login
     document.getElementById('account-modal-change-email-register')?.addEventListener('click', () => {
-      this.showPanel('email');
+      this.showPanel('login');
     });
 
     // Switch to register from login
     this.goRegisterBtn?.addEventListener('click', () => {
-      const email = document.getElementById('modal-CustomerEmail')?.value?.trim()
-        || document.getElementById('modal-EmailStep')?.value?.trim();
+      const email = document.getElementById('modal-CustomerEmail')?.value?.trim() || '';
       this.showPanel('register', email);
+    });
+
+    // Register panel: "already have account" → back to login
+    document.getElementById('account-modal-go-login')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('modal-RegisterEmail')?.value?.trim() || '';
+      this.showPanel('login', email);
     });
 
     // Escape key closes modal
@@ -96,14 +90,14 @@ class AccountModal {
       'submit',
       (e) => {
         const form = e.target;
-        if (form.id === 'CustomerRegisterForm') {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          this._handleRegisterSubmit(form);
-        } else if (form.id === 'CustomerLoginForm') {
+        if (form.id === 'CustomerLoginForm') {
           e.preventDefault();
           e.stopImmediatePropagation();
           this._handleLoginSubmit(form);
+        } else if (form.id === 'CustomerRegisterForm') {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          this._handleRegisterSubmit(form);
         }
       },
       true
@@ -118,36 +112,78 @@ class AccountModal {
   }
 
   // ---------------------------------------------------------------------------
-  // Email step handler
+  // Login form handler (Storefront API – email + password in modal)
   // ---------------------------------------------------------------------------
-  _handleEmailContinue() {
-    const emailInput = document.getElementById('modal-EmailStep');
-    const panel = this.panelEmail;
-    if (!emailInput) return;
+  async _handleLoginSubmit(form) {
+    const emailInput  = document.getElementById('modal-CustomerEmail');
+    const passInput   = form.querySelector('#modal-CustomerPassword');
+    const email    = emailInput?.value?.trim() || '';
+    const password = passInput?.value || '';
 
-    // Clear previous errors
-    this.clearFieldError(emailInput);
-    const summaryEl = panel?.querySelector('.account-modal__form-errors');
-    if (summaryEl) { summaryEl.textContent = ''; summaryEl.hidden = true; }
-
-    const email = emailInput.value.trim();
+    // Validate
     const required = this.i18n.required || 'This field is required.';
     const emailMsg = this.i18n.email || 'Please enter a valid email address.';
-
+    let hasError = false;
     if (!email) {
       this.setFieldError(emailInput, required);
-      emailInput.focus();
-      return;
-    }
-    if (!this.isValidEmail(email)) {
+      emailInput?.focus();
+      hasError = true;
+    } else if (!this.isValidEmail(email)) {
       this.setFieldError(emailInput, emailMsg);
-      emailInput.focus();
+      emailInput?.focus();
+      hasError = true;
+    }
+    if (!password) {
+      this.setFieldError(passInput, required);
+      if (!hasError) passInput?.focus();
+      hasError = true;
+    }
+    if (hasError) return;
+
+    if (!this.storefrontEndpoint || !this.storefrontToken) {
+      console.error('[AccountModal] Storefront endpoint/token not configured.');
+      this._displayServerErrors(form, {
+        summary: this.i18n.login_unknown_error || 'An unexpected error occurred. Please try again.',
+      });
       return;
     }
 
-    // Move to login panel with email pre-filled
-    this.showPanel('login', email);
-    document.getElementById('modal-CustomerPassword')?.focus();
+    this.setSubmitting(form, true);
+
+    try {
+      const result = await this.createCustomerAccessToken(email, password);
+
+      if (result.userErrors?.length) {
+        const fields = {};
+        for (const err of result.userErrors) {
+          const field = Array.isArray(err.field) ? err.field[0] : err.field;
+          if (field === 'password') fields['modal-CustomerPassword'] = err.message;
+        }
+        const summary = Object.keys(fields).length === 0
+          ? (this.i18n.login_failed || 'Invalid email or password.')
+          : '';
+        this._displayServerErrors(form, { summary, fields });
+        this.setSubmitting(form, false);
+        return;
+      }
+
+      const { accessToken, expiresAt } = result.customerAccessToken;
+      const customer = await this.fetchCustomerProfile(accessToken);
+      this.setCustomerSession(accessToken, expiresAt, customer);
+      // Submit the native Shopify login form to create a server-side session
+      // cookie, which is required for checkout to recognise the logged-in user.
+      // form.submit() bypasses the JS submit listener so there is no loop.
+      form.submit();
+    } catch (err) {
+      console.error('[AccountModal] Login error:', err);
+      const isNetwork = err instanceof TypeError;
+      this._displayServerErrors(form, {
+        summary: isNetwork
+          ? (this.i18n.login_network_error || 'Network error. Please check your connection and try again.')
+          : (this.i18n.login_unknown_error  || 'An unexpected error occurred. Please try again.'),
+      });
+      this.setSubmitting(form, false);
+    }
   }
 
   _handleRegisterSubmit(form) {
@@ -178,13 +214,25 @@ class AccountModal {
 
       // Success
       if (response.ok && data.success !== false) {
-        this.showPanel('login');
-        const loginForm = document.getElementById('CustomerLoginForm');
-        if (loginForm) {
-          this._displayServerErrors(loginForm, {
-            summary: this.i18n.register_success || data.message || 'Your account has been created. Please sign in.',
-          });
+        // Automatically log the user in after registration via Storefront API
+        try {
+          const result = await this.createCustomerAccessToken(payload.email, payload.password);
+          if (result.customerAccessToken) {
+            const { accessToken, expiresAt } = result.customerAccessToken;
+            const customer = await this.fetchCustomerProfile(accessToken);
+            this.setCustomerSession(accessToken, expiresAt, customer);
+            this.close();
+            window.dispatchEvent(new CustomEvent('customer:login', { detail: customer }));
+            window.location.href = '/pages/my-account';
+            return;
+          }
+        } catch (loginErr) {
+          console.warn('[AccountModal] Auto-login after registration failed:', loginErr);
         }
+
+        // Fallback: show login panel
+        this.showPanel('login');
+        this.setSubmitting(form, false);
         return;
       }
 
@@ -193,13 +241,8 @@ class AccountModal {
         response.status === 409 ||
         (data.message && /already.*exists|already.*taken|email.*taken|email.*exists/i.test(data.message))
       ) {
-        this.showPanel('login');
-        const loginForm = document.getElementById('CustomerLoginForm');
-        if (loginForm) {
-          this._displayServerErrors(loginForm, {
-            summary: this.i18n.email_exists || 'An account with this email already exists. Please sign in.',
-          });
-        }
+        // Show login panel — email already exists
+        this.showPanel('login', payload.email);
         return;
       }
 
@@ -269,65 +312,6 @@ class AccountModal {
       }
     }
     return errors;
-  }
-
-  async _submitLoginForm(form) {
-    const email    = form.querySelector('#modal-CustomerEmail')?.value?.trim() || '';
-    const password = form.querySelector('#modal-CustomerPassword')?.value || '';
-
-    // Guard: config not set
-    if (!this.storefrontEndpoint || !this.storefrontToken) {
-      console.error('[AccountModal] Storefront endpoint or token not configured.', {
-        endpoint: this.storefrontEndpoint,
-        token: this.storefrontToken ? '(set)' : '(MISSING)',
-      });
-      this._displayServerErrors(form, {
-        summary: this.i18n.login_unknown_error || 'An unexpected error occurred. Please try again.',
-      });
-      this.setSubmitting(form, false);
-      return;
-    }
-
-    try {
-      const result = await this.createCustomerAccessToken(email, password);
-
-      if (result.userErrors?.length) {
-        // Map field-level errors from Storefront API
-        const fields = {};
-        for (const err of result.userErrors) {
-          const field = Array.isArray(err.field) ? err.field[0] : err.field;
-          if (field === 'email')    fields['modal-CustomerEmail']    = err.message;
-          else if (field === 'password') fields['modal-CustomerPassword'] = err.message;
-        }
-        const summary = Object.keys(fields).length === 0
-          ? (result.userErrors[0]?.message || this.i18n.login_failed || 'Invalid email or password.')
-          : (this.i18n.login_failed || 'Invalid email or password.');
-        this._displayServerErrors(form, { summary, fields });
-        this.setSubmitting(form, false);
-        return;
-      }
-
-      const { accessToken, expiresAt } = result.customerAccessToken;
-      const customer = await this.fetchCustomerProfile(accessToken);
-      this.setCustomerSession(accessToken, expiresAt, customer);
-      this.close();
-      window.dispatchEvent(new CustomEvent('customer:login', { detail: customer }));
-    } catch (err) {
-      console.error('[AccountModal] Login error:', {
-        message: err.message,
-        isNetwork: err instanceof TypeError,
-        isAuth: Boolean(err.isAuthError),
-        isGraphQL: Boolean(err.isGraphQLError),
-        status: err.status,
-      });
-      const isNetwork = err instanceof TypeError;
-      this._displayServerErrors(form, {
-        summary: isNetwork
-          ? (this.i18n.login_network_error || 'Network error. Please check your connection and try again.')
-          : (this.i18n.login_unknown_error  || 'An unexpected error occurred. Please try again.'),
-      });
-      this.setSubmitting(form, false);
-    }
   }
 
   // ---------------------------------------------------------------------------
@@ -510,16 +494,6 @@ class AccountModal {
     }
   }
 
-  _handleLoginSubmit(form) {
-    const result = this.validateLoginForm(form);
-    if (!result.ok) {
-      result.firstInvalid?.focus();
-      return;
-    }
-    this.setSubmitting(form, true);
-    this._submitLoginForm(form);
-  }
-
   // ---------------------------------------------------------------------------
   // Submit button state
   // ---------------------------------------------------------------------------
@@ -556,34 +530,6 @@ class AccountModal {
     input.classList.remove('is-invalid');
     const el = this.getErrorEl(input);
     if (el) { el.textContent = ''; el.hidden = true; }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Login validation
-  // ---------------------------------------------------------------------------
-  validateLoginForm(form) {
-    const email = form.querySelector('#modal-CustomerEmail');
-    const password = form.querySelector('#modal-CustomerPassword');
-
-    [email, password].forEach((inp) => inp && this.clearFieldError(inp));
-
-    const required = this.i18n.required || 'This field is required.';
-    const emailMsg = this.i18n.email || 'Please enter a valid email address.';
-    const isBlank = (v) => !v || !String(v).trim();
-
-    const errors = [];
-    const push = (input, msg) => { errors.push(input); this.setFieldError(input, msg); };
-
-    if (isBlank(email?.value)) {
-      push(email, required);
-    } else if (!this.isValidEmail(email.value)) {
-      push(email, emailMsg);
-    }
-
-    if (isBlank(password?.value)) push(password, required);
-
-    if (errors.length) return { ok: false, firstInvalid: errors[0] };
-    return { ok: true };
   }
 
   // ---------------------------------------------------------------------------
@@ -803,7 +749,7 @@ class AccountModal {
     noteInput.value = lines.join('\n');
   }
 
-  open(view = 'email') {
+  open(view = 'login') {
     if (!this.modal) return;
 
     // Check URL for panel state
@@ -826,20 +772,18 @@ class AccountModal {
     document.body.style.overflow = 'hidden';
   }
 
-  // view: 'email' | 'login' | 'register'
-  // email: optional, pre-populates badge and hidden inputs
+  // view: 'login' | 'register'
+  // email: optional, pre-populates email inputs
   showPanel(view, email) {
-    const panels = ['email', 'login', 'register'];
+    const panels = ['login', 'register'];
     const panelEls = {
-      email: this.panelEmail,
       login: this.panelLogin,
       register: this.panelRegister,
     };
 
-    // Populate email from current step if not provided
+    // Populate email from current inputs if not provided
     if (!email) {
-      email = document.getElementById('modal-EmailStep')?.value?.trim()
-        || document.getElementById('modal-CustomerEmail')?.value?.trim()
+      email = document.getElementById('modal-CustomerEmail')?.value?.trim()
         || document.getElementById('modal-RegisterEmail')?.value?.trim()
         || '';
     }
@@ -850,18 +794,11 @@ class AccountModal {
     // Show target panel
     panelEls[view]?.removeAttribute('hidden');
 
-    // Sync email into each panel
+    // Sync email across panels
     if (email) {
-      const emailStep = document.getElementById('modal-EmailStep');
-      if (emailStep && !emailStep.value) emailStep.value = email;
+      const loginEmail = document.getElementById('modal-CustomerEmail');
+      if (loginEmail && !loginEmail.value) loginEmail.value = email;
 
-      // Login badge + hidden input
-      const loginHidden = document.getElementById('modal-CustomerEmail');
-      if (loginHidden) loginHidden.value = email;
-      const loginDisplay = document.getElementById('modal-LoginEmailDisplay');
-      if (loginDisplay) loginDisplay.textContent = email;
-
-      // Register badge + hidden input
       const registerHidden = document.getElementById('modal-RegisterEmail');
       if (registerHidden) registerHidden.value = email;
       const registerDisplay = document.getElementById('modal-RegisterEmailDisplay');

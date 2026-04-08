@@ -6,8 +6,10 @@
   role="dialog"
   aria-modal="true"
   aria-label="{{ 'content.account_title' | t }}"
-  data-storefront-endpoint="https://{{ shop.permanent_domain | default: 'diptyque-remake.myshopify.com' }}/api/2026-04/graphql.json"
+  data-storefront-endpoint="https://{{ shop.permanent_domain }}/api/2026-04/graphql.json"
   data-storefront-token="{{ settings.storefront_access_token }}"
+  data-shop-id="{{ shop.id }}"
+  data-shop-domain="{{ shop.permanent_domain }}"
   hidden
 >
   <div class="account-modal__inner">
@@ -27,21 +29,24 @@
 
     <div class="account-modal__body">
       {%- comment -%} LOGIN PANEL {%- endcomment -%}
-      <div id="account-panel-login" class="account-modal__panel account-modal__panel--active">
+      <div id="account-panel-login" class="account-modal__panel">
         <h2 class="account-modal__heading">{{ 'customer.login.title' | t }}</h2>
 
+        {%- comment -%} Native login form (email + password → Storefront API) {%- endcomment -%}
         {%- form 'customer_login', id: 'CustomerLoginForm', novalidate: 'novalidate' -%}
+          <input type="hidden" name="return_to" value="/pages/my-account">
           <p class="account-modal__form-errors" hidden></p>
+
           <div class="account-modal__field">
             <label class="account-modal__label" for="modal-CustomerEmail">
               {{ 'customer.login.email' | t }} <span aria-hidden="true">*</span>
             </label>
             <input
               class="account-modal__input"
-              autocomplete="email"
               type="email"
               name="customer[email]"
               id="modal-CustomerEmail"
+              autocomplete="email"
               autocorrect="off"
               autocapitalize="off"
               required
@@ -56,10 +61,10 @@
             <div class="account-modal__input-wrapper">
               <input
                 class="account-modal__input"
-                autocomplete="current-password"
                 type="password"
                 name="customer[password]"
                 id="modal-CustomerPassword"
+                autocomplete="current-password"
                 required
               >
               <button
@@ -75,17 +80,7 @@
             <p class="account-modal__error" data-error-for="modal-CustomerPassword" hidden></p>
           </div>
 
-          <div class="account-modal__remember-row">
-            <label class="account-modal__checkbox-label">
-              <input type="checkbox" name="customer[remember_me]" class="account-modal__checkbox">
-              <span>{{ 'customer.login.remember_me' | t }}</span>
-            </label>
-          </div>
-
-          <a
-            href="{{ routes.root_url }}account/login#recover"
-            class="account-modal__link account-modal__forgot-link"
-          >
+          <a href="{{ routes.account_recover_url }}" class="account-modal__forgot-link account-modal__link">
             {{ 'customer.login.forgot_password' | t }}
           </a>
 
@@ -109,9 +104,6 @@
         <div class="account-modal__benefits">
           <p class="account-modal__benefits-title">
             {{ 'customer.login.benefits_title' | t }}
-          </p>
-          <p class="account-modal__benefits-body">
-            {{ 'customer.login.benefits_body' | t }}
           </p>
         </div>
       </div>
@@ -574,6 +566,34 @@
     background: var(--color-foreground);
   }
 
+  .account-modal__email-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--color-border, #e0e0e0);
+    margin-bottom: 20px;
+  }
+
+  .account-modal__email-badge-text {
+    font-size: 0.82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .account-modal__email-badge-change {
+    flex-shrink: 0;
+    margin-left: 12px;
+    font-size: 0.75rem;
+    opacity: 0.6;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
   .account-modal__forgot-link {
     display: block;
     margin-bottom: 20px;
@@ -638,6 +658,15 @@
     background: #2d4a3e;
     color: #fff;
     padding: 20px;
+  }
+
+  .account-modal__login-description {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--color-foreground);
+    opacity: 0.7;
+    margin: 0 0 20px;
   }
 
   .account-modal__benefits-title {

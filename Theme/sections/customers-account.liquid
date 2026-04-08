@@ -1,0 +1,16 @@
+<script>
+  // After New Customer Accounts login, Shopify always redirects here.
+  // Check localStorage beacon first, then fall back to /pages/my-account.
+  (function () {
+    var target = localStorage.getItem('dp_post_login_redirect') || '/pages/my-account';
+    localStorage.removeItem('dp_post_login_redirect');
+    window.location.replace(target);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Account Redirect",
+  "settings": []
+}
+{% endschema %}
