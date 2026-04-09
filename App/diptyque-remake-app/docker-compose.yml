@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: diptyque_db
+      POSTGRES_USER: diptyque_user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diptyque_user -d diptyque_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "10000:10000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://diptyque_user:localpassword@db:5432/diptyque_db
+      SHOPIFY_API_KEY: f0164565c90177bfb6fccdac489fd38a
+      SHOPIFY_APP_URL: https://diptyque-shopify.onrender.com
+      SCOPES: read_products,write_products,read_orders,read_customers
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
