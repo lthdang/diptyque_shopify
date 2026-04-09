@@ -1,7 +1,7 @@
 FROM node:20-alpine
 RUN apk add --no-cache openssl
 
-# Render dùng port 10000, không phải 3000
+# Render uses port 10000
 EXPOSE 10000
 
 WORKDIR /app
@@ -10,16 +10,20 @@ ENV NODE_ENV=production
 
 COPY package.json package-lock.json* ./
 
-# Cài TẤT CẢ dependencies (bao gồm devDependencies) vì cần để build
+# Install all dependencies (including devDependencies needed for build)
 RUN npm ci && npm cache clean --force
 
 COPY . .
 
-# 1. Generate Prisma Client trước (dùng placeholder vì build phase chưa có DB)
+# Generate Prisma Client at build time with placeholder URL
 RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost/placeholder" npx prisma generate
 
-# 2. Build app sau khi đã có Prisma Client
+# Build the app after Prisma Client is generated
 RUN npm run build
 
-# 3. Migrate + Start ở runtime — lúc này DATABASE_URL thật đã được inject
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
+# Copy and set up entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Use entrypoint script to run migrations then start the app at container startup
+ENTRYPOINT ["/app/entrypoint.sh"]
