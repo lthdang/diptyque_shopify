@@ -3,9 +3,18 @@ set -e
 
 echo "==> [entrypoint] Starting container..."
 
+# Print available env var keys (not values) to help diagnose missing vars
+echo "==> [entrypoint] Detected environment variables:"
+env | cut -d= -f1 | sort | sed 's/^/    /'
+
 # Validate DATABASE_URL is set and non-empty
 if [ -z "$DATABASE_URL" ]; then
+  echo ""
   echo "ERROR: DATABASE_URL is not set or is empty. Aborting."
+  echo ""
+  echo "To fix: Go to Render Dashboard → diptyque-shopify → Environment"
+  echo "        and add DATABASE_URL linked to the diptyque-db connection string."
+  echo "        Or go to Render Dashboard → Blueprints and sync render.yaml."
   exit 1
 fi
 
