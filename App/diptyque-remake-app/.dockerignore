@@ -1,3 +1,6 @@
+.env
 .cache
-build
+build/
 node_modules
+docker-compose.yml
+docker-compose*.yml

@@ -6,8 +6,6 @@ services:
     branch: main
     plan: starter
     dockerfilePath: ./Dockerfile
-    buildCommand: npm install && npm run build && npx prisma generate && npx prisma migrate deploy
-    startCommand: npm run start
     envVars:
       - key: NODE_ENV
         value: production
