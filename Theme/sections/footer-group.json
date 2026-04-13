@@ -1154,7 +1154,7 @@
               "name": "Link Block",
               "settings": {
                 "link_text": "ご利用ガイド",
-                "link_url": "shopify://blogs/news",
+                "link_url": "https://customerservicejp.diptyqueparis.com/hc/ja?_gl=1*1v4p5on*_gcl_au*MTI0MzE2NzU2Ny4xNzcyMDA4NjIy*_ga*MTQxMDc4NTQ2MC4xNzcyMDA4NjI0*_ga_FE29KXKKVQ*czE3NzYwNDUxOTEkbzkzJGcxJHQxNzc2MDQ1Mjg3JGozMCRsMCRoMA..",
                 "font_size": 14,
                 "text_color": "#717171",
                 "padding_top": 0,
