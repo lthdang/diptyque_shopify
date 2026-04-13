@@ -541,6 +541,12 @@ p:empty {
   grid-column: 1 / -1;
 }
 
+/* My account page — full width */
+.section > .my-account {
+  grid-column: 1 / -1;
+  margin: 0 20px;
+}
+
 .section--height-small {
   --section-min-height: var(--section-height-small);
 }

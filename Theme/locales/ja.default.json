@@ -363,8 +363,8 @@
       "first_name": "名",
       "last_name_kana": "フリガナ（姓）",
       "first_name_kana": "フリガナ（名）",
-      "birthdate": "生年月日",
-      "birthdate_help": "誕生日情報はアカウントページで設定できます",
+      "birthday": "生年月日",
+      "birthday_help": "誕生日情報はアカウントページで設定できます",
       "phone": "電話番号",
       "email": "Eメールアドレス",
       "password": "パスワード",
@@ -430,6 +430,18 @@
     "benefit_3": "会員限定の特別販売へのご招待",
     "logout": "ログアウト",
     "loading": "ログイン中...",
-    "auth_error": "ログインに失敗しました。もう一度お試しください。"
+    "auth_error": "ログインに失敗しました。もう一度お試しください。",
+    "save_success": "情報が保存されました。",
+    "save_failed": "保存に失敗しました。もう一度お試しください。",
+    "validation_required": "この項目は必須です。",
+    "validation_kana_invalid": "全角カタカナで入力してください。",
+    "validation_email_invalid": "有効なメールアドレスを入力してください。",
+    "validation_phone_invalid": "有効な電話番号を入力してください（8〜20桁）。",
+    "validation_dob_invalid": "YYYY/MM/DD 形式の有効な日付を入力してください（未来日付は不可）。",
+    "validation_password_weak": "パスワードは8文字以上で、英字・数字・記号を含む必要があります。",
+    "validation_password_mismatch": "パスワードが一致しません。",
+    "validation_password_required_all": "すべてのパスワード欄を入力してください。",
+    "update_not_supported": "現在のセッションではパスワードの更新はサポートされていません。",
+    "saving": "保存中..."
   }
 }

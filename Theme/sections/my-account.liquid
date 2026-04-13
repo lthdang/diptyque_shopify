@@ -1,7 +1,7 @@
 <div
   id="my-account-app"
   class="my-account page-width"
-  data-storefront-endpoint="https://{{ shop.permanent_domain | default: 'diptyque-remake.myshopify.com' }}/api/2026-04/graphql.json"
+  data-storefront-endpoint="https://{{ shop.permanent_domain }}/api/2026-04/graphql.json"
   data-storefront-token="{{ settings.storefront_access_token }}"
   data-shop-id="{{ shop.id }}"
   data-logout-url="{{ routes.account_logout_url }}"
@@ -31,7 +31,22 @@
   data-t-benefit-2="{{ 'custom_account.benefit_2' | t }}"
   data-t-benefit-3="{{ 'custom_account.benefit_3' | t }}"
   data-t-logout="{{ 'custom_account.logout' | t }}"
+  data-t-save-success="{{ 'custom_account.save_success' | t }}"
+  data-t-save-failed="{{ 'custom_account.save_failed' | t }}"
+  data-t-validation-required="{{ 'custom_account.validation_required' | t }}"
+  data-t-validation-email-invalid="{{ 'custom_account.validation_email_invalid' | t }}"
+  data-t-validation-phone-invalid="{{ 'custom_account.validation_phone_invalid' | t }}"
+  data-t-validation-dob-invalid="{{ 'custom_account.validation_dob_invalid' | t }}"
+  data-t-validation-password-weak="{{ 'custom_account.validation_password_weak' | t }}"
+  data-t-validation-password-mismatch="{{ 'custom_account.validation_password_mismatch' | t }}"
+  data-t-validation-password-required-all="{{ 'custom_account.validation_password_required_all' | t }}"
+  data-t-update-not-supported="{{ 'custom_account.update_not_supported' | t }}"
+  data-t-saving="{{ 'custom_account.saving' | t }}"
+  data-api-base="{{ settings.be_api_base_url }}"
 ></div>
+
+{% comment %} Hidden form used only to expose the CSRF token for native session AJAX updates {% endcomment %}
+{% form 'customer', id: 'ma-native-form' %}{% endform %}
 
 <script id="my-account-translations" type="application/json">
   {{ shop.metafields.translations.custom_account | json }}
@@ -45,6 +60,26 @@
     "lastName": {{ customer.last_name | json }},
     "email": {{ customer.email | json }},
     "phone": {{ customer.phone | json }},
+    "metafields": [
+      {
+        "namespace": "registration",
+        "key": "first_name_kana",
+        "value": {{ customer.metafields.registration.first_name_kana.value | json }},
+        "type": {{ customer.metafields.registration.first_name_kana.type | json }}
+      },
+      {
+        "namespace": "registration",
+        "key": "last_name_kana",
+        "value": {{ customer.metafields.registration.last_name_kana.value | json }},
+        "type": {{ customer.metafields.registration.last_name_kana.type | json }}
+      },
+      {
+        "namespace": "registration",
+        "key": "birthday",
+        "value": {{ customer.metafields.registration.birthday.value | json }},
+        "type": {{ customer.metafields.registration.birthday.type | json }}
+      }
+    ],
     "defaultAddress": {% if customer.default_address %}{
       "id": {{ customer.default_address.id | json }},
       "firstName": {{ customer.default_address.first_name | json }},
@@ -127,7 +162,7 @@
 
   /* --- Sidebar --- */
   .my-account__sidebar {
-    width: 250px;
+    width: 350px;
     flex-shrink: 0;
   }
 
@@ -147,7 +182,6 @@
     font-size: 0.8rem;
     color: var(--color-foreground, #000);
     cursor: pointer;
-    border-bottom: 1px solid #efefef;
     width: 100%;
     letter-spacing: 0.02em;
   }
@@ -172,8 +206,10 @@
 
   /* --- Main Content --- */
   .my-account__main {
-    flex: 1;
-    min-width: 0;
+    padding-top: 0;
+    height: auto;
+    max-width: 768px;
+    margin: 0 auto;
   }
 
   .my-account__panel {
@@ -215,6 +251,10 @@
 
   .my-account__form-field--full {
     grid-column: 1 / -1;
+  }
+
+  .my-account__form-field--hidden {
+    display: none;
   }
 
   .my-account__form-field label {
@@ -394,6 +434,49 @@
 
   .mt-16 { margin-top: 16px; }
   .mt-40 { margin-top: 40px; }
+
+  /* --- Field Errors & Form Messages --- */
+  .my-account__field-error {
+    font-size: 0.72rem;
+    color: #c0392b;
+    min-height: 1em;
+    line-height: 1.3;
+    display: block;
+  }
+
+  .my-account__input--error {
+    border-color: #c0392b !important;
+  }
+
+  .my-account__form-message {
+    font-size: 0.78rem;
+    padding: 0;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .my-account__form-message--success {
+    color: #2a7a3b;
+    background: #e6f4ea;
+    padding: 10px 14px;
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+
+  .my-account__form-message--error {
+    color: #c0392b;
+    background: #fdecea;
+    padding: 10px 14px;
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+
+  .my-account__submit-btn:disabled,
+  .my-account__submit-btn--loading {
+    background: #d0d0d0;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 
   /* --- Loading State --- */
   .my-account__loading {
@@ -665,7 +748,56 @@
       gap: 24px;
     }
   }
+
+  /* ---- Flatpickr theme overrides for my-account ---- */
+  .flatpickr-calendar {
+    font-family: inherit !important;
+    border: 1px solid var(--color-border, #ccc) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    border-radius: 0 !important;
+  }
+
+  .flatpickr-calendar.open {
+    z-index: 9999 !important;
+  }
+
+  .flatpickr-day.selected,
+  .flatpickr-day.selected:hover {
+    background: var(--color-foreground) !important;
+    border-color: var(--color-foreground) !important;
+    color: var(--color-background) !important;
+  }
+
+  .flatpickr-day:hover {
+    background: rgba(0,0,0,0.06) !important;
+  }
+
+  .flatpickr-day.today {
+    border-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-day.today:hover {
+    background: rgba(0,0,0,0.06) !important;
+    color: inherit !important;
+  }
+
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    fill: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+    border-bottom-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+    border-top-color: var(--color-foreground) !important;
+  }
 {% endstylesheet %}
+
+<link rel="stylesheet" href="{{ 'flatpickr.min.css' | asset_url }}">
+<script src="{{ 'flatpickr.min.js' | asset_url }}" defer></script>
+<script src="{{ 'flatpickr-l10n-ja.js' | asset_url }}" defer></script>
 
 {% schema %}
 {

@@ -128,9 +128,6 @@
   // Logout: clear PKCE + Storefront API tokens before native redirect
   document.getElementById('account-loggedin-logout')?.addEventListener('click', (e) => {
     e.preventDefault();
-    sessionStorage.removeItem('dp_ca_token');
-    sessionStorage.removeItem('dp_ca_token_exp');
-    localStorage.removeItem('dp_ca_refresh_token');
     localStorage.removeItem('shopifyCustomerAccessToken');
     localStorage.removeItem('shopifyCustomerAccessTokenExpiresAt');
     localStorage.removeItem('shopifyCustomer');

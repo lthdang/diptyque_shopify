@@ -2297,6 +2297,16 @@
         "id": "storefront_access_token",
         "label": "Storefront Access Token",
         "info": "Public Storefront API access token. Shopify Admin → Apps → Develop apps → [Your App] → API credentials → Storefront API access token."
+      },
+      {
+        "type": "header",
+        "content": "Backend API"
+      },
+      {
+        "type": "text",
+        "id": "be_api_base_url",
+        "label": "API Base URL",
+        "info": "Base URL for the customer account management backend API (e.g., https://your-backend.vercel.app)"
       }
     ]
   }
