@@ -652,10 +652,24 @@ class MyAccountPage {
       }
     }
     if (data.phone && !errors.phone) {
-      // Allow +, digits, spaces, hyphens, parens; normalized 8-20 digits
-      const normalized = data.phone.replace(/[\s\-\(\)\+]/g, '');
-      if (!/^[\+\d\s\-\(\)]+$/.test(data.phone) || normalized.length < 8 || normalized.length > 20) {
+      const raw = data.phone;
+      if (!/^[0-9+()\-\s]+$/.test(raw)) {
         errors.phone = this.t.validation_phone_invalid;
+      } else {
+        const digits = raw.replace(/\D/g, '');
+        if (digits.length < 8 || digits.length > 15) {
+          errors.phone = this.t.validation_phone_invalid;
+        } else {
+          let e164 = raw.startsWith('+') ? `+${digits}` : `+81${digits.startsWith('0') ? digits.slice(1) : digits}`;
+          const digitsOnly = e164.replace('+', '');
+          if (digitsOnly.startsWith('81')) {
+            const localLen = digitsOnly.length - 2;
+            if (localLen !== 9 && localLen !== 10) errors.phone = this.t.validation_phone_invalid;
+          } else if (digitsOnly.startsWith('84')) {
+            const localPart = digitsOnly.slice(2);
+            if (!/^[235789]\d{8,9}$/.test(localPart)) errors.phone = this.t.validation_phone_invalid;
+          }
+        }
       }
     }
     if (data.dob) {

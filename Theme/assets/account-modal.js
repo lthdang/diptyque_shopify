@@ -724,13 +724,30 @@ class AccountModal {
     if (!raw) return '';
     if (!/^[0-9+()\-\s]+$/.test(raw)) return '';
     const digits = raw.replace(/\D/g, '');
-    if (digits.length < 8) return '';
+    if (digits.length < 8 || digits.length > 15) return '';
+    
+    let e164 = '';
     // Already in E.164 format
-    if (raw.startsWith('+')) return `+${digits}`;
-    // Japanese local number: starts with 0, e.g. 0123232222 → +81123232222
-    if (digits.startsWith('0')) return `+81${digits.slice(1)}`;
-    // Assume already a national number without leading 0
-    return `+81${digits}`;
+    if (raw.startsWith('+')) {
+      e164 = `+${digits}`;
+    } else if (digits.startsWith('0')) {
+      // Japanese local number: starts with 0, e.g. 0123232222 → +81123232222
+      e164 = `+81${digits.slice(1)}`;
+    } else {
+      // Assume already a national number without leading 0
+      e164 = `+81${digits}`;
+    }
+
+    const digitsOnly = e164.replace('+', '');
+    if (digitsOnly.startsWith('81')) { // Japan
+      const localLen = digitsOnly.length - 2;
+      if (localLen !== 9 && localLen !== 10) return '';
+    } else if (digitsOnly.startsWith('84')) { // Vietnam
+      const localPart = digitsOnly.slice(2);
+      if (!/^[235789]\d{8,9}$/.test(localPart)) return '';
+    }
+
+    return e164;
   }
 
   applyCustomerNote(form, meta) {
