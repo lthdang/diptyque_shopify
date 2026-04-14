@@ -4,6 +4,8 @@
   "scripts": {
     "build": "react-router build",
     "dev": "shopify app dev",
+    "worker": "tsx app/jobs/publishProductWorker.ts",
+    "worker:dev": "tsx watch app/jobs/publishProductWorker.ts",
     "config:link": "shopify app config link",
     "generate": "shopify app generate",
     "deploy": "shopify app deploy",
@@ -30,13 +32,18 @@
     "@react-router/node": "^7.12.0",
     "@react-router/serve": "^7.12.0",
     "@shopify/app-bridge-react": "^4.2.4",
+    "@shopify/polaris": "^13.9.5",
     "@shopify/shopify-app-react-router": "^1.1.0",
     "@shopify/shopify-app-session-storage-prisma": "^9.0.0",
+    "bullmq": "^5.73.5",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "isbot": "^5.1.31",
     "prisma": "^6.16.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.12.0",
+    "recharts": "^3.8.1",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
