@@ -134,6 +134,7 @@ const worker = new Worker<PublishJobData>(
       where: { id: scheduleId },
       data: {
         status: "PUBLISHED",
+        publishedAt: new Date(),
         errorMessage: null,
         updatedAt: new Date(),
       },
@@ -198,3 +199,116 @@ console.log(
   "[Worker] 🚀 Worker is running, listening on queue:",
   PUBLISH_QUEUE_NAME,
 );
+
+/**
+ * Startup reconciliation — runs once 5 s after boot.
+ *
+ * Handles two scenarios:
+ *  A) Worker was offline when the job fired → job is stuck in delayed/waiting,
+ *     or BullMQ re-enqueued it and we missed the DB update.
+ *  B) Product was manually published in Shopify Admin while the system was down
+ *     → Shopify status = ACTIVE but our DB status = SCHEDULED.
+ *
+ * For every overdue SCHEDULED record, we query Shopify:
+ *  - If already ACTIVE → mark DB as PUBLISHED (no re-publish needed).
+ *  - If still DRAFT    → immediately re-enqueue the job with delay=0.
+ */
+async function reconcileOnStartup(): Promise<void> {
+  console.log("[Worker] 🔍 Running startup reconciliation...");
+
+  const overdue = await prisma.scheduledPublish.findMany({
+    where: {
+      status: "SCHEDULED",
+      scheduledAt: { lt: new Date() },
+    },
+  });
+
+  if (overdue.length === 0) {
+    console.log("[Worker] ✅ No overdue SCHEDULED records found.");
+    return;
+  }
+
+  console.log(
+    `[Worker] Found ${overdue.length} overdue record(s) — checking Shopify status...`,
+  );
+
+  const queue = (await import("./queue.server.js")).getPublishQueue();
+
+  for (const record of overdue) {
+    try {
+      const accessToken = await getAccessToken(record.shop).catch(() => null);
+      if (!accessToken) {
+        console.warn(
+          `[Worker] No access token for ${record.shop} — skipping reconcile for ${record.id}`,
+        );
+        continue;
+      }
+
+      // Check actual product status on Shopify
+      const res = await fetch(
+        `https://${record.shop}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Shopify-Access-Token": accessToken,
+          },
+          body: JSON.stringify({
+            query: `query checkProduct($id: ID!) { product(id: $id) { status } }`,
+            variables: { id: record.productId },
+          }),
+        },
+      );
+
+      const json = await res.json();
+      const shopifyStatus: string | undefined = json?.data?.product?.status;
+
+      if (shopifyStatus === "ACTIVE") {
+        // Product is already live — just sync the DB, no re-publish
+        await prisma.scheduledPublish.update({
+          where: { id: record.id },
+          data: {
+            status: "PUBLISHED",
+            publishedAt: new Date(),
+            errorMessage: null,
+            updatedAt: new Date(),
+          },
+        });
+        console.log(
+          `[Worker] ✅ Reconciled ${record.id} → PUBLISHED (product already ACTIVE on Shopify)`,
+        );
+      } else {
+        // Product still DRAFT — re-enqueue immediately for processing
+        await queue
+          .add(
+            `reconcile:${record.shop}:${record.productId}`,
+            {
+              scheduleId: record.id,
+              productId: record.productId,
+              shop: record.shop,
+            },
+            { delay: 0, jobId: `reconcile-${record.id}` },
+          )
+          .catch((err: Error) =>
+            console.error(
+              `[Worker] Failed to re-enqueue ${record.id}:`,
+              err.message,
+            ),
+          );
+        console.log(
+          `[Worker] 🔁 Re-enqueued ${record.id} (product status: ${shopifyStatus ?? "unknown"})`,
+        );
+      }
+    } catch (err) {
+      console.error(
+        `[Worker] Reconcile error for ${record.id}:`,
+        (err as Error).message,
+      );
+    }
+  }
+
+  console.log("[Worker] 🔍 Reconciliation complete.");
+}
+
+// Delay 5 s to let Redis connection settle before querying
+setTimeout(reconcileOnStartup, 5_000);

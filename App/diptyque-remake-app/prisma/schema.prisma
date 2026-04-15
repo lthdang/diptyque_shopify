@@ -52,6 +52,8 @@ model ScheduledPublish {
   bullJobId     String?
   // Thông báo lỗi nếu publish thất bại
   errorMessage  String?
+  // Thời điểm thực tế đã được publish (set bởi worker)
+  publishedAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
