@@ -148,16 +148,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 // ─── Countdown hook ────────────────────────────────────────────────────────────
 
-function useCountdown(targetIso: string | null): string {
+function useCountdown(targetIso: string | null, onExpire?: () => void): string {
   const [display, setDisplay] = useState("");
+  const expiredRef = useRef(false);
 
   useEffect(() => {
     if (!targetIso) return;
+    expiredRef.current = false;
 
     const update = () => {
       const diff = new Date(targetIso).getTime() - Date.now();
       if (diff <= 0) {
         setDisplay("Publishing soon...");
+        // Trigger a single loader revalidation ~5 s after expiry,
+        // giving the worker time to process the job and update the DB.
+        if (!expiredRef.current) {
+          expiredRef.current = true;
+          setTimeout(() => onExpire?.(), 5_000);
+        }
         return;
       }
       const d = Math.floor(diff / 86_400_000);
@@ -173,7 +181,7 @@ function useCountdown(targetIso: string | null): string {
     update();
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, [targetIso]);
+  }, [targetIso, onExpire]);
 
   return display;
 }
@@ -183,11 +191,16 @@ function useCountdown(targetIso: string | null): string {
 function CountdownCell({
   scheduledAt,
   status,
+  onExpire,
 }: {
   scheduledAt: string;
   status: string;
+  onExpire?: () => void;
 }) {
-  const countdown = useCountdown(status === "SCHEDULED" ? scheduledAt : null);
+  const countdown = useCountdown(
+    status === "SCHEDULED" ? scheduledAt : null,
+    onExpire,
+  );
   if (status !== "SCHEDULED")
     return (
       <Text as="span" tone="subdued">
@@ -443,7 +456,14 @@ export default function ScheduledPublishPage() {
 
   const minDatetime = useMemo(() => {
     const d = new Date(Date.now() + 2 * 60_000);
-    return d.toISOString().slice(0, 16);
+    // Format as local time — datetime-local inputs interpret min/max as local time,
+    // NOT UTC. Using toISOString() (UTC) here would set the min 7 hours too early
+    // for GMT+7 users, allowing them to select already-past UTC datetimes.
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return (
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+      `T${pad(d.getHours())}:${pad(d.getMinutes())}`
+    );
   }, []);
 
   const isSubmitting = scheduleFetcher.state !== "idle";
@@ -707,6 +727,7 @@ export default function ScheduledPublishPage() {
                         <CountdownCell
                           scheduledAt={item.scheduledAt}
                           status={item.status}
+                          onExpire={revalidator.revalidate}
                         />
                       </IndexTable.Cell>
 
