@@ -22,16 +22,7 @@ const prisma = new PrismaClient();
 const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION || "2025-10";
 
 /**
- * Extracts the numeric ID from a Shopify GID.
- * Example: "gid://shopify/Product/1234567890" → "1234567890"
- */
-function extractNumericId(gid: string): string {
-  const parts = gid.split("/");
-  return parts[parts.length - 1];
-}
-
-/**
- * Retrieves the shop’s offline access token from the Session table.
+ * Retrieves the shop's offline access token from the Session table.
  * The worker runs outside the Remix request lifecycle, so it must
  * fetch the token directly from the database rather than from the session store.
  */
@@ -54,47 +45,70 @@ async function getAccessToken(shop: string): Promise<string> {
 }
 
 /**
- * Calls the Shopify Admin REST API to publish a product.
- * REST is preferred here over GraphQL’s publishablePublish because it does not
- * require resolving a publicationId — setting published=true publishes to all
- * active sales channels by default.
+ * Calls the Shopify Admin GraphQL API to change a product's status to ACTIVE.
+ * Uses the `productUpdate` mutation which correctly sets status: ACTIVE,
+ * making the product visible across all active sales channels.
  */
 async function publishProductOnShopify(
   shop: string,
   accessToken: string,
   productGid: string,
 ): Promise<void> {
-  const numericId = extractNumericId(productGid);
-
   const response = await fetch(
-    `https://${shop}/admin/api/${SHOPIFY_API_VERSION}/products/${numericId}.json`,
+    `https://${shop}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`,
     {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Shopify-Access-Token": accessToken,
       },
       body: JSON.stringify({
-        product: {
-          id: Number(numericId),
-          // Set published=true to make the product visible on all active sales channels
-          published: true,
-        },
+        query: `
+          mutation publishProduct($id: ID!) {
+            productUpdate(input: { id: $id, status: ACTIVE }) {
+              product {
+                id
+                status
+                publishedAt
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `,
+        variables: { id: productGid },
       }),
     },
   );
 
   if (!response.ok) {
     const errorBody = await response.text();
-    throw new Error(`Shopify API returned ${response.status}: ${errorBody}`);
+    throw new Error(
+      `Shopify GraphQL API returned ${response.status}: ${errorBody}`,
+    );
   }
 
-  const result = await response.json();
-  const publishedAt = result?.product?.published_at;
+  const json = await response.json();
 
-  if (!publishedAt) {
+  const userErrors = json?.data?.productUpdate?.userErrors as
+    | { field: string; message: string }[]
+    | undefined;
+
+  if (userErrors && userErrors.length > 0) {
     throw new Error(
-      "Product was not published successfully on Shopify (published_at is null)",
+      `Shopify productUpdate failed: ${userErrors.map((e) => e.message).join(", ")}`,
+    );
+  }
+
+  const product = json?.data?.productUpdate?.product as
+    | { id: string; status: string; publishedAt: string | null }
+    | undefined;
+
+  if (!product || product.status !== "ACTIVE") {
+    throw new Error(
+      `Product was not activated on Shopify (status: ${product?.status ?? "unknown"})`,
     );
   }
 }
