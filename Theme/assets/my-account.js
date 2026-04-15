@@ -189,34 +189,6 @@ class MyAccountPage {
             value
             type
           }
-          defaultAddress {
-            id
-            firstName
-            lastName
-            address1
-            address2
-            city
-            province
-            zip
-            country
-            phone
-          }
-          addresses(first: 10) {
-            edges {
-              node {
-                id
-                firstName
-                lastName
-                address1
-                address2
-                city
-                province
-                zip
-                country
-                phone
-              }
-            }
-          }
           orders(first: 20, sortKey: PROCESSED_AT, reverse: true) {
             edges {
               node {
@@ -290,58 +262,21 @@ class MyAccountPage {
 
   renderDashboard(customer) {
     this.currentCustomer = customer;
-    const orders = customer.orders?.edges?.map(e => e.node) || [];
-    const addresses = customer.addresses?.edges?.map(e => e.node) || [];
+    const orders    = customer.orders?.edges?.map(e => e.node) || [];
     const activeTab = this.resolveInitialTab();
 
     this.container.innerHTML = `
-      <div class="my-account__layout">
-
-        <!-- Sidebar -->
-        <aside class="my-account__sidebar">
-          <nav class="my-account__nav">
-            <button class="my-account__nav-item my-account__nav-item--active" data-tab="profile">
-              <span>${this.t.nav_profile}</span>
-              <span class="my-account__nav-arrow">▶</span>
-            </button>
-            <button class="my-account__nav-item" data-tab="orders">
-              <span>${this.t.nav_orders}</span>
-              <span class="my-account__nav-arrow">▶</span>
-            </button>
-            <button class="my-account__nav-item" data-tab="addresses">
-              <span>${this.t.nav_addresses}</span>
-              <span class="my-account__nav-arrow">▶</span>
-            </button>
-            <button class="my-account__nav-item" data-tab="cards">
-              <span>${this.t.nav_cards}</span>
-              <span class="my-account__nav-arrow">▶</span>
-            </button>
-            <button class="my-account__nav-item" data-tab="shipping">
-              <span>${this.t.nav_shipping}</span>
-              <span class="my-account__nav-arrow">▶</span>
-            </button>
-          </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="my-account__main">
-          <div class="my-account__panel my-account__panel--active" data-panel="profile">
-            ${this.renderProfile(customer)}
-          </div>
-          <div class="my-account__panel" data-panel="orders">
-            ${this.renderOrders(orders)}
-          </div>
-          <div class="my-account__panel" data-panel="addresses">
-            ${this.renderAddresses(addresses, customer.defaultAddress)}
-          </div>
-          <div class="my-account__panel" data-panel="cards">
-            <p style="font-size: 0.8rem; opacity: 0.6; margin-top:20px;">${this.t.no_cards}</p>
-          </div>
-          <div class="my-account__panel" data-panel="shipping">
-            <p style="font-size: 0.8rem; opacity: 0.6; margin-top:20px;">${this.t.no_shipping}</p>
-          </div>
-        </main>
-
+      <div class="my-account__panel my-account__panel--active" data-panel="profile">
+        ${this.renderProfile(customer)}
+      </div>
+      <div class="my-account__panel" data-panel="orders">
+        ${this.renderOrders(orders)}
+      </div>
+      <div class="my-account__panel" data-panel="cards">
+        <p style="font-size: 0.8rem; opacity: 0.6; margin-top:20px;">${this.t.no_cards}</p>
+      </div>
+      <div class="my-account__panel" data-panel="shipping">
+        <p style="font-size: 0.8rem; opacity: 0.6; margin-top:20px;">${this.t.no_shipping}</p>
       </div>
     `;
 
@@ -570,32 +505,6 @@ class MyAccountPage {
             <span class="my-account__benefit-text">${this.t.benefit_3}</span>
           </div>
         </div>
-      </div>
-    `;
-  }
-
-  renderAddresses(addresses, defaultAddress) {
-    if (!addresses.length) {
-      return `
-        <div class="my-account__empty">
-          <p>${this.t.no_addresses}</p>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="my-account__addresses">
-        ${addresses.map(addr => `
-          <div class="my-account__address-card ${defaultAddress?.id === addr.id ? 'my-account__address-card--default' : ''}">
-            ${defaultAddress?.id === addr.id ? `<span class="my-account__default-badge">${this.t.default_badge}</span>` : ''}
-            <p class="my-account__address-name">${this.escapeHtml(addr.lastName || '')} ${this.escapeHtml(addr.firstName || '')}</p>
-            <p>${this.escapeHtml(addr.address1 || '')}</p>
-            ${addr.address2 ? `<p>${this.escapeHtml(addr.address2)}</p>` : ''}
-            <p>${this.escapeHtml(addr.city || '')} ${this.escapeHtml(addr.province || '')} ${this.escapeHtml(addr.zip || '')}</p>
-            <p>${this.escapeHtml(addr.country || '')}</p>
-            ${addr.phone ? `<p>${this.escapeHtml(addr.phone)}</p>` : ''}
-          </div>
-        `).join('')}
       </div>
     `;
   }
@@ -1412,9 +1321,9 @@ class MyAccountPage {
       });
     });
 
-    // Tab switching
-    this.container.querySelectorAll('.my-account__nav-item').forEach(tab => {
-      tab.addEventListener('click', () => {
+    document.querySelectorAll('.my-account__nav-item[data-tab]').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
         const target = tab.dataset.tab;
         this.setActiveTab(target, true);
       });
@@ -1481,7 +1390,8 @@ class MyAccountPage {
 
   setActiveTab(tab, updateHash) {
     const safeTab = this.isValidTab(tab) ? tab : 'profile';
-    this.container.querySelectorAll('.my-account__nav-item').forEach((t) => {
+    // Nav lives in the Liquid snippet (outside this.container) — query from document.
+    document.querySelectorAll('.my-account__nav-item').forEach((t) => {
       t.classList.toggle('my-account__nav-item--active', t.dataset.tab === safeTab);
     });
     this.container.querySelectorAll('.my-account__panel').forEach((p) => {
