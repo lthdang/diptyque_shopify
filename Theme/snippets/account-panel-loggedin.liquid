@@ -40,7 +40,7 @@
         <span>{{ 'custom_account.nav_orders' | t }}</span>
         <span class="account-loggedin-panel__nav-arrow">›</span>
       </a>
-      <a href="/pages/my-account#addresses" class="account-loggedin-panel__nav-item">
+      <a href="/pages/addresses-details" class="account-loggedin-panel__nav-item">
         <span>{{ 'custom_account.nav_addresses' | t }}</span>
         <span class="account-loggedin-panel__nav-arrow">›</span>
       </a>
@@ -128,9 +128,6 @@
   // Logout: clear PKCE + Storefront API tokens before native redirect
   document.getElementById('account-loggedin-logout')?.addEventListener('click', (e) => {
     e.preventDefault();
-    sessionStorage.removeItem('dp_ca_token');
-    sessionStorage.removeItem('dp_ca_token_exp');
-    localStorage.removeItem('dp_ca_refresh_token');
     localStorage.removeItem('shopifyCustomerAccessToken');
     localStorage.removeItem('shopifyCustomerAccessTokenExpiresAt');
     localStorage.removeItem('shopifyCustomer');

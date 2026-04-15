@@ -9,6 +9,7 @@
  */
 {
   "current": {
+    "be_api_base_url": "https://diptyqueshopifybe.vercel.app",
     "logo": "shopify://shop_images/svgviewer-output.svg",
     "logo_inverse": "shopify://shop_images/svgviewer-output.svg",
     "logo_height": 36,

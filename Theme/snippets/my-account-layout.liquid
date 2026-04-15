@@ -1,0 +1,405 @@
+{%- comment -%}
+  Shared two-column layout for all My Account pages.
+
+  Parameters
+    active_nav  – string: 'profile' | 'orders' | 'addresses' | 'cards' | 'shipping'
+    content     – captured HTML to inject into <main> (use {% capture %} before rendering)
+{%- endcomment -%}
+
+<div class="my-account page-width">
+  <div class="my-account__layout">
+
+    {%- comment -%} ── Sidebar ─────────────────────────────────────────── {%- endcomment -%}
+    <aside class="my-account__sidebar">
+      <nav class="my-account__nav">
+
+        <a href="/pages/my-account"
+           class="my-account__nav-item{% if active_nav == 'profile' %} my-account__nav-item--active{% endif %}"
+           data-tab="profile">
+          <span>{{ 'custom_account.nav_profile' | t }}</span>
+          <span class="my-account__nav-arrow">▶</span>
+        </a>
+
+        <a href="/pages/my-account#orders"
+           class="my-account__nav-item{% if active_nav == 'orders' %} my-account__nav-item--active{% endif %}"
+           data-tab="orders">
+          <span>{{ 'custom_account.nav_orders' | t }}</span>
+          <span class="my-account__nav-arrow">▶</span>
+        </a>
+
+        <a href="/pages/addresses-details"
+           class="my-account__nav-item{% if active_nav == 'addresses' %} my-account__nav-item--active{% endif %}">
+          <span>{{ 'custom_account.nav_addresses' | t }}</span>
+          <span class="my-account__nav-arrow">▶</span>
+        </a>
+
+        <a href="/pages/my-account#cards"
+           class="my-account__nav-item{% if active_nav == 'cards' %} my-account__nav-item--active{% endif %}"
+           data-tab="cards">
+          <span>{{ 'custom_account.nav_cards' | t }}</span>
+          <span class="my-account__nav-arrow">▶</span>
+        </a>
+
+        <a href="/pages/my-account#shipping"
+           class="my-account__nav-item{% if active_nav == 'shipping' %} my-account__nav-item--active{% endif %}"
+           data-tab="shipping">
+          <span>{{ 'custom_account.nav_shipping' | t }}</span>
+          <span class="my-account__nav-arrow">▶</span>
+        </a>
+
+      </nav>
+    </aside>
+
+    {%- comment -%} ── Main content slot ─────────────────────────────── {%- endcomment -%}
+    <main class="my-account__main" id="my-account-content">
+      {{ content }}
+    </main>
+
+  </div>
+</div>
+
+{% stylesheet %}
+  /* ================================================================
+     Shared My Account layout — used by every my-account sub-page
+     ================================================================ */
+
+  .my-account {
+    min-height: 60vh;
+    padding-top: 40px;
+    padding-bottom: 60px;
+    font-family: var(--font-body-family, sans-serif);
+  }
+
+  /* ── Two-column layout ──────────────────────────────────────────── */
+  .my-account__layout {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+  }
+
+  /* ── Sidebar ────────────────────────────────────────────────────── */
+  .my-account__sidebar {
+    width: 350px;
+    flex-shrink: 0;
+  }
+
+  .my-account__nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .my-account__nav-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 14px 0;
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--color-foreground, #000);
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+
+  .my-account__nav-item--active {
+    font-weight: 600;
+  }
+
+  .my-account__nav-logout {
+    color: #999;
+    margin-top: 12px;
+    border: none;
+    font-size: 0.78rem;
+  }
+
+  .my-account__nav-item:hover {
+    opacity: 0.65;
+  }
+
+  .my-account__nav-item:hover .my-account__nav-arrow {
+    transform: translateX(3px);
+  }
+
+  .my-account__nav-arrow {
+    font-size: 0.6rem;
+    transition: transform 0.2s;
+  }
+
+  /* ── Main panel area ────────────────────────────────────────────── */
+  .my-account__main {
+    flex: 1;
+    min-width: 0;
+    padding-top: 0;
+    max-width: 768px;
+    margin: 0 auto;
+  }
+
+  /* panels (used by my-account.js single-page tabs) */
+  .my-account__panel {
+    display: none;
+    animation: ma-fade-in 0.3s ease;
+  }
+
+  .my-account__panel--active {
+    display: block;
+  }
+
+  @keyframes ma-fade-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Shared input ───────────────────────────────────────────────── */
+  .my-account__input {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    font-size: 0.85rem;
+    width: 100%;
+    outline: none;
+    background: #fff;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .my-account__input:focus {
+    border-color: #000;
+  }
+
+  .my-account__input--error {
+    border-color: #c0392b !important;
+  }
+
+  /* ── Date input ─────────────────────────────────────────────────── */
+  .my-account__date-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .my-account__calendar-icon {
+    position: absolute;
+    right: 16px;
+    color: #666;
+    pointer-events: none;
+    display: flex;
+  }
+
+  /* ── Field errors + form messages ───────────────────────────────── */
+  .my-account__field-error {
+    font-size: 0.72rem;
+    color: #c0392b;
+    min-height: 1em;
+    line-height: 1.3;
+    display: block;
+  }
+
+  .my-account__form-message {
+    font-size: 0.78rem;
+    padding: 0;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .my-account__form-message--success {
+    color: #2a7a3b;
+    background: #e6f4ea;
+    padding: 10px 14px;
+    margin-top: 12px;
+  }
+
+  .my-account__form-message--error {
+    color: #c0392b;
+    background: #fdecea;
+    padding: 10px 14px;
+    margin-top: 12px;
+  }
+
+  /* ── Loading / spinner ──────────────────────────────────────────── */
+  .my-account__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .my-account__spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e0e0e0;
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: ma-spin 0.7s linear infinite;
+  }
+
+  @keyframes ma-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── Not-logged-in state ────────────────────────────────────────── */
+  .my-account__not-logged-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .my-account__not-logged-in-icon { color: #ccc; margin-bottom: 8px; }
+
+  .my-account__not-logged-in h2 { font-size: 1rem; font-weight: 500; margin: 0; }
+
+  .my-account__not-logged-in p { font-size: 0.85rem; color: #666; margin: 0; }
+
+  .my-account__login-btn {
+    margin-top: 8px;
+    padding: 12px 32px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: background 0.2s;
+  }
+
+  .my-account__login-btn:hover { background: #333; }
+
+  /* ── Generic text link button (edit / delete) ───────────────────── */
+  .my-account__text-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.78rem;
+    color: var(--color-foreground, #000);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+  }
+
+  .my-account__text-btn:hover { opacity: 0.6; }
+
+  /* ── Info icon ──────────────────────────────────────────────────── */
+  .my-account__info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    margin-left: 6px;
+    color: #999;
+    cursor: help;
+  }
+
+  /* ── Benefits banner ────────────────────────────────────────────── */
+  .my-account__benefits-banner {
+    background: #2a4b38;
+    color: #fff;
+    padding: 40px 32px;
+    text-align: center;
+    border-radius: 2px;
+  }
+
+  .my-account__benefits-title {
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 0 0 12px;
+    letter-spacing: 0.05em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .my-account__benefits-subtitle {
+    font-size: 0.85rem;
+    margin: 0 0 32px;
+    opacity: 0.9;
+  }
+
+  .my-account__benefits-icons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .my-account__benefit-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  .my-account__benefit-icon-wrapper {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  .my-account__benefit-icon-wrapper img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+  }
+
+  .my-account__benefit-text {
+    color: #fff;
+    max-width: 120px;
+  }
+
+  /* ── Utilities ──────────────────────────────────────────────────── */
+  .mt-16 { margin-top: 16px; }
+  .mt-40 { margin-top: 40px; }
+
+  /* address form container slot (used in both pages) */
+  .my-account__address-form-container { /* JS-filled slot */ }
+
+  /* ── Responsive ─────────────────────────────────────────────────── */
+  @media screen and (max-width: 960px) {
+    .my-account__layout { gap: 40px; }
+    .my-account__sidebar { width: 260px; }
+  }
+
+  @media screen and (max-width: 749px) {
+    .my-account {
+      padding-top: 24px;
+      padding-bottom: 40px;
+    }
+
+    .my-account__layout {
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .my-account__sidebar { width: 100%; }
+
+    .my-account__benefits-icons {
+      flex-direction: column;
+      gap: 24px;
+    }
+  }
+{% endstylesheet %}
