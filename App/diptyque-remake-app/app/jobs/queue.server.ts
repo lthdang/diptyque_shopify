@@ -14,18 +14,24 @@ export interface PublishJobData {
 // Queue name used consistently between producer and worker
 export const PUBLISH_QUEUE_NAME = "product-publish";
 
+const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+
 // --- Redis connection singleton — reused across queue and worker to avoid extra connections ---
 let redisConnection: IORedis | null = null;
 
 export function getRedisConnection(): IORedis {
   if (!redisConnection) {
-    redisConnection = new IORedis(
-      process.env.REDIS_URL || "redis://localhost:6379",
-      {
-        // BullMQ requires maxRetriesPerRequest to be null
-        maxRetriesPerRequest: null,
-      },
-    );
+    redisConnection = new IORedis(REDIS_URL, {
+      // Required by BullMQ
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      // Enable TLS when connecting to a rediss:// URL (e.g. Render's internal Redis)
+      tls: REDIS_URL.startsWith("rediss://") ? {} : undefined,
+    });
+
+    redisConnection.on("error", (err) => {
+      console.error("[Redis] Connection error:", err.message);
+    });
   }
   return redisConnection;
 }
