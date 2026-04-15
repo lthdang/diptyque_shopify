@@ -376,7 +376,11 @@ export default function ScheduledPublishPage() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(9, 0, 0, 0);
-    setScheduledDatetime(`${tomorrow.toISOString().slice(0, 10)}T09:00`);
+    // Use LOCAL date parts — toISOString() would return the UTC date, which can be
+    // one day behind for GMT+7 users between 00:00–06:59 local time.
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const localDate = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
+    setScheduledDatetime(`${localDate}T09:00`);
     setModalOpen(true);
   };
 
@@ -854,12 +858,28 @@ export default function ScheduledPublishPage() {
 
             {scheduledDatetime && (
               <Banner tone="info">
-                <p>
-                  Will publish at:{" "}
-                  <strong>
-                    {new Date(scheduledDatetime).toLocaleString()}
-                  </strong>
-                </p>
+                <BlockStack gap="100">
+                  <Text as="p" variant="bodyMd">
+                    <strong>
+                      {formatInTimeZone(
+                        new Date(scheduledDatetime),
+                        "Asia/Ho_Chi_Minh",
+                        "dd/MM/yyyy HH:mm",
+                      )}
+                    </strong>{" "}
+                    <Text as="span" tone="subdued">
+                      (GMT+7)
+                    </Text>
+                  </Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    ={" "}
+                    {new Date(scheduledDatetime)
+                      .toISOString()
+                      .replace("T", " ")
+                      .slice(0, 16)}{" "}
+                    UTC
+                  </Text>
+                </BlockStack>
               </Banner>
             )}
           </BlockStack>
