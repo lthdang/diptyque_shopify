@@ -45,6 +45,7 @@ interface ScheduledRecord {
   productTitle: string;
   productImage: string | null;
   scheduledAt: string;
+  publishedAt: string | null;
   status: string;
   errorMessage: string | null;
 }
@@ -120,6 +121,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         productTitle: true,
         productImage: true,
         scheduledAt: true,
+        publishedAt: true,
         status: true,
         errorMessage: true,
       },
@@ -131,6 +133,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         (item: (typeof scheduledItems)[number]) => ({
           ...item,
           scheduledAt: item.scheduledAt.toISOString(),
+          publishedAt:
+            (
+              item as unknown as { publishedAt: Date | null }
+            ).publishedAt?.toISOString() ?? null,
         }),
       ),
       shop: session.shop,
@@ -689,6 +695,7 @@ export default function ScheduledPublishPage() {
                     { title: "Product" },
                     { title: "Scheduled time (GMT+7)" },
                     { title: "Status" },
+                    { title: "Published at (GMT+7)" },
                     { title: "Countdown" },
                     { title: "Action" },
                   ]}
@@ -721,6 +728,22 @@ export default function ScheduledPublishPage() {
 
                       <IndexTable.Cell>
                         <QueueStatusBadge status={item.status} />
+                      </IndexTable.Cell>
+
+                      <IndexTable.Cell>
+                        {item.publishedAt ? (
+                          <Text as="span" tone="success">
+                            {formatInTimeZone(
+                              new Date(item.publishedAt),
+                              "Asia/Ho_Chi_Minh",
+                              "dd/MM/yyyy HH:mm",
+                            )}
+                          </Text>
+                        ) : (
+                          <Text as="span" tone="subdued">
+                            —
+                          </Text>
+                        )}
                       </IndexTable.Cell>
 
                       <IndexTable.Cell>
