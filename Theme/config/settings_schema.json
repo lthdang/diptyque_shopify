@@ -2286,6 +2286,99 @@
     ]
   },
   {
+    "name": "Search Sidebar",
+    "settings": [
+      {
+        "type": "text",
+        "id": "search_sidebar_title",
+        "label": "Sidebar title",
+        "default": "Need help choosing?"
+      },
+      {
+        "type": "image_picker",
+        "id": "search_sidebar_image",
+        "label": "Sidebar banner image"
+      },
+
+      {
+        "type": "text",
+        "id": "search_sidebar_description",
+        "label": "Sidebar description",
+        "default": "Discover our curated collections and client services."
+      },
+      {
+        "type": "text",
+        "id": "search_sup_title",
+        "label": "Sidebar Sup title",
+        "default": "Need help choosing?"
+      },
+      {
+        "type": "image_picker",
+        "id": "search_sidebar_link_1_icon",
+        "label": "Link 1 icon"
+      },
+      {
+        "type": "text",
+        "id": "search_sidebar_link_1_label",
+        "label": "Link 1 label",
+        "default": "Customer Service"
+      },
+      {
+        "type": "url",
+        "id": "search_sidebar_link_1_url",
+        "label": "Link 1 URL"
+      },
+      {
+        "type": "image_picker",
+        "id": "search_sidebar_link_2_icon",
+        "label": "Link 2 icon"
+      },
+      {
+        "type": "text",
+        "id": "search_sidebar_link_2_label",
+        "label": "Link 2 label",
+        "default": "About Diptyque"
+      },
+      {
+        "type": "url",
+        "id": "search_sidebar_link_2_url",
+        "label": "Link 2 URL"
+      },
+      {
+        "type": "image_picker",
+        "id": "search_sidebar_link_3_icon",
+        "label": "Link 3 icon"
+      },
+      {
+        "type": "text",
+        "id": "search_sidebar_link_3_label",
+        "label": "Link 3 label",
+        "default": "Shop Collections"
+      },
+      {
+        "type": "url",
+        "id": "search_sidebar_link_3_url",
+        "label": "Link 3 URL"
+      },
+      {
+        "type": "image_picker",
+        "id": "search_sidebar_link_4_icon",
+        "label": "Link 4 icon"
+      },
+      {
+        "type": "text",
+        "id": "search_sidebar_link_4_label",
+        "label": "Link 4 label",
+        "default": "Store Locator"
+      },
+      {
+        "type": "url",
+        "id": "search_sidebar_link_4_url",
+        "label": "Link 4 URL"
+      }
+    ]
+  },
+  {
     "name": "API Settings",
     "settings": [
       {

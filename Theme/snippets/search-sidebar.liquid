@@ -1,0 +1,117 @@
+{%- liquid
+  assign sidebar_image = settings.search_sidebar_image
+  assign sidebar_title = settings.search_sidebar_title
+  assign sidebar_description = settings.search_sidebar_description
+  assign link_1_icon = settings.search_sidebar_link_1_icon
+  assign link_2_icon = settings.search_sidebar_link_2_icon
+  assign link_3_icon = settings.search_sidebar_link_3_icon
+  assign link_4_icon = settings.search_sidebar_link_4_icon
+-%}
+
+<div class="predictive-search-sidebar">
+  {% if sidebar_title != blank %}
+    <h3 class="predictive-search-sidebar__title">{{ sidebar_title }}</h3>
+  {% endif %}
+  {% if sidebar_image != blank %}
+    <div class="predictive-search-sidebar__image">
+      {{
+        sidebar_image
+        | image_url: width: 720
+        | image_tag:
+          loading: 'lazy',
+          widths: '320, 480, 640, 720',
+          sizes: '(max-width: 749px) 100vw, 30vw',
+          alt: sidebar_image.alt
+      }}
+    </div>
+  {% endif %}
+  
+  {% if sidebar_description != blank %}
+    <p class="predictive-search-sidebar__description">{{ sidebar_description }}</p>
+  {% endif %}
+
+    {% if sidebar_sup_title != blank %}
+    <p class="predictive-search-sidebar__description">{{ sidebar_sup_title }}</p>
+  {% endif %}
+
+  <nav
+    class="predictive-search-sidebar__links"
+    aria-label="Search sidebar links"
+  >
+    {% if settings.search_sidebar_link_1_label != blank and settings.search_sidebar_link_1_url != blank %}
+      <a href="{{ settings.search_sidebar_link_1_url }}" class="predictive-search-sidebar__link">
+        {% if link_1_icon != blank %}
+          <span class="predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{
+              link_1_icon
+              | image_url: width: 24
+              | image_tag: loading: 'lazy', widths: '16, 24, 32', sizes: '24px', alt: ''
+            }}
+          </span>
+        {% else %}
+          <span class="svg-wrapper predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{ 'icon-chevron-right.svg' | inline_asset_content }}
+          </span>
+        {% endif %}
+        {{ settings.search_sidebar_link_1_label }}
+      </a>
+    {% endif %}
+
+    {% if settings.search_sidebar_link_2_label != blank and settings.search_sidebar_link_2_url != blank %}
+      <a href="{{ settings.search_sidebar_link_2_url }}" class="predictive-search-sidebar__link">
+        {% if link_2_icon != blank %}
+          <span class="predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{
+              link_2_icon
+              | image_url: width: 24
+              | image_tag: loading: 'lazy', widths: '16, 24, 32', sizes: '24px', alt: ''
+            }}
+          </span>
+        {% else %}
+          <span class="svg-wrapper predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{ 'icon-chevron-right.svg' | inline_asset_content }}
+          </span>
+        {% endif %}
+        {{ settings.search_sidebar_link_2_label }}
+      </a>
+    {% endif %}
+
+    {% if settings.search_sidebar_link_3_label != blank and settings.search_sidebar_link_3_url != blank %}
+      <a href="{{ settings.search_sidebar_link_3_url }}" class="predictive-search-sidebar__link">
+        {% if link_3_icon != blank %}
+          <span class="predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{
+              link_3_icon
+              | image_url: width: 24
+              | image_tag: loading: 'lazy', widths: '16, 24, 32', sizes: '24px', alt: ''
+            }}
+          </span>
+        {% else %}
+          <span class="svg-wrapper predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{ 'icon-chevron-right.svg' | inline_asset_content }}
+          </span>
+        {% endif %}
+        {{ settings.search_sidebar_link_3_label }}
+      </a>
+    {% endif %}
+
+    {% if settings.search_sidebar_link_4_label != blank and settings.search_sidebar_link_4_url != blank %}
+      <a href="{{ settings.search_sidebar_link_4_url }}" class="predictive-search-sidebar__link">
+        {% if link_4_icon != blank %}
+          <span class="predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{
+              link_4_icon
+              | image_url: width: 24
+              | image_tag: loading: 'lazy', widths: '16, 24, 32', sizes: '24px', alt: ''
+            }}
+          </span>
+        {% else %}
+          <span class="svg-wrapper predictive-search-sidebar__link-icon" aria-hidden="true">
+            {{ 'icon-chevron-right.svg' | inline_asset_content }}
+          </span>
+        {% endif %}
+        {{ settings.search_sidebar_link_4_label }}
+      </a>
+    {% endif %}
+  </nav>
+</div>
