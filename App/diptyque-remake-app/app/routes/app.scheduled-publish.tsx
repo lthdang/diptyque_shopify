@@ -62,7 +62,6 @@ interface LoaderData {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
-
   try {
     const productsResponse = await admin.graphql(`
     #graphql
