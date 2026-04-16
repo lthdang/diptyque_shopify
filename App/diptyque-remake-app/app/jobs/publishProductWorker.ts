@@ -27,8 +27,9 @@ import { createServer } from "node:http";
 const PORT = process.env.PORT || 10000;
 createServer((_req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
-}).listen(PORT, () => {
-  console.log(`[Scheduler] Health-check server listening on port ${PORT}`);
+  res.end("");
+}).listen(Number(PORT), "0.0.0.0", () => {
+  console.log(`[Scheduler] Health-check server listening on 0.0.0.0:${PORT}`);
 });
 
 const prisma = new PrismaClient();
