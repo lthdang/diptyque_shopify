@@ -1,0 +1,25 @@
+FROM node:20-alpine
+RUN apk add --no-cache openssl
+
+# No EXPOSE — this is a background worker, not a web service
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY package.json package-lock.json* ./
+
+RUN npm ci && npm cache clean --force
+
+COPY . .
+
+# Generate Prisma Client
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost/placeholder" npx prisma generate
+
+# Build (needed so tsx is not required at runtime — we compile TS to JS)
+RUN npm run build
+
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
