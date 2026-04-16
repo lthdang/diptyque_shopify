@@ -5,19 +5,17 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-ENV NODE_ENV=production
-
 COPY package.json package-lock.json* ./
 
+# Install ALL dependencies (including devDependencies needed for tsx runtime)
 RUN npm ci && npm cache clean --force
 
 COPY . .
 
+ENV NODE_ENV=production
+
 # Generate Prisma Client
 RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost/placeholder" npx prisma generate
-
-# Build (needed so tsx is not required at runtime — we compile TS to JS)
-RUN npm run build
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
