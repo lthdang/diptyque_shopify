@@ -28,7 +28,7 @@ services:
     rootDir: App/diptyque-remake-app
     branch: main
     plan: starter
-    dockerfilePath: ./Dockerfile.worker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
