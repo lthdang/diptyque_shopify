@@ -27,7 +27,6 @@ import { createServer } from "node:http";
 const PORT = process.env.PORT || 10000;
 createServer((_req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("worker ok");
 }).listen(PORT, () => {
   console.log(`[Scheduler] Health-check server listening on port ${PORT}`);
 });
