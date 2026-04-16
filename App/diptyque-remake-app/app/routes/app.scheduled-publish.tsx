@@ -312,6 +312,8 @@ export default function ScheduledPublishPage() {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
 
   const prevScheduledRef = useRef<Set<string>>(new Set());
+  const handledScheduleData = useRef<unknown>(null);
+  const handledCancelData = useRef<unknown>(null);
 
   const showToast = useCallback((message: string, isError = false) => {
     setToastMessage(message);
@@ -347,6 +349,8 @@ export default function ScheduledPublishPage() {
   // Handle schedule POST response
   useEffect(() => {
     if (scheduleFetcher.state !== "idle" || !scheduleFetcher.data) return;
+    if (handledScheduleData.current === scheduleFetcher.data) return;
+    handledScheduleData.current = scheduleFetcher.data;
     if (scheduleFetcher.data.success) {
       showToast("Product scheduled successfully!");
       setModalOpen(false);
@@ -361,6 +365,8 @@ export default function ScheduledPublishPage() {
   // Handle cancel DELETE response
   useEffect(() => {
     if (cancelFetcher.state !== "idle" || !cancelFetcher.data) return;
+    if (handledCancelData.current === cancelFetcher.data) return;
+    handledCancelData.current = cancelFetcher.data;
     if (cancelFetcher.data.success) {
       showToast("Schedule cancelled.");
       setCancelModalOpen(false);

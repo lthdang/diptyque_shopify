@@ -26,7 +26,7 @@ echo "==> [entrypoint] Migrations complete. Starting application..."
 # If START_WORKER=true, run the BullMQ worker instead of the Remix server.
 # The Render worker service sets this env var; the web service does not.
 if [ "$START_WORKER" = "true" ]; then
-  echo "==> [entrypoint] START_WORKER=true — starting BullMQ worker process..."
+  echo "==> [entrypoint] START_WORKER=true — starting scheduler worker process..."
   exec npm run worker
 fi
 
