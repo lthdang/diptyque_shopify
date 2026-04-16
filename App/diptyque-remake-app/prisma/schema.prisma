@@ -44,17 +44,20 @@ model ScheduledPublish {
   // URL ảnh đại diện của sản phẩm
   productImage  String?
   productHandle String?
-  // Thời điểm dự kiến đăng sản phẩm (có múi giờ UTC)
+  // Thời điểm dự kiến đăng sản phẩm (UTC)
   scheduledAt   DateTime
-  // Trạng thái: SCHEDULED | PUBLISHED | CANCELLED | FAILED
+  // Trạng thái: SCHEDULED | PROCESSING | PUBLISHED | CANCELLED | FAILED
   status        String    @default("SCHEDULED")
-  // ID của job trong BullMQ để có thể huỷ khi cần
-  bullJobId     String?
+  // Shopify offline access token — persisted so the worker can call the API
+  accessToken   String
   // Thông báo lỗi nếu publish thất bại
   errorMessage  String?
+  // Thời điểm thực tế đã được publish (set bởi worker)
+  publishedAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   @@index([shop])
   @@index([shop, status])
+  @@index([status, scheduledAt])
 }

@@ -283,7 +283,7 @@ class AccountModal {
       phone: meta.phone || val('modal-RegisterPhone'),
       first_name_kana: meta.first_name_kana || val('modal-RegisterFirstNameKana'),
       last_name_kana: meta.last_name_kana || val('modal-RegisterLastNameKana'),
-      birthday: meta.birthdate || '',
+      birthday: meta.birthday || '',
       sms_opt_in: Boolean(meta.sms_opt_in),
       mail_opt_in: Boolean(meta.mail_opt_in),
       accepts_marketing: Boolean(acceptsMarketingEl?.checked),
@@ -300,7 +300,7 @@ class AccountModal {
       phone: 'modal-RegisterPhone',
       first_name_kana: 'modal-RegisterFirstNameKana',
       last_name_kana: 'modal-RegisterLastNameKana',
-      birthday: 'modal-RegisterBirthdate',
+      birthday: 'modal-Registerbirthday',
     };
     const errors = { summary: data.message || data.error || '', fields: {} };
     if (data.errors && typeof data.errors === 'object') {
@@ -540,7 +540,7 @@ class AccountModal {
     const firstName = form.querySelector('#modal-RegisterFirstName');
     const lastNameKana = form.querySelector('#modal-RegisterLastNameKana');
     const firstNameKana = form.querySelector('#modal-RegisterFirstNameKana');
-    const birthdate = form.querySelector('#modal-RegisterBirthdate');
+    const birthday = form.querySelector('#modal-Registerbirthday');
     const phone = form.querySelector('#modal-RegisterPhone');
     const email = form.querySelector('#modal-RegisterEmail');
     const password = form.querySelector('#modal-RegisterPassword');
@@ -562,7 +562,7 @@ class AccountModal {
       if (!input) return;
       this.clearFieldError(input);
     });
-    if (birthdate) this.clearFieldError(birthdate);
+    if (birthday) this.clearFieldError(birthday);
 
     if (isBlank(lastName?.value)) pushError(lastName, requiredMsg);
     if (isBlank(firstName?.value)) pushError(firstName, requiredMsg);
@@ -579,9 +579,9 @@ class AccountModal {
       pushError(firstNameKana, this.i18n.kana || 'Please use Katakana characters.');
     }
 
-    const birthdateIso = this.normalizeBirthdate(birthdate?.value);
-    if (birthdate?.value && !birthdateIso) {
-      pushError(birthdate, this.i18n.date || 'Please enter a valid date (YYYY/MM/DD).');
+    const birthdayIso = this.normalizebirthday(birthday?.value);
+    if (birthday?.value && !birthdayIso) {
+      pushError(birthday, this.i18n.date || 'Please enter a valid date (YYYY/MM/DD).');
     }
 
     const phoneNormalized = this.normalizePhone(phone?.value);
@@ -620,7 +620,7 @@ class AccountModal {
       meta: {
         last_name_kana: String(lastNameKana?.value || '').trim(),
         first_name_kana: String(firstNameKana?.value || '').trim(),
-        birthdate: birthdateIso || '',
+        birthday: birthdayIso || '',
         phone: phoneNormalized || String(phone?.value || '').trim(),
         sms_opt_in: Boolean(smsOptIn?.checked),
         mail_opt_in: Boolean(mailOptIn?.checked),
@@ -629,14 +629,14 @@ class AccountModal {
   }
 
   // ---------------------------------------------------------------------------
-  // Birthdate picker — flatpickr with Japanese locale + fallback
+  // birthday picker — flatpickr with Japanese locale + fallback
   // Called once on first showPanel('register'); subsequent calls are no-ops.
   // ---------------------------------------------------------------------------
-  initBirthdatePicker() {
-    if (this._birthdatePicker) return; // already initialised
+  initbirthdayPicker() {
+    if (this._birthdayPicker) return; // already initialised
 
-    const input  = document.getElementById('modal-RegisterBirthdate');
-    const toggle = document.getElementById('modal-RegisterBirthdateToggle');
+    const input  = document.getElementById('modal-Registerbirthday');
+    const toggle = document.getElementById('modal-RegisterbirthdayToggle');
     if (!input) return;
 
     const doInit = () => {
@@ -671,7 +671,7 @@ class AccountModal {
         });
       }
 
-      this._birthdatePicker = fp;
+      this._birthdayPicker = fp;
     };
 
     if (typeof flatpickr !== 'undefined') {
@@ -693,10 +693,10 @@ class AccountModal {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
-  normalizeBirthdate(value) {
+  normalizebirthday(value) {
     // Prefer flatpickr's parsed Date object — avoids string-parse edge-cases
-    if (this._birthdatePicker?.selectedDates?.length) {
-      const d = this._birthdatePicker.selectedDates[0];
+    if (this._birthdayPicker?.selectedDates?.length) {
+      const d = this._birthdayPicker.selectedDates[0];
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
       return `${d.getFullYear()}-${mm}-${dd}`;
@@ -724,13 +724,30 @@ class AccountModal {
     if (!raw) return '';
     if (!/^[0-9+()\-\s]+$/.test(raw)) return '';
     const digits = raw.replace(/\D/g, '');
-    if (digits.length < 8) return '';
+    if (digits.length < 8 || digits.length > 15) return '';
+    
+    let e164 = '';
     // Already in E.164 format
-    if (raw.startsWith('+')) return `+${digits}`;
-    // Japanese local number: starts with 0, e.g. 0123232222 → +81123232222
-    if (digits.startsWith('0')) return `+81${digits.slice(1)}`;
-    // Assume already a national number without leading 0
-    return `+81${digits}`;
+    if (raw.startsWith('+')) {
+      e164 = `+${digits}`;
+    } else if (digits.startsWith('0')) {
+      // Japanese local number: starts with 0, e.g. 0123232222 → +81123232222
+      e164 = `+81${digits.slice(1)}`;
+    } else {
+      // Assume already a national number without leading 0
+      e164 = `+81${digits}`;
+    }
+
+    const digitsOnly = e164.replace('+', '');
+    if (digitsOnly.startsWith('81')) { // Japan
+      const localLen = digitsOnly.length - 2;
+      if (localLen !== 9 && localLen !== 10) return '';
+    } else if (digitsOnly.startsWith('84')) { // Vietnam
+      const localPart = digitsOnly.slice(2);
+      if (!/^[235789]\d{8,9}$/.test(localPart)) return '';
+    }
+
+    return e164;
   }
 
   applyCustomerNote(form, meta) {
@@ -741,7 +758,7 @@ class AccountModal {
       'DP_META_V1',
       `last_name_kana=${meta.last_name_kana || ''}`,
       `first_name_kana=${meta.first_name_kana || ''}`,
-      `birthdate=${meta.birthdate || ''}`,
+      `birthday=${meta.birthday || ''}`,
       `sms_opt_in=${meta.sms_opt_in ? 'true' : 'false'}`,
       `mail_opt_in=${meta.mail_opt_in ? 'true' : 'false'}`,
       `phone=${meta.phone || ''}`,
@@ -814,7 +831,7 @@ class AccountModal {
         const registerDisplay = document.getElementById('modal-RegisterEmailDisplay');
         if (registerDisplay) registerDisplay.textContent = email;
       }
-      this.initBirthdatePicker();
+      this.initbirthdayPicker();
     }
 
     // Scroll modal body to top on panel switch
@@ -868,8 +885,8 @@ class AccountModal {
       el.classList.remove('is-invalid');
     });
     // Reset flatpickr if exists
-    if (this._birthdatePicker) {
-      this._birthdatePicker.clear();
+    if (this._birthdayPicker) {
+      this._birthdayPicker.clear();
     }
   }
 

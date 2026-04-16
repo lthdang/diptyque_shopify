@@ -1,0 +1,286 @@
+{%- comment -%}
+  Addresses Details page.
+  Uses the shared my-account-layout snippet for sidebar + outer layout.
+{%- endcomment -%}
+
+{%- capture ad_content -%}
+<div
+  id="addresses-details-container"
+  data-api-base-url="{{ settings.be_api_base_url }}"
+  data-storefront-endpoint="https://{{ shop.permanent_domain }}/api/2026-04/graphql.json"
+  data-storefront-token="{{ settings.storefront_access_token }}"
+  data-t-address-edit="{{ 'custom_account.address_edit' | t }}"
+  data-t-address-delete="{{ 'custom_account.address_delete' | t }}"
+  data-t-address-new="{{ 'custom_account.address_new' | t }}"
+  data-t-address-shipping="{{ 'custom_account.address_shipping' | t }}"
+  data-t-address-billing="{{ 'custom_account.address_billing' | t }}"
+  data-t-address-cancel="{{ 'custom_account.address_cancel' | t }}"
+  data-t-address-submit="{{ 'custom_account.address_submit' | t }}"
+  data-t-address-default-badge="{{ 'custom_account.address_default_badge' | t }}"
+  data-t-default-billing-label="{{ 'custom_account.default_billing_label' | t }}"
+  data-t-default-shipping-label="{{ 'custom_account.default_shipping_label' | t }}"
+  data-t-zip="{{ 'custom_account.zip' | t }}"
+  data-t-province="{{ 'custom_account.province' | t }}"
+  data-t-province-placeholder="{{ 'custom_account.province_placeholder' | t }}"
+  data-t-city="{{ 'custom_account.city' | t }}"
+  data-t-address1="{{ 'custom_account.address1' | t }}"
+  data-t-address2="{{ 'custom_account.address2' | t }}"
+  data-t-last-name="{{ 'custom_account.last_name' | t }}"
+  data-t-first-name="{{ 'custom_account.first_name' | t }}"
+  data-t-furigana-last="{{ 'custom_account.furigana_last' | t }}"
+  data-t-furigana-first="{{ 'custom_account.furigana_first' | t }}"
+  data-t-phone="{{ 'custom_account.phone' | t }}"
+  data-t-required="{{ 'custom_account.required' | t }}"
+  data-t-loading="{{ 'custom_account.loading' | t }}"
+  data-t-confirm-delete="{{ 'custom_account.confirm_delete' | t }}"
+  data-t-delete-error="{{ 'custom_account.delete_error' | t }}"
+  data-t-phone-invalid="{{ 'custom_account.validation_phone_invalid' | t }}"
+  data-t-save-error="{{ 'custom_account.save_failed' | t }}"
+>
+  {%- comment -%} JS renders the address list into this element {%- endcomment -%}
+  <div id="addresses-list-root"></div>
+
+  {%- comment -%} Static benefits banner — no JS needed {%- endcomment -%}
+  <div class="my-account__benefits-banner mt-40">
+    <h3 class="my-account__benefits-title">{{ 'custom_account.benefits_title' | t }}</h3>
+    <p class="my-account__benefits-subtitle">{{ 'custom_account.benefits_subtitle' | t }}</p>
+    <div class="my-account__benefits-icons">
+      <div class="my-account__benefit-item">
+        <div class="my-account__benefit-icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 11h16"/><path d="M12 11V7"/><path d="M8 7a4 4 0 0 1 8 0v4H8V7z"/></svg>
+        </div>
+        <span class="my-account__benefit-text">{{ 'custom_account.benefit_1' | t }}</span>
+      </div>
+      <div class="my-account__benefit-item">
+        <div class="my-account__benefit-icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <span class="my-account__benefit-text">{{ 'custom_account.benefit_2' | t }}</span>
+      </div>
+      <div class="my-account__benefit-item">
+        <div class="my-account__benefit-icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-2-2H5L3 8v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"/><path d="M3 8h18"/><path d="M12 3v5"/><path d="M16 12a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="my-account__benefit-text">{{ 'custom_account.benefit_3' | t }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endcapture -%}
+
+{%- render 'my-account-layout', active_nav: 'addresses', content: ad_content -%}
+
+<script src="{{ 'addresses-details.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  /* ===== Addresses Details — section-specific styles only ===== */
+  /* Layout, sidebar, input, loading, benefits → my-account-layout.liquid snippet */
+
+  /* ─── Section titles ─── */
+  .addresses-details__section-title {
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    margin: 0 0 4px;
+    color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ─── Address card ─── */
+  .addresses-details__card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 0;
+    gap: 16px;
+  }
+
+  .addresses-details__card-info {
+    flex: 1;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__name {
+    font-size: 0.82rem;
+    font-weight: 400;
+    margin: 0 0 2px;
+  }
+
+  .addresses-details__card-info p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.8;
+  }
+
+  .addresses-details__default-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    background: #000;
+    color: #fff;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── Edit / Delete column ─── */
+  .addresses-details__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  /* ─── "New address" button ─── */
+  .addresses-details__action-area { margin-top: 0; }
+
+  .addresses-details__new-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--color-foreground, #000);
+    border: 1px solid var(--color-foreground, #000);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+    display: block;
+  }
+
+  .addresses-details__new-btn:hover {
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+  }
+
+  /* ─── Address form ─── */
+  .addresses-details__form {
+    padding: 24px 0 0;
+    margin-bottom: 24px;
+  }
+
+  .addresses-details__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .addresses-details__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .addresses-details__field label {
+    font-size: 0.75rem;
+    color: #666;
+    letter-spacing: 0.01em;
+  }
+
+  .addresses-details__field select.my-account__input {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .addresses-details__field--checkbox {
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .addresses-details__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__required-label {
+    font-size: 0.72rem;
+    color: #999;
+    margin: 4px 0 16px;
+  }
+
+  /* ─── Submit / cancel ─── */
+  .addresses-details__submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.05em;
+    font-family: inherit;
+    transition: background 0.2s;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .addresses-details__submit-btn:hover { background: #333; }
+
+  .addresses-details__submit-btn:disabled {
+    background: #b3b3b3;
+    cursor: not-allowed;
+  }
+
+  .addresses-details__cancel-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--color-foreground, #000);
+    border: 1px solid var(--color-foreground, #000);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+    display: block;
+  }
+
+  .addresses-details__cancel-btn:hover {
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+  }
+
+  /* ─── Responsive ─── */
+  @media screen and (max-width: 749px) {
+    .addresses-details__form-row { grid-template-columns: 1fr; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Addresses Details",
+  "tag": "section",
+  "class": "section",
+  "settings": []
+}
+{% endschema %}

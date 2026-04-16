@@ -345,8 +345,8 @@
       "first_name": "First name",
       "last_name_kana": "Last name (Kana)",
       "first_name_kana": "First name (Kana)",
-      "birthdate": "Date of birth",
-      "birthdate_help": "You can set your birthday information on the account page.",
+      "birthday": "Date of birth",
+      "birthday_help": "You can set your birthday information on the account page.",
       "phone": "Phone number",
       "email": "Email address",
       "password": "Password",
@@ -430,6 +430,18 @@
     "benefit_3": "Access to member-only special sales",
     "logout": "Log out",
     "loading": "Signing in...",
-    "auth_error": "Sign in failed. Please try again."
+    "auth_error": "Sign in failed. Please try again.",
+    "save_success": "Your information has been saved.",
+    "save_failed": "Failed to save. Please try again.",
+    "validation_required": "This field is required.",
+    "validation_kana_invalid": "Please use Katakana characters.",
+    "validation_email_invalid": "Please enter a valid email address.",
+    "validation_phone_invalid": "Please enter a valid phone number (8–20 digits).",
+    "validation_dob_invalid": "Please enter a valid date in YYYY/MM/DD format (must not be in the future).",
+    "validation_password_weak": "Password must be at least 8 characters and include letters, numbers, and symbols.",
+    "validation_password_mismatch": "Passwords do not match.",
+    "validation_password_required_all": "Please fill in all password fields.",
+    "update_not_supported": "Password update is not supported in this session. Please use the account page.",
+    "saving": "Saving..."
   }
 }

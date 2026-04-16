@@ -45,13 +45,15 @@ interface ScheduledRecord {
   productTitle: string;
   productImage: string | null;
   scheduledAt: string;
+  publishedAt: string | null;
   status: string;
   errorMessage: string | null;
 }
 
 interface LoaderData {
   products: ShopifyProduct[];
-  scheduledItems: ScheduledRecord[];
+  pendingItems: ScheduledRecord[];
+  historyItems: ScheduledRecord[];
   shop: string;
   error?: string;
 }
@@ -108,38 +110,63 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         }),
       ) ?? [];
 
-    const scheduledItems = await prisma.scheduledPublish.findMany({
-      where: {
-        shop: session.shop,
-        status: { in: ["SCHEDULED", "PUBLISHED", "FAILED"] },
-      },
-      orderBy: { scheduledAt: "asc" },
-      select: {
-        id: true,
-        productId: true,
-        productTitle: true,
-        productImage: true,
-        scheduledAt: true,
-        status: true,
-        errorMessage: true,
-      },
-    });
+    const selectFields = {
+      id: true,
+      productId: true,
+      productTitle: true,
+      productImage: true,
+      scheduledAt: true,
+      publishedAt: true,
+      status: true,
+      errorMessage: true,
+    } as const;
+
+    const [pendingItems, historyItems] = await Promise.all([
+      prisma.scheduledPublish.findMany({
+        where: {
+          shop: session.shop,
+          status: { in: ["SCHEDULED", "PROCESSING", "FAILED"] },
+        },
+        orderBy: { scheduledAt: "asc" },
+        select: selectFields,
+      }),
+      prisma.scheduledPublish.findMany({
+        where: {
+          shop: session.shop,
+          status: { in: ["PUBLISHED", "CANCELLED"] },
+        },
+        orderBy: { scheduledAt: "desc" },
+        take: 50,
+        select: selectFields,
+      }),
+    ]);
+
+    const serialize = <
+      T extends { scheduledAt: Date; publishedAt?: Date | null },
+    >(
+      items: T[],
+    ) =>
+      items.map((item) => ({
+        ...item,
+        scheduledAt: item.scheduledAt.toISOString(),
+        publishedAt:
+          (
+            item as unknown as { publishedAt: Date | null }
+          ).publishedAt?.toISOString() ?? null,
+      }));
 
     return {
       products,
-      scheduledItems: scheduledItems.map(
-        (item: (typeof scheduledItems)[number]) => ({
-          ...item,
-          scheduledAt: item.scheduledAt.toISOString(),
-        }),
-      ),
+      pendingItems: serialize(pendingItems),
+      historyItems: serialize(historyItems),
       shop: session.shop,
     };
   } catch (err) {
     console.error("[scheduled-publish loader]", err);
     return {
       products: [],
-      scheduledItems: [],
+      pendingItems: [],
+      historyItems: [],
       shop: "",
       error: "Failed to load data — please refresh the page.",
     };
@@ -148,16 +175,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 // ─── Countdown hook ────────────────────────────────────────────────────────────
 
-function useCountdown(targetIso: string | null): string {
+function useCountdown(targetIso: string | null, onExpire?: () => void): string {
   const [display, setDisplay] = useState("");
+  const expiredRef = useRef(false);
 
   useEffect(() => {
     if (!targetIso) return;
+    expiredRef.current = false;
 
     const update = () => {
       const diff = new Date(targetIso).getTime() - Date.now();
       if (diff <= 0) {
         setDisplay("Publishing soon...");
+        // Trigger a single loader revalidation ~5 s after expiry,
+        // giving the worker time to process the job and update the DB.
+        if (!expiredRef.current) {
+          expiredRef.current = true;
+          setTimeout(() => onExpire?.(), 5_000);
+        }
         return;
       }
       const d = Math.floor(diff / 86_400_000);
@@ -173,7 +208,7 @@ function useCountdown(targetIso: string | null): string {
     update();
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, [targetIso]);
+  }, [targetIso, onExpire]);
 
   return display;
 }
@@ -183,11 +218,16 @@ function useCountdown(targetIso: string | null): string {
 function CountdownCell({
   scheduledAt,
   status,
+  onExpire,
 }: {
   scheduledAt: string;
   status: string;
+  onExpire?: () => void;
 }) {
-  const countdown = useCountdown(status === "SCHEDULED" ? scheduledAt : null);
+  const countdown = useCountdown(
+    status === "SCHEDULED" ? scheduledAt : null,
+    onExpire,
+  );
   if (status !== "SCHEDULED")
     return (
       <Text as="span" tone="subdued">
@@ -244,6 +284,13 @@ const STATUS_TABS = [
 
 type TabId = (typeof STATUS_TABS)[number]["id"];
 
+const QUEUE_TABS = [
+  { id: "pending", content: "Pending" },
+  { id: "history", content: "History" },
+] as const;
+
+type QueueTabId = (typeof QUEUE_TABS)[number]["id"];
+
 const COLUMN_TITLE = 0;
 const COLUMN_STATUS = 1;
 const COLUMN_PRICE = 2;
@@ -254,7 +301,8 @@ const PLACEHOLDER_IMAGE =
 // ─── Main page component ───────────────────────────────────────────────────────
 
 export default function ScheduledPublishPage() {
-  const { products, scheduledItems, error } = useLoaderData<LoaderData>();
+  const { products, pendingItems, historyItems, error } =
+    useLoaderData<LoaderData>();
   const revalidator = useRevalidator();
   const shopify = useAppBridge();
 
@@ -292,7 +340,13 @@ export default function ScheduledPublishPage() {
   );
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
 
+  // Queue tab
+  const [selectedQueueTab, setSelectedQueueTab] =
+    useState<QueueTabId>("pending");
+
   const prevScheduledRef = useRef<Set<string>>(new Set());
+  const handledScheduleData = useRef<unknown>(null);
+  const handledCancelData = useRef<unknown>(null);
 
   const showToast = useCallback((message: string, isError = false) => {
     setToastMessage(message);
@@ -303,7 +357,7 @@ export default function ScheduledPublishPage() {
   // Detect newly PUBLISHED products
   useEffect(() => {
     const prev = prevScheduledRef.current;
-    scheduledItems.forEach((item) => {
+    historyItems.forEach((item) => {
       if (item.status === "PUBLISHED" && prev.has(item.productId)) {
         showToast(`Product "${item.productTitle}" has been published!`);
         shopify.toast.show(`"${item.productTitle}" is now live!`, {
@@ -312,22 +366,24 @@ export default function ScheduledPublishPage() {
       }
     });
     prevScheduledRef.current = new Set(
-      scheduledItems
+      pendingItems
         .filter((i) => i.status === "SCHEDULED")
         .map((i) => i.productId),
     );
-  }, [scheduledItems, showToast, shopify]);
+  }, [pendingItems, historyItems, showToast, shopify]);
 
   // Auto-refresh every 30 s when pending schedules exist
   useEffect(() => {
-    if (!scheduledItems.some((i) => i.status === "SCHEDULED")) return;
+    if (!pendingItems.some((i) => i.status === "SCHEDULED")) return;
     const interval = setInterval(() => revalidator.revalidate(), 30_000);
     return () => clearInterval(interval);
-  }, [scheduledItems, revalidator]);
+  }, [pendingItems, revalidator]);
 
   // Handle schedule POST response
   useEffect(() => {
     if (scheduleFetcher.state !== "idle" || !scheduleFetcher.data) return;
+    if (handledScheduleData.current === scheduleFetcher.data) return;
+    handledScheduleData.current = scheduleFetcher.data;
     if (scheduleFetcher.data.success) {
       showToast("Product scheduled successfully!");
       setModalOpen(false);
@@ -342,6 +398,8 @@ export default function ScheduledPublishPage() {
   // Handle cancel DELETE response
   useEffect(() => {
     if (cancelFetcher.state !== "idle" || !cancelFetcher.data) return;
+    if (handledCancelData.current === cancelFetcher.data) return;
+    handledCancelData.current = cancelFetcher.data;
     if (cancelFetcher.data.success) {
       showToast("Schedule cancelled.");
       setCancelModalOpen(false);
@@ -357,7 +415,11 @@ export default function ScheduledPublishPage() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(9, 0, 0, 0);
-    setScheduledDatetime(`${tomorrow.toISOString().slice(0, 10)}T09:00`);
+    // Use LOCAL date parts — toISOString() would return the UTC date, which can be
+    // one day behind for GMT+7 users between 00:00–06:59 local time.
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const localDate = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
+    setScheduledDatetime(`${localDate}T09:00`);
     setModalOpen(true);
   };
 
@@ -395,11 +457,11 @@ export default function ScheduledPublishPage() {
   const scheduledProductIds = useMemo(
     () =>
       new Set(
-        scheduledItems
+        pendingItems
           .filter((i) => i.status === "SCHEDULED")
           .map((i) => i.productId),
       ),
-    [scheduledItems],
+    [pendingItems],
   );
 
   // Filter
@@ -443,7 +505,14 @@ export default function ScheduledPublishPage() {
 
   const minDatetime = useMemo(() => {
     const d = new Date(Date.now() + 2 * 60_000);
-    return d.toISOString().slice(0, 16);
+    // Format as local time — datetime-local inputs interpret min/max as local time,
+    // NOT UTC. Using toISOString() (UTC) here would set the min 7 hours too early
+    // for GMT+7 users, allowing them to select already-past UTC datetimes.
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return (
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+      `T${pad(d.getHours())}:${pad(d.getMinutes())}`
+    );
   }, []);
 
   const isSubmitting = scheduleFetcher.state !== "idle";
@@ -633,13 +702,17 @@ export default function ScheduledPublishPage() {
           </Card>
         </Layout.Section>
 
-        {/* Scheduled Queue */}
+        {/* Publishing Queue */}
         <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
+          <Card padding="0">
+            <Box
+              paddingInlineStart="400"
+              paddingInlineEnd="400"
+              paddingBlockStart="400"
+            >
               <InlineStack align="space-between" blockAlign="center">
                 <Text as="h2" variant="headingMd">
-                  Scheduled Queue
+                  Publishing Queue
                 </Text>
                 {revalidator.state === "loading" && (
                   <Box width="20px" minWidth="20px" as="span">
@@ -647,98 +720,209 @@ export default function ScheduledPublishPage() {
                   </Box>
                 )}
               </InlineStack>
+            </Box>
 
-              {scheduledItems.length === 0 ? (
-                <EmptyState
-                  heading="No scheduled publishes"
-                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-                >
-                  <p>
-                    Choose a DRAFT product above and schedule it to publish
-                    automatically.
-                  </p>
-                </EmptyState>
-              ) : (
-                <IndexTable
-                  resourceName={{
-                    singular: "scheduled item",
-                    plural: "scheduled items",
-                  }}
-                  itemCount={scheduledItems.length}
-                  headings={[
-                    { title: "Product" },
-                    { title: "Scheduled time (GMT+7)" },
-                    { title: "Status" },
-                    { title: "Countdown" },
-                    { title: "Action" },
-                  ]}
-                  selectable={false}
-                >
-                  {scheduledItems.map((item, index) => (
-                    <IndexTable.Row id={item.id} key={item.id} position={index}>
-                      <IndexTable.Cell>
-                        <InlineStack gap="200" blockAlign="center">
-                          <Box width="40px" minWidth="40px">
-                            <Thumbnail
-                              source={item.productImage ?? PLACEHOLDER_IMAGE}
-                              alt={item.productTitle}
-                              size="small"
+            <Tabs
+              tabs={QUEUE_TABS.map((t) => ({ ...t }))}
+              selected={QUEUE_TABS.findIndex((t) => t.id === selectedQueueTab)}
+              onSelect={(i) => setSelectedQueueTab(QUEUE_TABS[i].id)}
+            />
+
+            {/* Pending tab */}
+            {selectedQueueTab === "pending" && (
+              <Box padding="0">
+                {pendingItems.length === 0 ? (
+                  <Box padding="400">
+                    <EmptyState
+                      heading="No pending schedules"
+                      image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+                    >
+                      <p>
+                        Choose a DRAFT product above and schedule it to publish
+                        automatically.
+                      </p>
+                    </EmptyState>
+                  </Box>
+                ) : (
+                  <>
+                    <IndexTable
+                      resourceName={{
+                        singular: "scheduled item",
+                        plural: "scheduled items",
+                      }}
+                      itemCount={pendingItems.length}
+                      headings={[
+                        { title: "Product" },
+                        { title: "Scheduled time (GMT+7)" },
+                        { title: "Status" },
+                        { title: "Countdown" },
+                        { title: "Action" },
+                      ]}
+                      selectable={false}
+                    >
+                      {pendingItems.map((item, index) => (
+                        <IndexTable.Row
+                          id={item.id}
+                          key={item.id}
+                          position={index}
+                        >
+                          <IndexTable.Cell>
+                            <InlineStack gap="200" blockAlign="center">
+                              <Box width="40px" minWidth="40px">
+                                <Thumbnail
+                                  source={
+                                    item.productImage ?? PLACEHOLDER_IMAGE
+                                  }
+                                  alt={item.productTitle}
+                                  size="small"
+                                />
+                              </Box>
+                              <Text as="span" fontWeight="medium">
+                                {item.productTitle}
+                              </Text>
+                            </InlineStack>
+                          </IndexTable.Cell>
+
+                          <IndexTable.Cell>
+                            {formatInTimeZone(
+                              new Date(item.scheduledAt),
+                              "Asia/Ho_Chi_Minh",
+                              "dd/MM/yyyy HH:mm",
+                            )}
+                          </IndexTable.Cell>
+
+                          <IndexTable.Cell>
+                            <QueueStatusBadge status={item.status} />
+                          </IndexTable.Cell>
+
+                          <IndexTable.Cell>
+                            <CountdownCell
+                              scheduledAt={item.scheduledAt}
+                              status={item.status}
+                              onExpire={revalidator.revalidate}
                             />
-                          </Box>
-                          <Text as="span" fontWeight="medium">
-                            {item.productTitle}
-                          </Text>
-                        </InlineStack>
-                      </IndexTable.Cell>
+                          </IndexTable.Cell>
 
-                      <IndexTable.Cell>
-                        {formatInTimeZone(
-                          new Date(item.scheduledAt),
-                          "Asia/Ho_Chi_Minh",
-                          "dd/MM/yyyy HH:mm",
-                        )}
-                      </IndexTable.Cell>
+                          <IndexTable.Cell>
+                            {item.status === "SCHEDULED" ? (
+                              <Button
+                                tone="critical"
+                                size="slim"
+                                onClick={() => {
+                                  setCancelTarget(item);
+                                  setCancelModalOpen(true);
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            ) : item.status === "FAILED" ? (
+                              <Text as="span" tone="critical" variant="bodySm">
+                                {item.errorMessage ?? "Unknown error"}
+                              </Text>
+                            ) : (
+                              <Text as="span" tone="subdued">
+                                —
+                              </Text>
+                            )}
+                          </IndexTable.Cell>
+                        </IndexTable.Row>
+                      ))}
+                    </IndexTable>
 
-                      <IndexTable.Cell>
-                        <QueueStatusBadge status={item.status} />
-                      </IndexTable.Cell>
+                    {pendingItems.some((i) => i.status === "FAILED") && (
+                      <Box padding="400">
+                        <Banner tone="warning">
+                          Some scheduled publishes failed. Check item details
+                          above.
+                        </Banner>
+                      </Box>
+                    )}
+                  </>
+                )}
+              </Box>
+            )}
 
-                      <IndexTable.Cell>
-                        <CountdownCell
-                          scheduledAt={item.scheduledAt}
-                          status={item.status}
-                        />
-                      </IndexTable.Cell>
+            {/* History tab */}
+            {selectedQueueTab === "history" && (
+              <Box padding="0">
+                {historyItems.length === 0 ? (
+                  <Box padding="400">
+                    <EmptyState
+                      heading="No publish history yet"
+                      image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+                    >
+                      <p>Completed and cancelled schedules will appear here.</p>
+                    </EmptyState>
+                  </Box>
+                ) : (
+                  <IndexTable
+                    resourceName={{
+                      singular: "history item",
+                      plural: "history items",
+                    }}
+                    itemCount={historyItems.length}
+                    headings={[
+                      { title: "Product" },
+                      { title: "Scheduled time (GMT+7)" },
+                      { title: "Status" },
+                      { title: "Published at (GMT+7)" },
+                    ]}
+                    selectable={false}
+                  >
+                    {historyItems.map((item, index) => (
+                      <IndexTable.Row
+                        id={item.id}
+                        key={item.id}
+                        position={index}
+                      >
+                        <IndexTable.Cell>
+                          <InlineStack gap="200" blockAlign="center">
+                            <Box width="40px" minWidth="40px">
+                              <Thumbnail
+                                source={item.productImage ?? PLACEHOLDER_IMAGE}
+                                alt={item.productTitle}
+                                size="small"
+                              />
+                            </Box>
+                            <Text as="span" fontWeight="medium">
+                              {item.productTitle}
+                            </Text>
+                          </InlineStack>
+                        </IndexTable.Cell>
 
-                      <IndexTable.Cell>
-                        {item.status === "SCHEDULED" ? (
-                          <Button
-                            tone="critical"
-                            size="slim"
-                            onClick={() => {
-                              setCancelTarget(item);
-                              setCancelModalOpen(true);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        ) : (
-                          <Text as="span" tone="subdued">
-                            —
-                          </Text>
-                        )}
-                      </IndexTable.Cell>
-                    </IndexTable.Row>
-                  ))}
-                </IndexTable>
-              )}
+                        <IndexTable.Cell>
+                          {formatInTimeZone(
+                            new Date(item.scheduledAt),
+                            "Asia/Ho_Chi_Minh",
+                            "dd/MM/yyyy HH:mm",
+                          )}
+                        </IndexTable.Cell>
 
-              {scheduledItems.some((i) => i.status === "FAILED") && (
-                <Banner tone="warning">
-                  Some scheduled publishes failed. Check item details above.
-                </Banner>
-              )}
-            </BlockStack>
+                        <IndexTable.Cell>
+                          <QueueStatusBadge status={item.status} />
+                        </IndexTable.Cell>
+
+                        <IndexTable.Cell>
+                          {item.publishedAt ? (
+                            <Text as="span" tone="success">
+                              {formatInTimeZone(
+                                new Date(item.publishedAt),
+                                "Asia/Ho_Chi_Minh",
+                                "dd/MM/yyyy HH:mm",
+                              )}
+                            </Text>
+                          ) : (
+                            <Text as="span" tone="subdued">
+                              —
+                            </Text>
+                          )}
+                        </IndexTable.Cell>
+                      </IndexTable.Row>
+                    ))}
+                  </IndexTable>
+                )}
+              </Box>
+            )}
           </Card>
         </Layout.Section>
 
@@ -810,12 +994,28 @@ export default function ScheduledPublishPage() {
 
             {scheduledDatetime && (
               <Banner tone="info">
-                <p>
-                  Will publish at:{" "}
-                  <strong>
-                    {new Date(scheduledDatetime).toLocaleString()}
-                  </strong>
-                </p>
+                <BlockStack gap="100">
+                  <Text as="p" variant="bodyMd">
+                    <strong>
+                      {formatInTimeZone(
+                        new Date(scheduledDatetime),
+                        "Asia/Ho_Chi_Minh",
+                        "dd/MM/yyyy HH:mm",
+                      )}
+                    </strong>{" "}
+                    <Text as="span" tone="subdued">
+                      (GMT+7)
+                    </Text>
+                  </Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    ={" "}
+                    {new Date(scheduledDatetime)
+                      .toISOString()
+                      .replace("T", " ")
+                      .slice(0, 16)}{" "}
+                    UTC
+                  </Text>
+                </BlockStack>
               </Banner>
             )}
           </BlockStack>

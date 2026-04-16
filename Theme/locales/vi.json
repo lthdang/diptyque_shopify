@@ -380,6 +380,18 @@
     "benefit_3": "Quyền ưu tiên mua sản phẩm giới hạn",
     "logout": "Đăng xuất",
     "loading": "Đang đăng nhập...",
-    "auth_error": "Đăng nhập thất bại. Vui lòng thử lại."
+    "auth_error": "Đăng nhập thất bại. Vui lòng thử lại.",
+    "save_success": "Thông tin đã được lưu thành công.",
+    "save_failed": "Lưu thất bại. Vui lòng thử lại.",
+    "validation_required": "Trường này là bắt buộc.",
+    "validation_kana_invalid": "Vui lòng sử dụng ký tự Katakana.",
+    "validation_email_invalid": "Vui lòng nhập địa chỉ email hợp lệ.",
+    "validation_phone_invalid": "Vui lòng nhập số điện thoại hợp lệ (8–20 chữ số).",
+    "validation_dob_invalid": "Vui lòng nhập ngày hợp lệ theo định dạng YYYY/MM/DD (không được ở tương lai).",
+    "validation_password_weak": "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt.",
+    "validation_password_mismatch": "Mật khẩu không khớp.",
+    "validation_password_required_all": "Vui lòng điền đầy đủ các trường mật khẩu.",
+    "update_not_supported": "Không hỗ trợ cập nhật mật khẩu trong phiên này. Vui lòng sử dụng trang tài khoản.",
+    "saving": "Đang lưu..."
   }
 }
