@@ -23,11 +23,14 @@ npx prisma migrate deploy
 
 echo "==> [entrypoint] Migrations complete. Starting application..."
 
-# If START_WORKER=true, run the BullMQ worker instead of the Remix server.
-# The Render worker service sets this env var; the web service does not.
-if [ "$START_WORKER" = "true" ]; then
-  echo "==> [entrypoint] START_WORKER=true — starting scheduler worker process..."
-  exec npm run worker
-fi
+# Start the scheduler worker as a background process.
+# It polls the DB for due scheduled-publish jobs — no port binding needed.
+echo "==> [entrypoint] Starting scheduler worker in background..."
+npm run worker &
+WORKER_PID=$!
+echo "==> [entrypoint] Worker started (PID: $WORKER_PID)"
 
+# Start the Remix server as the foreground process (binds to $PORT).
+# Using exec so signals (SIGTERM) are forwarded to the server process.
+echo "==> [entrypoint] Starting Remix server..."
 exec npm run start

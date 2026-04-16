@@ -20,10 +20,6 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { createServer } from "node:http";
-
-// Render Web Services require an open port for health checks.
-// This minimal server satisfies the port scanner without affecting worker logic.
 
 const prisma = new PrismaClient();
 
