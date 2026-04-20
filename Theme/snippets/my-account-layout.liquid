@@ -13,36 +13,37 @@
     <aside class="my-account__sidebar">
       <nav class="my-account__nav">
 
-        <a href="/pages/my-account"
+        <a href="/pages/account"
            class="my-account__nav-item{% if active_nav == 'profile' %} my-account__nav-item--active{% endif %}"
-           data-tab="profile">
+           data-view="profile">
           <span>{{ 'custom_account.nav_profile' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
-        <a href="/pages/my-account#orders"
+        <a href="/pages/account?tab=orders"
            class="my-account__nav-item{% if active_nav == 'orders' %} my-account__nav-item--active{% endif %}"
-           data-tab="orders">
+           data-view="orders">
           <span>{{ 'custom_account.nav_orders' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
-        <a href="/pages/addresses-details"
-           class="my-account__nav-item{% if active_nav == 'addresses' %} my-account__nav-item--active{% endif %}">
+        <a href="/pages/account?tab=addresses"
+           class="my-account__nav-item{% if active_nav == 'addresses' %} my-account__nav-item--active{% endif %}"
+           data-view="addresses">
           <span>{{ 'custom_account.nav_addresses' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
-        <a href="/pages/my-account#cards"
+        <a href="/pages/account"
            class="my-account__nav-item{% if active_nav == 'cards' %} my-account__nav-item--active{% endif %}"
-           data-tab="cards">
+           data-view="profile">
           <span>{{ 'custom_account.nav_cards' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
-        <a href="/pages/my-account#shipping"
+        <a href="/pages/account"
            class="my-account__nav-item{% if active_nav == 'shipping' %} my-account__nav-item--active{% endif %}"
-           data-tab="shipping">
+           data-view="profile">
           <span>{{ 'custom_account.nav_shipping' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
