@@ -3,8 +3,8 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Vite build script for account JS bundles.
  *
- * Produces self-contained IIFE bundles in assets/ (no hash, no chunks):
- *   assets/account-addresses.bundle.js    ← Addresses page
+ * Produces a self-contained IIFE bundle in assets/ (no hash, no chunks):
+ *   assets/account-app.bundle.js    ← Main SPA (/pages/account)
  *
  * Usage:
  *   npm run build          # one-off build
@@ -47,19 +47,7 @@ function sharedConfig(entry, outputName, iifeName) {
 }
 
 async function main() {
-  console.log('[build] Building account bundles…');
-
-  await build(sharedConfig(
-    'src/account/addresses.js',
-    'account-addresses.bundle.js',
-    'DiptyqueAddresses',
-  ));
-
-  await build(sharedConfig(
-    'src/account/order-history.js',
-    'account-order-history.bundle.js',
-    'DiptyqueOrderHistory',
-  ));
+  console.log('[build] Building account bundle…');
 
   await build(sharedConfig(
     'src/account/account-app.js',
@@ -67,8 +55,6 @@ async function main() {
     'DiptyqueAccountApp',
   ));
 
-  console.log('[build] ✓ Done → assets/account-addresses.bundle.js');
-  console.log('[build] ✓ Done → assets/account-order-history.bundle.js');
   console.log('[build] ✓ Done → assets/account-app.bundle.js');
 }
 
