@@ -58,12 +58,6 @@ export const diptyqueAddressStore = createDiptyqueStore({
   error:     null,
 });
 
-/** { status: 'idle'|'loading'|'ready'|'error', orders: Order[], error: string|null } */
-export const diptyqueOrderStore = createDiptyqueStore({
-  status: 'idle',
-  orders: [],
-  error:  null,
-});
 
 /** Order history page store with pagination support */
 export const diptyqueOrderHistoryStore = createDiptyqueStore({
