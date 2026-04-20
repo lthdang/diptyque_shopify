@@ -1,13 +1,12 @@
 import type { ActionFunctionArgs } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
-import { getPublishQueue } from "../jobs/queue.server";
 
 /**
  * POST /api/schedule-publish
  *
- * Accepts a product scheduling request, persists it to the database,
- * and enqueues a delayed BullMQ job that will publish the product at the exact time.
+ * Accepts a product scheduling request and persists it to the database.
+ * The polling worker (publishProductWorker.ts) will pick it up at the scheduled time.
  *
  * Request body (JSON):
  * {
@@ -101,6 +100,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // --- Persist the schedule record to the database ---
+  // The polling worker will pick up this record at scheduledAt.
+  // accessToken is saved so the worker can call the Shopify API without Redis/session.
+  const offlineSession = await prisma.session.findFirst({
+    where: {
+      shop: session.shop,
+      isOnline: false,
+    },
+    select: { accessToken: true },
+  });
+
+  if (!offlineSession?.accessToken) {
+    return Response.json(
+      { error: "No offline access token found. Please reinstall the app." },
+      { status: 500 },
+    );
+  }
+
   const record = await prisma.scheduledPublish.create({
     data: {
       shop: session.shop,
@@ -110,38 +126,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       productHandle: productHandle ?? null,
       scheduledAt: scheduledDate,
       status: "SCHEDULED",
+      accessToken: offlineSession.accessToken,
     },
-  });
-
-  // --- Enqueue a delayed BullMQ job; BullMQ will fire it at exactly scheduledAt ---
-  const delayMs = scheduledDate.getTime() - Date.now();
-  const queue = getPublishQueue();
-
-  const job = await queue.add(
-    // Human-readable job name for Bull Board monitoring
-    `publish:${session.shop}:${productId}`,
-    {
-      scheduleId: record.id,
-      productId,
-      shop: session.shop,
-    },
-    {
-      delay: Math.max(delayMs, 0),
-      jobId: `schedule-${record.id}`, // Stable ID so we can remove it by ID on cancellation
-    },
-  );
-
-  // Store the BullMQ job ID so the cancel endpoint can remove it later
-  await prisma.scheduledPublish.update({
-    where: { id: record.id },
-    data: { bullJobId: job.id },
   });
 
   return Response.json(
     {
       success: true,
       scheduleId: record.id,
-      bullJobId: job.id,
       message: `Đã lên lịch đăng sản phẩm "${productTitle}" vào lúc ${scheduledDate.toISOString()}`,
     },
     { status: 201 },

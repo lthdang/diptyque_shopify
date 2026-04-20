@@ -1,13 +1,12 @@
 import type { ActionFunctionArgs } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
-import { getPublishQueue } from "../jobs/queue.server";
 
 /**
  * DELETE /api/schedule-publish/:id
  *
- * Cancels a pending schedule: removes the BullMQ job from the queue
- * so the worker will not publish the product, then marks the DB record CANCELLED.
+ * Cancels a pending schedule by marking the DB record as CANCELLED.
+ * The polling worker will skip CANCELLED records.
  *
  * Params:
  *   id — ScheduledPublish record ID in the database
@@ -51,27 +50,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     );
   }
 
-  // --- Remove the BullMQ job so the worker never executes it ---
-  if (record.bullJobId) {
-    try {
-      const queue = getPublishQueue();
-      const job = await queue.getJob(record.bullJobId);
-
-      if (job) {
-        // Removes the job whether it is waiting, delayed, or paused
-        await job.remove();
-        console.log(`[API] Removed job ${record.bullJobId} from queue`);
-      }
-    } catch (err) {
-      // Log but continue — the job may have already expired or been removed
-      console.warn(
-        `[API] Could not remove job ${record.bullJobId} from queue:`,
-        err,
-      );
-    }
-  }
-
   // --- Mark the DB record as CANCELLED ---
+  // The polling worker will skip records with status !== 'SCHEDULED'
   await prisma.scheduledPublish.update({
     where: { id: record.id },
     data: {
