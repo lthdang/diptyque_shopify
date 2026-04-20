@@ -222,24 +222,32 @@ class AccountModal {
 
       // Success
       if (response.ok && data.success !== false) {
-        // Automatically log the user in after registration via Storefront API
         try {
           const result = await this.createCustomerAccessToken(payload.email, payload.password);
           if (result.customerAccessToken) {
             const { accessToken, expiresAt } = result.customerAccessToken;
             const customer = await this.fetchCustomerProfile(accessToken);
             this.setCustomerSession(accessToken, expiresAt, customer);
-            this.close();
-            window.dispatchEvent(new CustomEvent('customer:login', { detail: customer }));
-            window.location.href = '/pages/my-account';
-            return;
           }
-        } catch (loginErr) {
-          console.warn('[AccountModal] Auto-login after registration failed:', loginErr);
+        } catch (tokenErr) {
+          console.warn('[AccountModal] Could not obtain Storefront API token after registration:', tokenErr);
         }
 
-        // Fallback: show login panel
-        this.showPanel('login');
+        // Submit the native Shopify login form to create a server-side session
+        // cookie, which is required for checkout to recognise the logged-in user.
+        const loginForm = document.getElementById('CustomerLoginForm');
+        if (loginForm) {
+          const emailEl = loginForm.querySelector('[name="customer[email]"]');
+          const passEl = loginForm.querySelector('[name="customer[password]"]');
+          if (emailEl) emailEl.value = payload.email;
+          if (passEl) passEl.value = payload.password;
+          // form.submit() bypasses JS listeners so there is no loop.
+          loginForm.submit();
+          return;
+        }
+
+        // Fallback: show login panel in modal
+        this.showPanel('login', payload.email);
         this.setSubmitting(form, false);
         return;
       }
