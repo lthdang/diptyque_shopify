@@ -10,6 +10,7 @@
   data-storefront-token="{{ settings.storefront_access_token }}"
   data-shop-id="{{ shop.id }}"
   data-shop-domain="{{ shop.permanent_domain }}"
+  data-api-base-url="{{ settings.be_api_base_url | strip }}"
   hidden
 >
   <div class="account-modal__inner">
@@ -301,7 +302,7 @@
             </p>
             <div class="account-modal__newsletter-options">
               <label class="account-modal__checkbox-label">
-                <input type="checkbox" name="customer[accepts_marketing]" class="account-modal__checkbox" value="true">
+                <input type="checkbox" name="account-modal__checkbox" id="modal-RegisterEmailOptIn" data-meta-key="email_opt_in">
                 <span>{{ 'customer.register.newsletter_email' | t }}</span>
               </label>
               <label class="account-modal__checkbox-label">
@@ -310,7 +311,7 @@
               </label>
               <label class="account-modal__checkbox-label">
                 <input type="checkbox" class="account-modal__checkbox" id="modal-RegisterMailOptIn" data-meta-key="mail_opt_in">
-                <span>{{ 'customer.register.newsletter_mail' | t }}</span>
+                <span>{{ 'customer.register.newsletter_postal' | t }}</span>
               </label>
             </div>
           </div>

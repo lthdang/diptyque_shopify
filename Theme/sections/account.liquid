@@ -1,0 +1,875 @@
+{%- comment -%}
+  account.liquid — Unified single-page account section.
+
+  ALL sub-views (profile / orders / addresses / order-detail) are rendered
+  by client-side JS on /pages/account via query-param routing.
+  Liquid's only job: deliver structured config + i18n to the bundle.
+{%- endcomment -%}
+
+{%- capture account_content -%}
+{%- comment -%} Mount point — JS renders the active view inside this div {%- endcomment -%}
+<div id="account-root"></div>
+{%- endcapture -%}
+
+{%- comment -%}
+  Determine which nav item to highlight on initial Liquid render.
+  The JS router overrides this immediately on DOMContentLoaded.
+{%- endcomment -%}
+{%- assign active_view = request.page_description -%}
+{%- assign url_view = request.path | append: request.query_string -%}
+{%- assign initial_nav = 'profile' -%}
+{%- if request.query_string contains 'tab=orders' -%}
+  {%- assign initial_nav = 'orders' -%}
+{%- elsif request.query_string contains 'tab=addresses' -%}
+  {%- assign initial_nav = 'addresses' -%}
+{%- elsif request.query_string contains 'tab=newsletter' -%}
+  {%- assign initial_nav = 'newsletter' -%}
+{%- endif -%}
+
+{%- render 'my-account-layout', active_nav: initial_nav, content: account_content -%}
+
+{% comment %} ── Shopify native session snapshot (logged-in only) ─────────── {% endcomment %}
+{% if customer %}
+<script id="my-account-native-customer" type="application/json">
+  {
+    "id": {{ customer.id | json }},
+    "firstName": {{ customer.first_name | json }},
+    "lastName": {{ customer.last_name | json }},
+    "email": {{ customer.email | json }},
+    "phone": {{ customer.phone | json }},
+    "metafields": [
+      {
+        "namespace": "registration",
+        "key": "first_name_kana",
+        "value": {{ customer.metafields.registration.first_name_kana.value | json }},
+        "type": {{ customer.metafields.registration.first_name_kana.type | json }}
+      },
+      {
+        "namespace": "registration",
+        "key": "last_name_kana",
+        "value": {{ customer.metafields.registration.last_name_kana.value | json }},
+        "type": {{ customer.metafields.registration.last_name_kana.type | json }}
+      },
+      {
+        "namespace": "registration",
+        "key": "birthday",
+        "value": {{ customer.metafields.registration.birthday.value | json }},
+        "type": {{ customer.metafields.registration.birthday.type | json }}
+      }
+    ],
+    "defaultAddress": {% if customer.default_address %}{
+      "id": {{ customer.default_address.id | json }},
+      "firstName": {{ customer.default_address.first_name | json }},
+      "lastName": {{ customer.default_address.last_name | json }},
+      "address1": {{ customer.default_address.address1 | json }},
+      "address2": {{ customer.default_address.address2 | json }},
+      "city": {{ customer.default_address.city | json }},
+      "province": {{ customer.default_address.province | json }},
+      "zip": {{ customer.default_address.zip | json }},
+      "country": {{ customer.default_address.country | json }},
+      "phone": {{ customer.default_address.phone | json }}
+    }{% else %}null{% endif %},
+    "addresses": { "edges": [
+      {% for address in customer.addresses %}
+      { "node": {
+        "id": {{ address.id | json }},
+        "firstName": {{ address.first_name | json }},
+        "lastName": {{ address.last_name | json }},
+        "address1": {{ address.address1 | json }},
+        "address2": {{ address.address2 | json }},
+        "city": {{ address.city | json }},
+        "province": {{ address.province | json }},
+        "zip": {{ address.zip | json }},
+        "country": {{ address.country | json }},
+        "phone": {{ address.phone | json }}
+      }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]},
+    "orders": { "edges": [
+      {% for order in customer.orders limit: 20 %}
+      { "node": {
+        "id": {{ order.id | json }},
+        "name": {{ order.name | json }},
+        "processedAt": {{ order.processed_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+        "financialStatus": {{ order.financial_status | upcase | json }},
+        "fulfillmentStatus": {{ order.fulfillment_status | upcase | json }},
+        "totalPrice": {
+          "amount": {{ order.total_price | money_without_currency | remove: ',' | json }},
+          "currencyCode": {{ order.currency | json }}
+        },
+        "lineItems": { "edges": [
+          {% for item in order.line_items %}
+          { "node": {
+            "title": {{ item.title | json }},
+            "quantity": {{ item.quantity }},
+            "variant": {
+              "title": {{ item.variant.title | json }},
+              "image": {% if item.image %}{ "url": {{ item.image | img_url: '240x' | prepend: 'https:' | json }} }{% else %}null{% endif %},
+              "price": {
+                "amount": {{ item.price | money_without_currency | remove: ',' | json }},
+                "currencyCode": {{ order.currency | json }}
+              }
+            }
+          }}{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ]}
+      }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]}
+  }
+</script>
+{% endif %}
+
+{% comment %} ── ① Config: endpoints ─────────────────────────────────────── {% endcomment %}
+<script id="account-config" type="application/json">
+  {
+    "storefrontEndpoint": "https://{{ shop.permanent_domain }}/api/2026-04/graphql.json",
+    "storefrontToken":    {{ settings.storefront_access_token | json }},
+    "apiBase":            {{ settings.be_api_base_url | json }},
+    "logoutUrl":          {{ routes.account_logout_url | json }}
+  }
+</script>
+
+{% comment %} ── ② i18n: all views in one payload ──────────────────────────── {% endcomment %}
+<script id="account-i18n" type="application/json">
+  {
+    "nav_profile":       {{ 'custom_account.nav_profile'     | t | json }},
+    "nav_orders":        {{ 'custom_account.nav_orders'      | t | json }},
+    "nav_addresses":     {{ 'custom_account.nav_addresses'   | t | json }},
+    "nav_cards":         {{ 'custom_account.nav_cards'       | t | json }},
+    "nav_shipping":      {{ 'custom_account.shipping'        | t | json }},
+
+    "profile_title":     {{ 'custom_account.profile_title'   | t | json }},
+    "last_name":         {{ 'custom_account.last_name'       | t | json }},
+    "first_name":        {{ 'custom_account.first_name'      | t | json }},
+    "furigana_last":     {{ 'custom_account.furigana_last'   | t | json }},
+    "furigana_first":    {{ 'custom_account.furigana_first'  | t | json }},
+    "dob":               {{ 'custom_account.dob'             | t | json }},
+    "phone":             {{ 'custom_account.phone'           | t | json }},
+    "email":             {{ 'custom_account.email'           | t | json }},
+    "required":          {{ 'custom_account.required'        | t | json }},
+    "submit":            {{ 'custom_account.submit'          | t | json }},
+    "login_info_title":  {{ 'custom_account.login_info_title'| t | json }},
+    "password":          {{ 'custom_account.password'        | t | json }},
+    "current_password":  {{ 'custom_account.current_password'| t | json }},
+    "new_password":      {{ 'custom_account.new_password'    | t | json }},
+    "password_hint":     {{ 'custom_account.password_hint'   | t | json }},
+    "password_confirm":  {{ 'custom_account.password_confirm'| t | json }},
+    "benefits_title":    {{ 'custom_account.benefits_title'  | t | json }},
+    "benefits_subtitle": {{ 'custom_account.benefits_subtitle'| t | json }},
+    "benefit_1":         {{ 'custom_account.benefit_1'        | t | json }},
+    "benefit_2":         {{ 'custom_account.benefit_2'        | t | json }},
+    "benefit_3":         {{ 'custom_account.benefit_3'        | t | json }},
+    "nav_newsletter":    {{ 'custom_account.nav_newsletter'   | t | json }},
+    "newsletter_title":  {{ 'customer.register.newsletter_title' | t | json }},
+    "newsletter_email":  {{ 'customer.register.newsletter_email' | t | json }},
+    "newsletter_sms":    {{ 'customer.register.newsletter_sms'   | t | json }},
+    "newsletter_postal": {{ 'customer.register.newsletter_postal' | t | json }},
+    "newsletter_submit": {{ 'custom_account.newsletter_submit'| t | json }},
+    "newsletter_note":   {{ 'custom_account.newsletter_note_html'  | t | json }},
+    "newsletter_success":{{ 'custom_account.newsletter_success'| t | json }},
+    "logout":            {{ 'custom_account.logout'          | t | json }},
+    "header_my_account": {{ 'custom_account.nav_profile'     | t | json }},
+    "save_success":      {{ 'custom_account.save_success'    | t | json }},
+    "password_changed_relogin": {{ 'custom_account.password_changed_relogin' | t | json }},
+    "save_failed":       {{ 'custom_account.save_failed'     | t | json }},
+    "saving":            {{ 'custom_account.saving'          | t | json }},
+    "loading":           {{ 'custom_account.loading'         | t | json }},
+    "login_required":    {{ 'custom_account.login_required'  | t | json }},
+    "login_prompt":      {{ 'custom_account.login_prompt'    | t | json }},
+    "login_btn":         {{ 'custom_account.login_btn'       | t | json }},
+    "no_orders":         {{ 'custom_account.no_orders'       | t | json }},
+    "start_shopping":    {{ 'custom_account.start_shopping'  | t | json }},
+    "qty":               {{ 'custom_account.qty'             | t | json }},
+    "total":             {{ 'custom_account.total'           | t | json }},
+    "order_number":      {{ 'custom_account.order_number'    | t | json }},
+    "order_items":       {{ 'custom_account.order_items'     | t | json }},
+    "subtotal":          {{ 'custom_account.subtotal'        | t | json }},
+    "shipping":          {{ 'custom_account.shipping'        | t | json }},
+    "shipping_address":  {{ 'custom_account.shipping_address'| t | json }},
+    "order_not_found":   {{ 'custom_account.order_not_found' | t | json }},
+
+    "validation_required":                        {{ 'custom_account.validation_required'                        | t | json }},
+    "validation_kana_invalid":                    {{ 'custom_account.validation_kana_invalid'                    | t | json }},
+    "validation_email_invalid":                   {{ 'custom_account.validation_email_invalid'                   | t | json }},
+    "validation_phone_invalid":                   {{ 'custom_account.validation_phone_invalid'                   | t | json }},
+    "validation_dob_invalid":                     {{ 'custom_account.validation_dob_invalid'                     | t | json }},
+    "validation_password_weak":                   {{ 'custom_account.validation_password_weak'                   | t | json }},
+    "validation_password_mismatch":               {{ 'custom_account.validation_password_mismatch'               | t | json }},
+    "validation_current_password_invalid":        {{ 'custom_account.validation_current_password_invalid'        | t | json }},
+    "validation_current_password_required_for_email": {{ 'custom_account.validation_current_password_required_for_email' | t | json }},
+    "validation_email_taken":                     {{ 'custom_account.validation_email_taken'                     | t | json }},
+
+    "address_edit":           {{ 'custom_account.address_edit'           | t | json }},
+    "address_delete":         {{ 'custom_account.address_delete'         | t | json }},
+    "address_new":            {{ 'custom_account.address_new'            | t | json }},
+    "address_shipping":       {{ 'custom_account.address_shipping'       | t | json }},
+    "address_billing":        {{ 'custom_account.address_billing'        | t | json }},
+    "address_cancel":         {{ 'custom_account.address_cancel'         | t | json }},
+    "address_submit":         {{ 'custom_account.address_submit'         | t | json }},
+    "address_default_badge":  {{ 'custom_account.address_default_badge'  | t | json }},
+    "default_billing_label":  {{ 'custom_account.default_billing_label'  | t | json }},
+    "default_shipping_label": {{ 'custom_account.default_shipping_label' | t | json }},
+    "zip":                    {{ 'custom_account.zip'                    | t | json }},
+    "province":               {{ 'custom_account.province'               | t | json }},
+    "province_placeholder":   {{ 'custom_account.province_placeholder'   | t | json }},
+    "city":                   {{ 'custom_account.city'                   | t | json }},
+    "confirm_delete":         {{ 'custom_account.confirm_delete'         | t | json }},
+    "delete_error":           {{ 'custom_account.delete_error'           | t | json }},
+    "address_new_btn":        {{ 'custom_account.address_new_btn'        | t | json }},
+
+    "load_more":      {{ 'custom_account.order_load_more'     | t | json }},
+    "load_error":     {{ 'custom_account.order_load_error'    | t | json }},
+    "view_details":   {{ 'custom_account.order_view_details'  | t | json }},
+    "tab_all":        {{ 'custom_account.order_tab_all'       | t | json }},
+    "tab_processing": {{ 'custom_account.order_tab_processing'| t | json }},
+    "tab_shipped":    {{ 'custom_account.order_tab_shipped'   | t | json }},
+    "tab_cancelled":  {{ 'custom_account.order_tab_cancelled' | t | json }},
+    "tab_returned":   {{ 'custom_account.order_tab_returned'  | t | json }},
+
+    "order_id_label":            "ご注文ID",
+    "order_tracking_unavailable": "トラッキングはご利用できません",
+    "order_toggle_detail":       "ご注文詳細をみる",
+    "order_shipping_address":    "配送先情報",
+    "order_billing_address":     "ご依頼主",
+    "order_shipping_time":       "配送時間: 指定しない",
+    "order_payment_details":     "お支払い明細",
+    "order_subtotal":            "小計",
+    "order_tax":                 "税",
+    "order_grand_total":         "合計 (税込)",
+    "order_download_receipt":    "領収書をダウンロードする",
+    "order_reorder":             "もう一度注文する",
+    "order_history_notice":      "本ページでは2021年以降のご注文履歴をご確認いただけます。2020年以前のご注文に関するお問い合わせはカスタマーサービスへご連絡ください。"
+  }
+</script>
+
+{% comment %} ── CSRF (native session mutations) ─────────────────────────── {% endcomment %}
+{% form 'customer', id: 'ma-native-form' %}{% endform %}
+
+{% comment %} ── Bundle ─────────────────────────────────────────────────── {% endcomment %}
+<link rel="stylesheet" href="{{ 'flatpickr.min.css' | asset_url }}">
+<script src="{{ 'flatpickr.min.js' | asset_url }}" defer></script>
+<script src="{{ 'flatpickr-l10n-ja.js' | asset_url }}" defer></script>
+<script src="{{ 'account-app.bundle.js' | asset_url }}" defer></script>
+
+{% comment %} ── Order history + Order detail styles ───────────────────────── {% endcomment %}
+{% stylesheet %}
+
+  /* ================================================================
+     Order History — tabs, cards, status badges, load-more
+     (mirrors sections/order-history.liquid styles for /pages/account)
+     ================================================================ */
+
+  /* ─── Tabs ─── */
+  .order-history__tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e6e6e6;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .order-history__tabs::-webkit-scrollbar { display: none; }
+
+  .order-history__tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    color: #999;
+    white-space: nowrap;
+    margin-bottom: -1px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .order-history__tab.is-active {
+    color: var(--color-foreground, #000);
+    border-bottom-color: var(--color-foreground, #000);
+  }
+
+  .order-history__tab:hover { color: var(--color-foreground, #000); }
+
+  /* ─── Order list ─── */
+  .order-history__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ─── Order card (accordion design) ─── */
+  .order-history__notice {
+    font-size: 0.78rem;
+    color: #666;
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  .order-history__card {
+    display: block;
+    padding: 20px 0;
+  }
+
+  /* ─── Header row: status badge LEFT, date RIGHT ─── */
+  .order-history__card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  .order-history__date {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  /* ─── Card body: thumbnail (left) + info (right) ─── */
+  .order-history__card-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .order-history__card-thumb {
+    position: relative;
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+  }
+
+  .order-history__card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .order-history__card-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+  }
+
+  .order-history__card-thumb-count {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 0.65rem;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    line-height: 1;
+  }
+
+  .order-history__card-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .order-history__order-id {
+    font-size: 0.85rem;
+    margin: 0 0 8px;
+  }
+
+  .order-history__order-id strong { font-weight: 600; }
+
+  .order-history__tracking {
+    font-size: 0.8rem;
+    margin: 0 0 14px;
+  }
+
+  .order-history__tracking a {
+    color: var(--color-foreground, #000);
+    text-decoration: underline;
+  }
+
+  .order-history__tracking--unavailable { color: #999; }
+
+  /* ─── Toggle button ─── */
+  .order-history__toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    font-size: 0.82rem;
+    font-family: inherit;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    padding: 0;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__toggle-arrow {
+    font-size: 0.65rem;
+    transition: transform 0.25s ease;
+    display: inline-block;
+  }
+
+  .order-history__toggle.is-open .order-history__toggle-arrow {
+    transform: rotate(90deg);
+  }
+
+  /* ─── Expandable detail (indented to align with info column) ─── */
+  .order-history__detail {
+    display: none;
+    margin-top: 24px;
+    padding-left: 20px; /* 100px thumb + 20px gap */
+    width: 100%;
+  }
+
+  .order-history__detail.is-open { display: block; }
+
+  @media screen and (max-width: 749px) {
+    .order-history__detail { padding-left: 0; }
+  }
+
+  /* ─── Line items ─── */
+  .order-history__items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
+
+  .order-history__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .order-history__item-image {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    background: #f5f5f5;
+  }
+
+  .order-history__item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .order-history__item-image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+  }
+
+  .order-history__item-info { flex: 1; min-width: 0; }
+
+  .order-history__item-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+
+  .order-history__item-variant,
+  .order-history__item-meta {
+    font-size: 0.78rem;
+    color: #666;
+    margin: 0 0 2px;
+  }
+
+  .order-history__item-price {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  /* ─── Addresses ─── */
+  .order-history__addresses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
+
+  .order-history__address-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+    letter-spacing: 0.03em;
+  }
+
+  .order-history__address-body,
+  .order-history__shipping-time {
+    font-size: 0.78rem;
+    color: #444;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .order-history__shipping-time { margin-top: 8px; color: #666; }
+
+  /* ─── Payment ─── */
+  .order-history__payment {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
+
+  .order-history__payment-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+    letter-spacing: 0.03em;
+  }
+
+  .order-history__payment-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+  }
+
+  .order-history__payment-row--total {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  /* ─── Detail actions ─── */
+  .order-history__detail-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .order-history__receipt-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--color-foreground, #000);
+    font-size: 0.82rem;
+    font-family: inherit;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    color: var(--color-foreground, #000);
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .order-history__receipt-btn:hover {
+    background: var(--color-foreground, #000);
+    color: #fff;
+  }
+
+  .order-history__reorder-link {
+    background: none;
+    border: none;
+    font-size: 0.82rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--color-foreground, #000);
+    padding: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .order-history__addresses { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Status badge ─── */
+  .order-history__status {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    letter-spacing: 0.03em;
+    border-radius: 2px;
+  }
+
+  .order-history__status--paid,
+  .order-history__status--fulfilled,
+  .order-history__status--delivered { background: #eef5f0; color: #2a6b40; }
+
+  .order-history__status--pending,
+  .order-history__status--unfulfilled,
+  .order-history__status--partial   { background: #fff8e6; color: #7d5700; }
+
+  .order-history__status--refunded,
+  .order-history__status--returned  { background: #f0f4ff; color: #1a3a8d; }
+
+  .order-history__status--cancelled,
+  .order-history__status--voided    { background: #f5f5f5; color: #666; }
+
+  .order-history__status--in-transit { background: #e6f4ff; color: #0050a0; }
+
+  /* ─── Load more ─── */
+  .order-history__load-more-wrap {
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  .order-history__load-more-btn {
+    padding: 12px 40px;
+    background: transparent;
+    border: 1px solid var(--color-foreground, #000);
+    font-size: 0.82rem;
+    font-family: inherit;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .order-history__load-more-btn:hover {
+    background: var(--color-foreground, #000);
+    color: #fff;
+  }
+
+  .order-history__load-more-btn.is-loading {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  /* ─── Order support block ─── */
+  .order-history__support {
+    margin-top: 36px;
+    background: #f4f4f4;
+    text-align: center;
+    padding: 52px 24px 48px;
+  }
+
+  .order-history__support-title {
+    margin: 0 0 22px;
+    line-height: 1.1;
+    font-weight: 400;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__support-body {
+    margin: 0 auto 28px;
+    max-width: 510px;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__support-contact-btn {
+    display: inline-block;
+    min-width: 260px;
+    margin: 0 auto 22px;
+    padding: 10px 24px;
+    border: 1px solid #000;
+    box-shadow: 0 2px 0 #000;
+    color: #000;
+    text-decoration: none;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    background: transparent;
+  }
+
+  .order-history__support-contact-btn:hover {
+    opacity: 0.7;
+  }
+
+  .order-history__support-hours-label {
+    margin: 0 0 8px;
+    color: #6d7f95;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+
+  .order-history__support-hours-text {
+    margin: 0 0 16px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #2f3f4e;
+  }
+
+  .order-history__support-help-link {
+    font-size: 1rem;
+    color: #000;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .order-history__support {
+      padding: 40px 16px;
+    }
+
+    .order-history__support-title {
+      font-size: 2.2rem;
+    }
+
+    .order-history__support-body {
+      font-size: 1rem;
+    }
+  }
+
+
+
+  /* ================================================================
+     Order Detail
+     ================================================================ */
+
+  .order-detail {
+    max-width: 640px;
+  }
+
+  .order-detail__back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #666;
+    padding: 0;
+    margin-bottom: 24px;
+    letter-spacing: 0.04em;
+    text-decoration: underline;
+  }
+
+  .order-detail__back:hover { color: #000; }
+
+  .order-detail__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .order-detail__number {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .order-detail__date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .order-detail__status {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    background: #f0f0f0;
+    border-radius: 2px;
+  }
+
+  .order-detail__status--shipped    { background: #e8f0fe; color: #1a56c4; }
+  .order-detail__status--processing { background: #fef9e7; color: #8a6d00; }
+  .order-detail__status--cancelled  { background: #fdecea; color: #c0392b; }
+  .order-detail__status--returned   { background: #f3e8fd; color: #7b2ca8; }
+
+  .order-detail__section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .order-detail__items,
+  .order-detail__totals,
+  .order-detail__shipping {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+    margin-bottom: 24px;
+  }
+
+  .order-detail__item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .order-detail__item-img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border: 1px solid #f0f0f0;
+    flex-shrink: 0;
+  }
+
+  .order-detail__item-img--placeholder { background: #f5f5f5; }
+
+  .order-detail__item-info { flex: 1; }
+
+  .order-detail__item-title {
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+
+  .order-detail__item-variant,
+  .order-detail__item-qty {
+    font-size: 0.74rem;
+    color: #888;
+    margin: 0 0 2px;
+  }
+
+  .order-detail__item-price {
+    font-size: 0.82rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .order-detail__total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    padding: 5px 0;
+  }
+
+  .order-detail__total-row--grand {
+    font-weight: 600;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 6px;
+    padding-top: 10px;
+    font-size: 0.9rem;
+  }
+
+  .order-detail__address {
+    font-size: 0.8rem;
+    line-height: 1.7;
+    font-style: normal;
+  }
+
+  .order-detail__loading,
+  .order-detail__error {
+    font-size: 0.85rem;
+    color: #888;
+    padding: 20px 0;
+  }
+
+  .order-detail__error { color: #c0392b; }
+
+  .account-view__error {
+    font-size: 0.85rem;
+    color: #c0392b;
+    padding: 20px 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Account",
+  "tag": "section",
+  "class": "section",
+  "settings": []
+}
+{% endschema %}

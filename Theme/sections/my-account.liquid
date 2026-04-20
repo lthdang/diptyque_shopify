@@ -1,60 +1,96 @@
+{%- comment -%}
+  my-account.liquid — Thin bootstrap shell.
+  Passes config + i18n to JS via structured JSON blocks only.
+  Zero business logic in Liquid.
+{%- endcomment -%}
+
 {%- capture ma_content -%}
-<div
-  id="my-account-app"
-  data-storefront-endpoint="https://{{ shop.permanent_domain }}/api/2026-04/graphql.json"
-  data-storefront-token="{{ settings.storefront_access_token }}"
-  data-shop-id="{{ shop.id }}"
-  data-logout-url="{{ routes.account_logout_url }}"
-  data-t-nav-profile="{{ 'custom_account.nav_profile' | t }}"
-  data-t-nav-orders="{{ 'custom_account.nav_orders' | t }}"
-  data-t-nav-addresses="{{ 'custom_account.nav_addresses' | t }}"
-  data-t-nav-cards="{{ 'custom_account.nav_cards' | t }}"
-  data-t-nav-shipping="{{ 'custom_account.shipping' | t }}"
-  data-t-profile-title="{{ 'custom_account.profile_title' | t }}"
-  data-t-last-name="{{ 'custom_account.last_name' | t }}"
-  data-t-first-name="{{ 'custom_account.first_name' | t }}"
-  data-t-furigana-last="{{ 'custom_account.furigana_last' | t }}"
-  data-t-furigana-first="{{ 'custom_account.furigana_first' | t }}"
-  data-t-dob="{{ 'custom_account.dob' | t }}"
-  data-t-phone="{{ 'custom_account.phone' | t }}"
-  data-t-email="{{ 'custom_account.email' | t }}"
-  data-t-required="{{ 'custom_account.required' | t }}"
-  data-t-submit="{{ 'custom_account.submit' | t }}"
-  data-t-login-info-title="{{ 'custom_account.login_info_title' | t }}"
-  data-t-password="{{ 'custom_account.password' | t }}"
-  data-t-new-password="{{ 'custom_account.new_password' | t }}"
-  data-t-password-hint="{{ 'custom_account.password_hint' | t }}"
-  data-t-password-confirm="{{ 'custom_account.password_confirm' | t }}"
-  data-t-benefits-title="{{ 'custom_account.benefits_title' | t }}"
-  data-t-benefits-subtitle="{{ 'custom_account.benefits_subtitle' | t }}"
-  data-t-benefit-1="{{ 'custom_account.benefit_1' | t }}"
-  data-t-benefit-2="{{ 'custom_account.benefit_2' | t }}"
-  data-t-benefit-3="{{ 'custom_account.benefit_3' | t }}"
-  data-t-logout="{{ 'custom_account.logout' | t }}"
-  data-t-save-success="{{ 'custom_account.save_success' | t }}"
-  data-t-save-failed="{{ 'custom_account.save_failed' | t }}"
-  data-t-validation-required="{{ 'custom_account.validation_required' | t }}"
-  data-t-validation-email-invalid="{{ 'custom_account.validation_email_invalid' | t }}"
-  data-t-validation-phone-invalid="{{ 'custom_account.validation_phone_invalid' | t }}"
-  data-t-validation-dob-invalid="{{ 'custom_account.validation_dob_invalid' | t }}"
-  data-t-validation-password-weak="{{ 'custom_account.validation_password_weak' | t }}"
-  data-t-validation-password-mismatch="{{ 'custom_account.validation_password_mismatch' | t }}"
-  data-t-validation-password-required-all="{{ 'custom_account.validation_password_required_all' | t }}"
-  data-t-update-not-supported="{{ 'custom_account.update_not_supported' | t }}"
-  data-t-saving="{{ 'custom_account.saving' | t }}"
-  data-api-base="{{ settings.be_api_base_url }}"
-></div>
+{%- comment -%} Mount point. JS renders all panels into this container. {%- endcomment -%}
+<div id="my-account-app">
+  <div class="my-account__panel my-account__panel--active" data-panel="profile"></div>
+  <div class="my-account__panel" data-panel="orders"></div>
+  <div class="my-account__panel" data-panel="cards">
+    <p style="font-size:0.8rem;opacity:0.6;margin-top:20px;">{{ 'custom_account.no_cards' | t }}</p>
+  </div>
+  <div class="my-account__panel" data-panel="shipping">
+    <p style="font-size:0.8rem;opacity:0.6;margin-top:20px;">{{ 'custom_account.no_shipping' | t }}</p>
+  </div>
+</div>
 {%- endcapture -%}
 {%- render 'my-account-layout', active_nav: 'profile', content: ma_content -%}
 
-{% comment %} Hidden form used only to expose the CSRF token for native session AJAX updates {% endcomment %}
+{% comment %} Hidden form — exposes CSRF token for native session mutations {% endcomment %}
 {% form 'customer', id: 'ma-native-form' %}{% endform %}
 
-<script id="my-account-translations" type="application/json">
-  {{ shop.metafields.translations.custom_account | json }}
+{% comment %} ─── ① Static config — endpoints + URLs ─────────────────────────────────── {% endcomment %}
+<script id="ma-config" type="application/json">
+  {
+    "storefrontEndpoint": "https://{{ shop.permanent_domain }}/api/2026-04/graphql.json",
+    "storefrontToken":    {{ settings.storefront_access_token | json }},
+    "apiBase":            {{ settings.be_api_base_url | json }},
+    "logoutUrl":          {{ routes.account_logout_url | json }}
+  }
+</script>
+
+{% comment %} ─── ② i18n — all UI strings in one payload ──────────────────────────────── {% endcomment %}
+{%- assign ca_trans = shop.metafields.translations.custom_account -%}
+<script id="ma-i18n" type="application/json">
+  {
+    "nav_profile":     {{ 'custom_account.nav_profile'     | t | json }},
+    "nav_orders":      {{ 'custom_account.nav_orders'      | t | json }},
+    "nav_addresses":   {{ 'custom_account.nav_addresses'   | t | json }},
+    "nav_cards":       {{ 'custom_account.nav_cards'       | t | json }},
+    "nav_shipping":    {{ 'custom_account.shipping'        | t | json }},
+    "profile_title":   {{ 'custom_account.profile_title'   | t | json }},
+    "last_name":       {{ 'custom_account.last_name'       | t | json }},
+    "first_name":      {{ 'custom_account.first_name'      | t | json }},
+    "furigana_last":   {{ 'custom_account.furigana_last'   | t | json }},
+    "furigana_first":  {{ 'custom_account.furigana_first'  | t | json }},
+    "dob":             {{ 'custom_account.dob'             | t | json }},
+    "phone":           {{ 'custom_account.phone'           | t | json }},
+    "email":           {{ 'custom_account.email'           | t | json }},
+    "required":        {{ 'custom_account.required'        | t | json }},
+    "submit":          {{ 'custom_account.submit'          | t | json }},
+    "login_info_title":{{ 'custom_account.login_info_title'| t | json }},
+    "password":        {{ 'custom_account.password'        | t | json }},
+    "current_password":{{ 'custom_account.current_password'| t | json }},
+    "new_password":    {{ 'custom_account.new_password'    | t | json }},
+    "password_hint":   {{ 'custom_account.password_hint'   | t | json }},
+    "password_confirm":{{ 'custom_account.password_confirm'| t | json }},
+    "benefits_title":  {{ 'custom_account.benefits_title'  | t | json }},
+    "benefits_subtitle":{{ 'custom_account.benefits_subtitle'| t | json }},
+    "benefit_1":       {{ 'custom_account.benefit_1'       | t | json }},
+    "benefit_2":       {{ 'custom_account.benefit_2'       | t | json }},
+    "benefit_3":       {{ 'custom_account.benefit_3'       | t | json }},
+    "logout":          {{ 'custom_account.logout'          | t | json }},
+    "header_my_account":{{ 'custom_account.nav_profile'    | t | json }},
+    "save_success":    {{ 'custom_account.save_success'    | t | json }},
+    "password_changed_relogin": {{ 'custom_account.password_changed_relogin' | t | json }},
+    "save_failed":     {{ 'custom_account.save_failed'     | t | json }},
+    "saving":          {{ 'custom_account.saving'          | t | json }},
+    "loading":         {{ 'custom_account.loading'         | t | json }},
+    "login_required":  {{ 'custom_account.login_required'  | t | json }},
+    "login_prompt":    {{ 'custom_account.login_prompt'    | t | json }},
+    "login_btn":       {{ 'custom_account.login_btn'       | t | json }},
+    "no_orders":       {{ 'custom_account.no_orders'       | t | json }},
+    "start_shopping":  {{ 'custom_account.start_shopping'  | t | json }},
+    "qty":             {{ 'custom_account.qty'             | t | json }},
+    "total":           {{ 'custom_account.total'           | t | json }},
+    "validation_required":           {{ 'custom_account.validation_required'           | t | json }},
+    "validation_kana_invalid":       {{ 'custom_account.validation_kana_invalid'       | t | json }},
+    "validation_email_invalid":      {{ 'custom_account.validation_email_invalid'      | t | json }},
+    "validation_phone_invalid":      {{ 'custom_account.validation_phone_invalid'      | t | json }},
+    "validation_dob_invalid":        {{ 'custom_account.validation_dob_invalid'        | t | json }},
+    "validation_password_weak":      {{ 'custom_account.validation_password_weak'      | t | json }},
+    "validation_password_mismatch":  {{ 'custom_account.validation_password_mismatch'  | t | json }},
+    "validation_current_password_invalid": {{ 'custom_account.validation_current_password_invalid' | t | json }},
+    "validation_current_password_required_for_email": {{ 'custom_account.validation_current_password_required_for_email' | t | json }},
+    "validation_email_taken":        {{ 'custom_account.validation_email_taken'        | t | json }}
+  }
 </script>
 
 {% if customer %}
+{% comment %} ─── ③ Native session snapshot — read by account-auth.js {% endcomment %}
 <script id="my-account-native-customer" type="application/json">
   {
     "id": {{ customer.id | json }},
@@ -145,7 +181,8 @@
 </script>
 {% endif %}
 
-<script src="{{ 'my-account.js' | asset_url }}" defer></script>
+{% comment %} ─── ④ Bundled JS (Vite build → assets/account-my-account.bundle.js) {% endcomment %}
+<script src="{{ 'account-my-account.bundle.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   /* ===== My Account — section-specific styles ===== */
