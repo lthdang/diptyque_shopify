@@ -21,17 +21,32 @@
 {% comment %} ─── ② i18n ─── {% endcomment %}
 <script id="oh-i18n" type="application/json">
   {
-    "loading":        {{ 'custom_account.loading'         | t | json }},
-    "load_more":      {{ 'custom_account.order_load_more' | t | json }},
-    "load_error":     {{ 'custom_account.order_load_error'| t | json }},
-    "no_orders":      {{ 'custom_account.no_orders'       | t | json }},
-    "start_shopping": {{ 'custom_account.start_shopping'  | t | json }},
-    "view_details":   {{ 'custom_account.order_view_details' | t | json }},
-    "tab_all":        {{ 'custom_account.order_tab_all'      | t | json }},
-    "tab_processing": {{ 'custom_account.order_tab_processing' | t | json }},
-    "tab_shipped":    {{ 'custom_account.order_tab_shipped'   | t | json }},
-    "tab_cancelled":  {{ 'custom_account.order_tab_cancelled' | t | json }},
-    "tab_returned":   {{ 'custom_account.order_tab_returned'  | t | json }}
+    "loading":                    {{ 'custom_account.loading'                   | t | json }},
+    "load_more":                  {{ 'custom_account.order_load_more'            | t | json }},
+    "load_error":                 {{ 'custom_account.order_load_error'           | t | json }},
+    "no_orders":                  {{ 'custom_account.no_orders'                  | t | json }},
+    "start_shopping":             {{ 'custom_account.start_shopping'             | t | json }},
+    "view_details":               {{ 'custom_account.order_view_details'         | t | json }},
+    "tab_all":                    {{ 'custom_account.order_tab_all'              | t | json }},
+    "tab_processing":             {{ 'custom_account.order_tab_processing'       | t | json }},
+    "tab_shipped":                {{ 'custom_account.order_tab_shipped'          | t | json }},
+    "tab_cancelled":              {{ 'custom_account.order_tab_cancelled'        | t | json }},
+    "tab_returned":               {{ 'custom_account.order_tab_returned'         | t | json }},
+    "order_history_notice":       {{ 'custom_account.order_history_notice'       | t | json }},
+    "order_id_label":             {{ 'custom_account.order_id_label'             | t | json }},
+    "order_tracking_unavailable": {{ 'custom_account.order_tracking_unavailable' | t | json }},
+    "order_toggle_detail":        {{ 'custom_account.order_toggle_detail'        | t | json }},
+    "order_shipping_address":     {{ 'custom_account.order_shipping_address'     | t | json }},
+    "order_shipping_time":        {{ 'custom_account.order_shipping_time'        | t | json }},
+    "order_billing_address":      {{ 'custom_account.order_billing_address'      | t | json }},
+    "order_payment_details":      {{ 'custom_account.order_payment_details'      | t | json }},
+    "order_subtotal":             {{ 'custom_account.order_subtotal'             | t | json }},
+    "order_tax":                  {{ 'custom_account.order_tax'                  | t | json }},
+    "order_grand_total":          {{ 'custom_account.order_grand_total'          | t | json }},
+    "order_shipping_cost":        {{ 'custom_account.order_shipping_cost'        | t | json }},
+    "order_download_receipt":     {{ 'custom_account.order_download_receipt'     | t | json }},
+    "order_reorder":              {{ 'custom_account.order_reorder'              | t | json }},
+    "order_support_title":        {{ 'custom_account.order_support_title'        | t | json }}
   }
 </script>
 
@@ -232,7 +247,6 @@
     gap: 20px;
     margin-top: 20px;
     padding-top: 16px;
-    border-top: 1px solid #eee;
     flex-wrap: wrap;
   }
 

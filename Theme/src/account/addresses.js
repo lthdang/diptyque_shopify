@@ -19,10 +19,10 @@ function boot() {
   const container = document.getElementById('addresses-details-container');
   if (!container) return;
 
-  // Mirror the same auth check as my-account.js:
-  // DiptyqueTokenStore.get() returns { token: null, isNative: true } when
-  // #my-account-native-customer is in the DOM — even if not authenticated.
-  // Check native session and token validity independently.
+  // Auth check: DiptyqueTokenStore.get() returns { token: null, isNative: true } when
+  // #my-account-native-customer is in the DOM — even when the storefront token is also
+  // present. Check native session and token validity independently to avoid
+  // suppressing the backend flow for users with both session types.
   const nativeCustomer = DiptyqueNativeSession.get();
   const storedToken  = localStorage.getItem('shopifyCustomerAccessToken');
   const storedExpiry = localStorage.getItem('shopifyCustomerAccessTokenExpiresAt');
