@@ -22,6 +22,8 @@
   {%- assign initial_nav = 'orders' -%}
 {%- elsif request.query_string contains 'tab=addresses' -%}
   {%- assign initial_nav = 'addresses' -%}
+{%- elsif request.query_string contains 'tab=newsletter' -%}
+  {%- assign initial_nav = 'newsletter' -%}
 {%- endif -%}
 
 {%- render 'my-account-layout', active_nav: initial_nav, content: account_content -%}
@@ -155,6 +157,17 @@
     "password_confirm":  {{ 'custom_account.password_confirm'| t | json }},
     "benefits_title":    {{ 'custom_account.benefits_title'  | t | json }},
     "benefits_subtitle": {{ 'custom_account.benefits_subtitle'| t | json }},
+    "benefit_1":         {{ 'custom_account.benefit_1'        | t | json }},
+    "benefit_2":         {{ 'custom_account.benefit_2'        | t | json }},
+    "benefit_3":         {{ 'custom_account.benefit_3'        | t | json }},
+    "nav_newsletter":    {{ 'custom_account.nav_newsletter'   | t | json }},
+    "newsletter_title":  {{ 'customer.register.newsletter_title' | t | json }},
+    "newsletter_email":  {{ 'customer.register.newsletter_email' | t | json }},
+    "newsletter_sms":    {{ 'customer.register.newsletter_sms'   | t | json }},
+    "newsletter_postal": {{ 'customer.register.newsletter_postal' | t | json }},
+    "newsletter_submit": {{ 'custom_account.newsletter_submit'| t | json }},
+    "newsletter_note":   {{ 'custom_account.newsletter_note_html'  | t | json }},
+    "newsletter_success":{{ 'custom_account.newsletter_success'| t | json }},
     "logout":            {{ 'custom_account.logout'          | t | json }},
     "header_my_account": {{ 'custom_account.nav_profile'     | t | json }},
     "save_success":      {{ 'custom_account.save_success'    | t | json }},
@@ -169,12 +182,14 @@
     "start_shopping":    {{ 'custom_account.start_shopping'  | t | json }},
     "qty":               {{ 'custom_account.qty'             | t | json }},
     "total":             {{ 'custom_account.total'           | t | json }},
-    "order_number":      {{ 'custom_account.order_number'    | t | json }},
-    "order_items":       {{ 'custom_account.order_items'     | t | json }},
-    "subtotal":          {{ 'custom_account.subtotal'        | t | json }},
-    "shipping":          {{ 'custom_account.shipping'        | t | json }},
-    "shipping_address":  {{ 'custom_account.shipping_address'| t | json }},
-    "order_not_found":   {{ 'custom_account.order_not_found' | t | json }},
+    "order_number":      {{ 'custom_account.order_number'      | t | json }},
+    "order_items":       {{ 'custom_account.order_items'       | t | json }},
+    "subtotal":          {{ 'custom_account.subtotal'          | t | json }},
+    "shipping":          {{ 'custom_account.order_shipping_cost'| t | json }},
+    "shipping_address":  {{ 'custom_account.shipping_address'  | t | json }},
+    "order_not_found":   {{ 'custom_account.order_not_found'   | t | json }},
+    "order_load_error":  {{ 'custom_account.order_load_error'  | t | json }},
+    "saved_cards_empty": {{ 'custom_account.saved_cards_empty' | t | json }},
 
     "validation_required":                        {{ 'custom_account.validation_required'                        | t | json }},
     "validation_kana_invalid":                    {{ 'custom_account.validation_kana_invalid'                    | t | json }},
@@ -205,28 +220,30 @@
     "delete_error":           {{ 'custom_account.delete_error'           | t | json }},
     "address_new_btn":        {{ 'custom_account.address_new_btn'        | t | json }},
 
-    "load_more":      {{ 'custom_account.order_load_more'     | t | json }},
-    "load_error":     {{ 'custom_account.order_load_error'    | t | json }},
-    "view_details":   {{ 'custom_account.order_view_details'  | t | json }},
-    "tab_all":        {{ 'custom_account.order_tab_all'       | t | json }},
-    "tab_processing": {{ 'custom_account.order_tab_processing'| t | json }},
-    "tab_shipped":    {{ 'custom_account.order_tab_shipped'   | t | json }},
-    "tab_cancelled":  {{ 'custom_account.order_tab_cancelled' | t | json }},
-    "tab_returned":   {{ 'custom_account.order_tab_returned'  | t | json }},
+    "load_more":                  {{ 'custom_account.order_load_more'            | t | json }},
+    "load_error":                 {{ 'custom_account.order_load_error'           | t | json }},
+    "view_details":               {{ 'custom_account.order_view_details'         | t | json }},
+    "tab_all":                    {{ 'custom_account.order_tab_all'              | t | json }},
+    "tab_processing":             {{ 'custom_account.order_tab_processing'       | t | json }},
+    "tab_shipped":                {{ 'custom_account.order_tab_shipped'          | t | json }},
+    "tab_cancelled":              {{ 'custom_account.order_tab_cancelled'        | t | json }},
+    "tab_returned":               {{ 'custom_account.order_tab_returned'         | t | json }},
 
-    "order_id_label":            "ご注文ID",
-    "order_tracking_unavailable": "トラッキングはご利用できません",
-    "order_toggle_detail":       "ご注文詳細をみる",
-    "order_shipping_address":    "配送先情報",
-    "order_billing_address":     "ご依頼主",
-    "order_shipping_time":       "配送時間: 指定しない",
-    "order_payment_details":     "お支払い明細",
-    "order_subtotal":            "小計",
-    "order_tax":                 "税",
-    "order_grand_total":         "合計 (税込)",
-    "order_download_receipt":    "領収書をダウンロードする",
-    "order_reorder":             "もう一度注文する",
-    "order_history_notice":      "本ページでは2021年以降のご注文履歴をご確認いただけます。2020年以前のご注文に関するお問い合わせはカスタマーサービスへご連絡ください。"
+    "order_history_notice":       {{ 'custom_account.order_history_notice'       | t | json }},
+    "order_id_label":             {{ 'custom_account.order_id_label'             | t | json }},
+    "order_tracking_unavailable": {{ 'custom_account.order_tracking_unavailable' | t | json }},
+    "order_toggle_detail":        {{ 'custom_account.order_toggle_detail'        | t | json }},
+    "order_shipping_address":     {{ 'custom_account.order_shipping_address'     | t | json }},
+    "order_shipping_time":        {{ 'custom_account.order_shipping_time'        | t | json }},
+    "order_billing_address":      {{ 'custom_account.order_billing_address'      | t | json }},
+    "order_payment_details":      {{ 'custom_account.order_payment_details'      | t | json }},
+    "order_subtotal":             {{ 'custom_account.order_subtotal'             | t | json }},
+    "order_tax":                  {{ 'custom_account.order_tax'                  | t | json }},
+    "order_grand_total":          {{ 'custom_account.order_grand_total'          | t | json }},
+    "order_shipping_cost":        {{ 'custom_account.order_shipping_cost'        | t | json }},
+    "order_download_receipt":     {{ 'custom_account.order_download_receipt'     | t | json }},
+    "order_reorder":              {{ 'custom_account.order_reorder'              | t | json }},
+    "order_support_title":        {{ 'custom_account.order_support_title'        | t | json }}
   }
 </script>
 
@@ -241,6 +258,353 @@
 
 {% comment %} ── Order history + Order detail styles ───────────────────────── {% endcomment %}
 {% stylesheet %}
+  /* ===== Addresses Details styles (migrated from removed addresses-details.liquid) ===== */
+
+  .addresses-details__section-title {
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    margin: 0 0 4px;
+    color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .addresses-details__card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 0;
+    gap: 16px;
+  }
+
+  .addresses-details__card-info {
+    flex: 1;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__name {
+    font-size: 0.82rem;
+    font-weight: 400;
+    margin: 0 0 2px;
+  }
+
+  .addresses-details__card-info p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.8;
+  }
+
+  .addresses-details__default-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    background: #000;
+    color: #fff;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .addresses-details__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .addresses-details__action-area { margin-top: 0; }
+
+  .addresses-details__new-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--color-foreground, #000);
+    border: 1px solid var(--color-foreground, #000);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+    display: block;
+  }
+
+  .addresses-details__new-btn:hover {
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+  }
+
+  .addresses-details__form {
+    padding: 24px 0 0;
+    margin-bottom: 24px;
+  }
+
+  .addresses-details__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .addresses-details__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .addresses-details__field label {
+    font-size: 0.75rem;
+    color: #666;
+    letter-spacing: 0.01em;
+  }
+
+  .addresses-details__field select.my-account__input {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .addresses-details__field--checkbox {
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .addresses-details__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--color-foreground, #000);
+  }
+
+  .addresses-details__required-label {
+    font-size: 0.72rem;
+    color: #999;
+    margin: 4px 0 16px;
+  }
+
+  .addresses-details__submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.05em;
+    font-family: inherit;
+    transition: background 0.2s;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .addresses-details__submit-btn:hover { background: #333; }
+
+  .addresses-details__submit-btn:disabled {
+    background: #b3b3b3;
+    cursor: not-allowed;
+  }
+
+  .addresses-details__cancel-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--color-foreground, #000);
+    border: 1px solid var(--color-foreground, #000);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.03em;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+    display: block;
+  }
+
+  .addresses-details__cancel-btn:hover {
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+  }
+
+  @media screen and (max-width: 749px) {
+    .addresses-details__form-row { grid-template-columns: 1fr; }
+  }
+
+  /* ===== My Account profile styles (migrated from removed my-account section) ===== */
+  .my-account__form-section {
+    margin-bottom: 40px;
+  }
+
+  .my-account__section-heading {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 24px;
+  }
+
+  .my-account__form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .my-account__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .my-account__form-field--full {
+    grid-column: 1 / -1;
+  }
+
+  .my-account__form-field--hidden {
+    display: none;
+  }
+
+  .my-account__form-field label {
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  .my-account__password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .my-account__password-input .my-account__input {
+    padding-right: 48px;
+  }
+
+  .my-account__password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+
+  .my-account__password-toggle:hover {
+    color: #000;
+  }
+
+  .my-account__submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #b3b3b3;
+    color: #fff;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .my-account__submit-btn:hover {
+    background: #000;
+  }
+
+  .my-account__password-hint {
+    font-size: 0.7rem;
+    color: #999;
+    margin: 8px 0 0;
+    line-height: 1.4;
+  }
+
+  .my-account__required-text {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 12px 0;
+  }
+
+  .my-account__submit-btn:disabled,
+  .my-account__submit-btn--loading {
+    background: #d0d0d0;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ---- Flatpickr theme overrides for profile date picker ---- */
+  .flatpickr-calendar {
+    font-family: inherit !important;
+    border: 1px solid var(--color-border, #ccc) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    border-radius: 0 !important;
+  }
+
+  .flatpickr-calendar.open {
+    z-index: 9999 !important;
+  }
+
+  .flatpickr-day.selected,
+  .flatpickr-day.selected:hover {
+    background: var(--color-foreground) !important;
+    border-color: var(--color-foreground) !important;
+    color: var(--color-background) !important;
+  }
+
+  .flatpickr-day:hover {
+    background: rgba(0,0,0,0.06) !important;
+  }
+
+  .flatpickr-day.today {
+    border-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-day.today:hover {
+    background: rgba(0,0,0,0.06) !important;
+    color: inherit !important;
+  }
+
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    fill: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+    border-bottom-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+    border-top-color: var(--color-foreground) !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .my-account__form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 
   /* ================================================================
      Order History — tabs, cards, status badges, load-more
@@ -299,10 +663,7 @@
   .order-history__card {
     display: block;
     padding: 20px 0;
-    border-bottom: 1px solid #e6e6e680;
   }
-
-  .order-history__card:first-child { border-top: 1px solid #e6e6e680; }
 
   /* ─── Header row: status badge LEFT, date RIGHT ─── */
   .order-history__card-header {
@@ -325,6 +686,7 @@
     display: flex;
     align-items: flex-start;
     gap: 20px;
+    width: 100%;
   }
 
   .order-history__card-thumb {
@@ -416,7 +778,8 @@
   .order-history__detail {
     display: none;
     margin-top: 24px;
-    padding-left: 120px; /* 100px thumb + 20px gap */
+    padding-left: 20px; /* 100px thumb + 20px gap */
+    width: 100%;
   }
 
   .order-history__detail.is-open { display: block; }
@@ -432,7 +795,6 @@
     gap: 12px;
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e6e6e680;
   }
 
   .order-history__item {
@@ -490,7 +852,6 @@
     gap: 24px;
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e6e6e680;
   }
 
   .order-history__address-title {
@@ -514,7 +875,6 @@
   .order-history__payment {
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e6e6e680;
   }
 
   .order-history__payment-title {
@@ -536,7 +896,6 @@
     font-size: 0.9rem;
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px solid #e6e6e680;
   }
 
   /* ─── Detail actions ─── */
@@ -633,6 +992,82 @@
   .order-history__load-more-btn.is-loading {
     opacity: 0.6;
     cursor: wait;
+  }
+
+  /* ─── Order support block ─── */
+  .order-history__support {
+    margin-top: 36px;
+    background: #f4f4f4;
+    text-align: center;
+    padding: 52px 24px 48px;
+  }
+
+  .order-history__support-title {
+    margin: 0 0 22px;
+    line-height: 1.1;
+    font-weight: 400;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__support-body {
+    margin: 0 auto 28px;
+    max-width: 510px;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__support-contact-btn {
+    display: inline-block;
+    min-width: 260px;
+    margin: 0 auto 22px;
+    padding: 10px 24px;
+    border: 1px solid #000;
+    box-shadow: 0 2px 0 #000;
+    color: #000;
+    text-decoration: none;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    background: transparent;
+  }
+
+  .order-history__support-contact-btn:hover {
+    opacity: 0.7;
+  }
+
+  .order-history__support-hours-label {
+    margin: 0 0 8px;
+    color: #6d7f95;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+
+  .order-history__support-hours-text {
+    margin: 0 0 16px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #2f3f4e;
+  }
+
+  .order-history__support-help-link {
+    font-size: 1rem;
+    color: #000;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .order-history__support {
+      padding: 40px 16px;
+    }
+
+    .order-history__support-title {
+      font-size: 2.2rem;
+    }
+
+    .order-history__support-body {
+      font-size: 1rem;
+    }
   }
 
 

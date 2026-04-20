@@ -1,0 +1,13 @@
+{
+  "name": "diptyque-shopify-theme",
+  "private": true,
+  "description": "Shopify Theme — Vite build for account JS modules",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "dev": "node build.mjs --watch"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0"
+  }
+}

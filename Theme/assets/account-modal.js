@@ -1,4 +1,5 @@
-const REGISTER_API_URL = 'https://diptyqueshopifybe.vercel.app/api/register';
+const REGISTER_API_PATH = '/api/register';
+
 
 class AccountModal {
   constructor() {
@@ -13,6 +14,8 @@ class AccountModal {
     this.storefrontToken = this.modal?.dataset.storefrontToken || '';
     this.shopId = this.modal?.dataset.shopId || '';
     this.shopDomain = this.modal?.dataset.shopDomain || '';
+    this.registerApiBaseUrl = this.modal?.dataset.apiBaseUrl || '';
+    this.registerApiUrl = this.resolveRegisterApiUrl();
 
     if (!this.modal) return;
 
@@ -29,6 +32,11 @@ class AccountModal {
     } catch {
       return {};
     }
+  }
+
+  resolveRegisterApiUrl() {
+    const base = String(this.registerApiBaseUrl || '').trim().replace(/\/+$/, '');
+    return base ? `${base}${REGISTER_API_PATH}` : REGISTER_API_PATH;
   }
 
   bindEvents() {
@@ -200,7 +208,7 @@ class AccountModal {
     const payload = this.buildRegisterPayload(form, meta);
 
     try {
-      const response = await fetch(REGISTER_API_URL, {
+      const response = await fetch(this.registerApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -214,24 +222,32 @@ class AccountModal {
 
       // Success
       if (response.ok && data.success !== false) {
-        // Automatically log the user in after registration via Storefront API
         try {
           const result = await this.createCustomerAccessToken(payload.email, payload.password);
           if (result.customerAccessToken) {
             const { accessToken, expiresAt } = result.customerAccessToken;
             const customer = await this.fetchCustomerProfile(accessToken);
             this.setCustomerSession(accessToken, expiresAt, customer);
-            this.close();
-            window.dispatchEvent(new CustomEvent('customer:login', { detail: customer }));
-            window.location.href = '/pages/my-account';
-            return;
           }
-        } catch (loginErr) {
-          console.warn('[AccountModal] Auto-login after registration failed:', loginErr);
+        } catch (tokenErr) {
+          console.warn('[AccountModal] Could not obtain Storefront API token after registration:', tokenErr);
         }
 
-        // Fallback: show login panel
-        this.showPanel('login');
+        // Submit the native Shopify login form to create a server-side session
+        // cookie, which is required for checkout to recognise the logged-in user.
+        const loginForm = document.getElementById('CustomerLoginForm');
+        if (loginForm) {
+          const emailEl = loginForm.querySelector('[name="customer[email]"]');
+          const passEl = loginForm.querySelector('[name="customer[password]"]');
+          if (emailEl) emailEl.value = payload.email;
+          if (passEl) passEl.value = payload.password;
+          // form.submit() bypasses JS listeners so there is no loop.
+          loginForm.submit();
+          return;
+        }
+
+        // Fallback: show login panel in modal
+        this.showPanel('login', payload.email);
         this.setSubmitting(form, false);
         return;
       }
@@ -273,7 +289,7 @@ class AccountModal {
 
   buildRegisterPayload(form, meta) {
     const val = (id) => (form.querySelector(`#${id}`)?.value ?? '').trim();
-    const acceptsMarketingEl = form.querySelector('input[name="customer[accepts_marketing]"]');
+    const acceptsMarketingEl = form.querySelector('input[name="customer[accepts_marketing]"]') || form.querySelector('#modal-RegisterEmailOptIn');
     return {
       first_name: val('modal-RegisterFirstName'),
       last_name: val('modal-RegisterLastName'),
@@ -286,6 +302,7 @@ class AccountModal {
       birthday: meta.birthday || '',
       sms_opt_in: Boolean(meta.sms_opt_in),
       mail_opt_in: Boolean(meta.mail_opt_in),
+      postal_opt_in: Boolean(meta.postal_opt_in),
       accepts_marketing: Boolean(acceptsMarketingEl?.checked),
     };
   }
@@ -624,6 +641,7 @@ class AccountModal {
         phone: phoneNormalized || String(phone?.value || '').trim(),
         sms_opt_in: Boolean(smsOptIn?.checked),
         mail_opt_in: Boolean(mailOptIn?.checked),
+        postal_opt_in: Boolean(mailOptIn?.checked),
       },
     };
   }
@@ -761,6 +779,7 @@ class AccountModal {
       `birthday=${meta.birthday || ''}`,
       `sms_opt_in=${meta.sms_opt_in ? 'true' : 'false'}`,
       `mail_opt_in=${meta.mail_opt_in ? 'true' : 'false'}`,
+      `postal_opt_in=${meta.postal_opt_in ? 'true' : 'false'}`,
       `phone=${meta.phone || ''}`,
     ];
     noteInput.value = lines.join('\n');
