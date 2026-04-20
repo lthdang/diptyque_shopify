@@ -254,6 +254,160 @@
 
 {% comment %} ── Order history + Order detail styles ───────────────────────── {% endcomment %}
 {% stylesheet %}
+  /* ===== My Account profile styles (migrated from removed my-account section) ===== */
+  .my-account__form-section {
+    margin-bottom: 40px;
+  }
+
+  .my-account__section-heading {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 24px;
+  }
+
+  .my-account__form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .my-account__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .my-account__form-field--full {
+    grid-column: 1 / -1;
+  }
+
+  .my-account__form-field--hidden {
+    display: none;
+  }
+
+  .my-account__form-field label {
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  .my-account__password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .my-account__password-input .my-account__input {
+    padding-right: 48px;
+  }
+
+  .my-account__password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+
+  .my-account__password-toggle:hover {
+    color: #000;
+  }
+
+  .my-account__submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #b3b3b3;
+    color: #fff;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .my-account__submit-btn:hover {
+    background: #000;
+  }
+
+  .my-account__password-hint {
+    font-size: 0.7rem;
+    color: #999;
+    margin: 8px 0 0;
+    line-height: 1.4;
+  }
+
+  .my-account__required-text {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 12px 0;
+  }
+
+  .my-account__submit-btn:disabled,
+  .my-account__submit-btn--loading {
+    background: #d0d0d0;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ---- Flatpickr theme overrides for profile date picker ---- */
+  .flatpickr-calendar {
+    font-family: inherit !important;
+    border: 1px solid var(--color-border, #ccc) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    border-radius: 0 !important;
+  }
+
+  .flatpickr-calendar.open {
+    z-index: 9999 !important;
+  }
+
+  .flatpickr-day.selected,
+  .flatpickr-day.selected:hover {
+    background: var(--color-foreground) !important;
+    border-color: var(--color-foreground) !important;
+    color: var(--color-background) !important;
+  }
+
+  .flatpickr-day:hover {
+    background: rgba(0,0,0,0.06) !important;
+  }
+
+  .flatpickr-day.today {
+    border-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-day.today:hover {
+    background: rgba(0,0,0,0.06) !important;
+    color: inherit !important;
+  }
+
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    fill: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowUp:after {
+    border-bottom-color: var(--color-foreground) !important;
+  }
+
+  .flatpickr-current-month .numInputWrapper span.arrowDown:after {
+    border-top-color: var(--color-foreground) !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .my-account__form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 
   /* ================================================================
      Order History — tabs, cards, status badges, load-more
