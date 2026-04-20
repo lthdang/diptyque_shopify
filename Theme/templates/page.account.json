@@ -10,11 +10,9 @@
 {
   "sections": {
     "main": {
-      "type": "my-account",
+      "type": "account",
       "settings": {}
     }
   },
-  "order": [
-    "main"
-  ]
+  "order": ["main"]
 }

@@ -4,39 +4,8 @@
 {%- endcomment -%}
 
 {%- capture ad_content -%}
-<div
-  id="addresses-details-container"
-  data-api-base-url="{{ settings.be_api_base_url }}"
-  data-storefront-endpoint="https://{{ shop.permanent_domain }}/api/2026-04/graphql.json"
-  data-storefront-token="{{ settings.storefront_access_token }}"
-  data-t-address-edit="{{ 'custom_account.address_edit' | t }}"
-  data-t-address-delete="{{ 'custom_account.address_delete' | t }}"
-  data-t-address-new="{{ 'custom_account.address_new' | t }}"
-  data-t-address-shipping="{{ 'custom_account.address_shipping' | t }}"
-  data-t-address-billing="{{ 'custom_account.address_billing' | t }}"
-  data-t-address-cancel="{{ 'custom_account.address_cancel' | t }}"
-  data-t-address-submit="{{ 'custom_account.address_submit' | t }}"
-  data-t-address-default-badge="{{ 'custom_account.address_default_badge' | t }}"
-  data-t-default-billing-label="{{ 'custom_account.default_billing_label' | t }}"
-  data-t-default-shipping-label="{{ 'custom_account.default_shipping_label' | t }}"
-  data-t-zip="{{ 'custom_account.zip' | t }}"
-  data-t-province="{{ 'custom_account.province' | t }}"
-  data-t-province-placeholder="{{ 'custom_account.province_placeholder' | t }}"
-  data-t-city="{{ 'custom_account.city' | t }}"
-  data-t-address1="{{ 'custom_account.address1' | t }}"
-  data-t-address2="{{ 'custom_account.address2' | t }}"
-  data-t-last-name="{{ 'custom_account.last_name' | t }}"
-  data-t-first-name="{{ 'custom_account.first_name' | t }}"
-  data-t-furigana-last="{{ 'custom_account.furigana_last' | t }}"
-  data-t-furigana-first="{{ 'custom_account.furigana_first' | t }}"
-  data-t-phone="{{ 'custom_account.phone' | t }}"
-  data-t-required="{{ 'custom_account.required' | t }}"
-  data-t-loading="{{ 'custom_account.loading' | t }}"
-  data-t-confirm-delete="{{ 'custom_account.confirm_delete' | t }}"
-  data-t-delete-error="{{ 'custom_account.delete_error' | t }}"
-  data-t-phone-invalid="{{ 'custom_account.validation_phone_invalid' | t }}"
-  data-t-save-error="{{ 'custom_account.save_failed' | t }}"
->
+<div id="addresses-details-container">
+
   {%- comment -%} JS renders the address list into this element {%- endcomment -%}
   <div id="addresses-list-root"></div>
 
@@ -70,7 +39,55 @@
 
 {%- render 'my-account-layout', active_nav: 'addresses', content: ad_content -%}
 
-<script src="{{ 'addresses-details.js' | asset_url }}" defer></script>
+{% comment %} ─── ① Config ─── {% endcomment %}
+<script id="ad-config" type="application/json">
+  {
+    "storefrontEndpoint": "https://{{ shop.permanent_domain }}/api/2026-04/graphql.json",
+    "storefrontToken":    {{ settings.storefront_access_token | json }},
+    "apiBase":            {{ settings.be_api_base_url | json }}
+  }
+</script>
+
+{% comment %} ─── ② i18n ─── {% endcomment %}
+<script id="ad-i18n" type="application/json">
+  {
+    "address_edit":          {{ 'custom_account.address_edit'           | t | json }},
+    "address_delete":        {{ 'custom_account.address_delete'         | t | json }},
+    "address_new":           {{ 'custom_account.address_new'            | t | json }},
+    "address_shipping":      {{ 'custom_account.address_shipping'       | t | json }},
+    "address_billing":       {{ 'custom_account.address_billing'        | t | json }},
+    "address_cancel":        {{ 'custom_account.address_cancel'         | t | json }},
+    "address_submit":        {{ 'custom_account.address_submit'         | t | json }},
+    "address_default_badge": {{ 'custom_account.address_default_badge'  | t | json }},
+    "default_billing_label": {{ 'custom_account.default_billing_label'  | t | json }},
+    "default_shipping_label":{{ 'custom_account.default_shipping_label' | t | json }},
+    "zip":                   {{ 'custom_account.zip'                    | t | json }},
+    "province":              {{ 'custom_account.province'               | t | json }},
+    "province_placeholder":  {{ 'custom_account.province_placeholder'   | t | json }},
+    "city":                  {{ 'custom_account.city'                   | t | json }},
+    "address1":              {{ 'custom_account.address1'               | t | json }},
+    "address2":              {{ 'custom_account.address2'               | t | json }},
+    "last_name":             {{ 'custom_account.last_name'              | t | json }},
+    "first_name":            {{ 'custom_account.first_name'             | t | json }},
+    "furigana_last":         {{ 'custom_account.furigana_last'          | t | json }},
+    "furigana_first":        {{ 'custom_account.furigana_first'         | t | json }},
+    "phone":                 {{ 'custom_account.phone'                  | t | json }},
+    "required":              {{ 'custom_account.required'               | t | json }},
+    "loading":               {{ 'custom_account.loading'                | t | json }},
+    "confirm_delete":        {{ 'custom_account.confirm_delete'         | t | json }},
+    "delete_error":          {{ 'custom_account.delete_error'           | t | json }},
+    "save_failed":           {{ 'custom_account.save_failed'            | t | json }},
+    "validation_required":         {{ 'custom_account.validation_required'          | t | json }},
+    "validation_phone_invalid":    {{ 'custom_account.validation_phone_invalid'     | t | json }},
+    "validation_kana_invalid":     {{ 'custom_account.validation_kana_invalid'      | t | json }},
+    "login_required":              {{ 'custom_account.login_required'               | t | json }},
+    "login_btn":                   {{ 'custom_account.login_btn'                | t | json }},
+    "address_new_btn":             {{ 'custom_account.address_new_btn'          | t | json }}
+  }
+</script>
+
+{% comment %} ─── ③ Bundled JS (Vite build → assets/account-addresses.bundle.js) {% endcomment %}
+<script src="{{ 'account-addresses.bundle.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   /* ===== Addresses Details — section-specific styles only ===== */
@@ -172,7 +189,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-    margin-bottom: 16px;
   }
 
   .addresses-details__field {

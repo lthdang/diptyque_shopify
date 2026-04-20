@@ -5210,3 +5210,17 @@ product-recommendations:has([data-has-recommendations="false"]) {
     translate: 0px var(--atc-destination, 0px);
   }
 }
+
+/* ── Address form field validation errors ─────────────────────────────── */
+.my-account__field-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.2rem;
+  color: #c0392b;
+  min-height: 1.6em;
+}
+
+.my-account__input.is-invalid {
+  border-color: #c0392b !important;
+}
+
