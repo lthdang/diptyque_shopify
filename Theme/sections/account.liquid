@@ -22,6 +22,8 @@
   {%- assign initial_nav = 'orders' -%}
 {%- elsif request.query_string contains 'tab=addresses' -%}
   {%- assign initial_nav = 'addresses' -%}
+{%- elsif request.query_string contains 'tab=newsletter' -%}
+  {%- assign initial_nav = 'newsletter' -%}
 {%- endif -%}
 
 {%- render 'my-account-layout', active_nav: initial_nav, content: account_content -%}
@@ -155,6 +157,17 @@
     "password_confirm":  {{ 'custom_account.password_confirm'| t | json }},
     "benefits_title":    {{ 'custom_account.benefits_title'  | t | json }},
     "benefits_subtitle": {{ 'custom_account.benefits_subtitle'| t | json }},
+    "benefit_1":         {{ 'custom_account.benefit_1'        | t | json }},
+    "benefit_2":         {{ 'custom_account.benefit_2'        | t | json }},
+    "benefit_3":         {{ 'custom_account.benefit_3'        | t | json }},
+    "nav_newsletter":    {{ 'custom_account.nav_newsletter'   | t | json }},
+    "newsletter_title":  {{ 'customer.register.newsletter_title' | t | json }},
+    "newsletter_email":  {{ 'customer.register.newsletter_email' | t | json }},
+    "newsletter_sms":    {{ 'customer.register.newsletter_sms'   | t | json }},
+    "newsletter_postal": {{ 'customer.register.newsletter_postal' | t | json }},
+    "newsletter_submit": {{ 'custom_account.newsletter_submit'| t | json }},
+    "newsletter_note":   {{ 'custom_account.newsletter_note_html'  | t | json }},
+    "newsletter_success":{{ 'custom_account.newsletter_success'| t | json }},
     "logout":            {{ 'custom_account.logout'          | t | json }},
     "header_my_account": {{ 'custom_account.nav_profile'     | t | json }},
     "save_success":      {{ 'custom_account.save_success'    | t | json }},
@@ -299,10 +312,7 @@
   .order-history__card {
     display: block;
     padding: 20px 0;
-    border-bottom: 1px solid #e6e6e680;
   }
-
-  .order-history__card:first-child { border-top: 1px solid #e6e6e680; }
 
   /* ─── Header row: status badge LEFT, date RIGHT ─── */
   .order-history__card-header {
@@ -325,6 +335,7 @@
     display: flex;
     align-items: flex-start;
     gap: 20px;
+    width: 100%;
   }
 
   .order-history__card-thumb {
@@ -416,7 +427,8 @@
   .order-history__detail {
     display: none;
     margin-top: 24px;
-    padding-left: 120px; /* 100px thumb + 20px gap */
+    padding-left: 20px; /* 100px thumb + 20px gap */
+    width: 100%;
   }
 
   .order-history__detail.is-open { display: block; }
@@ -432,7 +444,6 @@
     gap: 12px;
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e6e6e680;
   }
 
   .order-history__item {
@@ -490,7 +501,6 @@
     gap: 24px;
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e6e6e680;
   }
 
   .order-history__address-title {
@@ -514,7 +524,6 @@
   .order-history__payment {
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e6e6e680;
   }
 
   .order-history__payment-title {
@@ -536,7 +545,6 @@
     font-size: 0.9rem;
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px solid #e6e6e680;
   }
 
   /* ─── Detail actions ─── */
@@ -633,6 +641,82 @@
   .order-history__load-more-btn.is-loading {
     opacity: 0.6;
     cursor: wait;
+  }
+
+  /* ─── Order support block ─── */
+  .order-history__support {
+    margin-top: 36px;
+    background: #f4f4f4;
+    text-align: center;
+    padding: 52px 24px 48px;
+  }
+
+  .order-history__support-title {
+    margin: 0 0 22px;
+    line-height: 1.1;
+    font-weight: 400;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__support-body {
+    margin: 0 auto 28px;
+    max-width: 510px;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--color-foreground, #000);
+  }
+
+  .order-history__support-contact-btn {
+    display: inline-block;
+    min-width: 260px;
+    margin: 0 auto 22px;
+    padding: 10px 24px;
+    border: 1px solid #000;
+    box-shadow: 0 2px 0 #000;
+    color: #000;
+    text-decoration: none;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    background: transparent;
+  }
+
+  .order-history__support-contact-btn:hover {
+    opacity: 0.7;
+  }
+
+  .order-history__support-hours-label {
+    margin: 0 0 8px;
+    color: #6d7f95;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+
+  .order-history__support-hours-text {
+    margin: 0 0 16px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #2f3f4e;
+  }
+
+  .order-history__support-help-link {
+    font-size: 1rem;
+    color: #000;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .order-history__support {
+      padding: 40px 16px;
+    }
+
+    .order-history__support-title {
+      font-size: 2.2rem;
+    }
+
+    .order-history__support-body {
+      font-size: 1rem;
+    }
   }
 
 

@@ -1,4 +1,224 @@
-(function(){"use strict";function N(o){let e={};try{const t=document.getElementById(o);t&&t.textContent.trim()!=="null"&&(e=JSON.parse(t.textContent)||{})}catch(t){console.warn("[DiptyqueAccount] Failed to parse i18n from #"+o,t)}return function(r,s){return r in e?e[r]:s!==void 0?s:(console.warn("[DiptyqueAccount] Missing i18n key:",r),r)}}function x(o){try{const e=document.getElementById(o);if(e)return JSON.parse(e.textContent)||{}}catch(e){console.warn("[DiptyqueAccount] Failed to parse config from #"+o,e)}return{}}function u(o){if(!o&&o!==0)return"";const e=document.createElement("div");return e.textContent=String(o),e.innerHTML}function A(o){if(!o)return"";const e=new Date(o);return isNaN(e)?String(o):e.getFullYear()+"/"+String(e.getMonth()+1).padStart(2,"0")+"/"+String(e.getDate()).padStart(2,"0")}function q(o){return!o||!/^\d{4}-\d{2}-\d{2}$/.test(o)?o||"":o.replace(/-/g,"/")}function L(o){return!o||!/^\d{4}\/\d{2}\/\d{2}$/.test(o)?o||"":o.replace(/\//g,"-")}function b(o,e){const t=parseFloat(o);return isNaN(t)?"":e==="JPY"?"¥"+Math.round(t).toLocaleString("ja-JP"):e+" "+t.toFixed(2)}function M(o){return{PAID:"支払い済み",PENDING:"保留中",REFUNDED:"返金済み",PARTIALLY_REFUNDED:"一部返金",VOIDED:"無効",AUTHORIZED:"承認済み"}[o]||o||"—"}function I(o){return{FULFILLED:"発送済み",PARTIAL:"一部発送",UNFULFILLED:"未発送",RESTOCKED:"再入荷"}[o]||o||"未発送"}function h(o,e,t){if(!Array.isArray(o))return"";const r=o.find(s=>s&&s.namespace===e&&s.key===t);return r&&r.value||""}const y="shopifyCustomerAccessToken",w="shopifyCustomerAccessTokenExpiresAt",F="shopifyCustomer",g={get(){if(document.getElementById("my-account-native-customer"))return{token:null,isNative:!0};const o=localStorage.getItem(y),e=localStorage.getItem(w);return!o||!e?null:new Date(e)<=new Date?(this.clear(),null):{token:o,isNative:!1}},save(o,e){localStorage.setItem(y,o),localStorage.setItem(w,e)},clear(){localStorage.removeItem(y),localStorage.removeItem(w),localStorage.removeItem(F)},getToken(){const o=this.get();return o?o.token:null},isNative(){return!!document.getElementById("my-account-native-customer")}},k={get(){const o=document.getElementById("my-account-native-customer");if(!o)return null;try{return JSON.parse(o.textContent||"null")||null}catch(e){return console.warn("[DiptyqueAccount] Failed to parse #ma-native-customer JSON",e),null}}};function E(){var o;return((o=document.querySelector('#ma-native-form [name="authenticity_token"]'))==null?void 0:o.value)||""}function S(o){g.clear(),sessionStorage.removeItem("dp_ca_token"),window.location.href=o||"/"}class D{constructor(e,t){if(!e)throw new Error("[DiptyqueStorefrontClient] endpoint is required");if(!t)throw new Error("[DiptyqueStorefrontClient] token is required");this._endpoint=e,this._token=t}async request(e,t={}){let r;try{r=await fetch(this._endpoint,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json","X-Shopify-Storefront-Access-Token":this._token},body:JSON.stringify({query:e,variables:t})})}catch(a){throw new Error("[StorefrontClient] Network error: "+a.message)}if(!r.ok)throw new Error("[StorefrontClient] HTTP "+r.status+" "+r.statusText);const s=await r.json();if(s.errors&&s.errors.length){const a=s.errors.map(n=>n.message).join("; ");throw new Error("[StorefrontClient] GraphQL error: "+a)}return s.data||{}}}class O{constructor(e,t){if(!e)throw new Error("[DiptyqueBackendClient] baseUrl is required");if(!t)throw new Error("[DiptyqueBackendClient] getToken callback is required");this._base=e.replace(/\/+$/,""),this._getToken=t}async post(e,t={}){const r=this._base+e;let s;try{s=await fetch(r,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({customer_access_token:this._getToken(),...t})})}catch(n){throw new Error("[BackendClient] Network error: "+n.message)}let a;try{a=await s.json()}catch{a={}}if(!s.ok||a.success===!1){const n=new Error(a.message||"HTTP "+s.status);throw n.status=s.status,n.code=a.code,n.response=a,console.warn("[BackendClient]",s.status,r,a),n}return a.data!==void 0?a.data:a}}const B=`
+(function() {
+  "use strict";
+  function loadI18n(elementId) {
+    let strings = {};
+    try {
+      const el = document.getElementById(elementId);
+      if (el && el.textContent.trim() !== "null") {
+        strings = JSON.parse(el.textContent) || {};
+      }
+    } catch (e) {
+      console.warn("[DiptyqueAccount] Failed to parse i18n from #" + elementId, e);
+    }
+    return function t(key, fallback) {
+      if (key in strings) return strings[key];
+      if (fallback !== void 0) return fallback;
+      console.warn("[DiptyqueAccount] Missing i18n key:", key);
+      return key;
+    };
+  }
+  function loadConfig(elementId) {
+    try {
+      const el = document.getElementById(elementId);
+      if (el) return JSON.parse(el.textContent) || {};
+    } catch (e) {
+      console.warn("[DiptyqueAccount] Failed to parse config from #" + elementId, e);
+    }
+    return {};
+  }
+  function escapeHtml(str) {
+    if (!str && str !== 0) return "";
+    const div = document.createElement("div");
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+  function isoToDisplayDate(iso) {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || "";
+    return iso.replace(/-/g, "/");
+  }
+  function displayToIsoDate(display) {
+    if (!display || !/^\d{4}\/\d{2}\/\d{2}$/.test(display)) return display || "";
+    return display.replace(/\//g, "-");
+  }
+  function translateOrderStatus(status) {
+    const map = {
+      PAID: "支払い済み",
+      PENDING: "保留中",
+      REFUNDED: "返金済み",
+      PARTIALLY_REFUNDED: "一部返金",
+      VOIDED: "無効",
+      AUTHORIZED: "承認済み"
+    };
+    return map[status] || status || "—";
+  }
+  function translateFulfillmentStatus(status) {
+    const map = {
+      FULFILLED: "発送済み",
+      PARTIAL: "一部発送",
+      UNFULFILLED: "未発送",
+      RESTOCKED: "再入荷"
+    };
+    return map[status] || status || "未発送";
+  }
+  function getMetafieldValue(metafields, namespace, key) {
+    if (!Array.isArray(metafields)) return "";
+    const mf = metafields.find((m) => m && m.namespace === namespace && m.key === key);
+    return mf ? mf.value || "" : "";
+  }
+  const TOKEN_KEY = "shopifyCustomerAccessToken";
+  const EXPIRY_KEY = "shopifyCustomerAccessTokenExpiresAt";
+  const CACHE_KEY = "shopifyCustomer";
+  const DiptyqueTokenStore = {
+    /**
+     * @returns {{ token: string|null, isNative: boolean } | null}
+     */
+    get() {
+      if (document.getElementById("my-account-native-customer")) {
+        return { token: null, isNative: true };
+      }
+      const token = localStorage.getItem(TOKEN_KEY);
+      const expiry = localStorage.getItem(EXPIRY_KEY);
+      if (!token || !expiry) return null;
+      if (new Date(expiry) <= /* @__PURE__ */ new Date()) {
+        this.clear();
+        return null;
+      }
+      return { token, isNative: false };
+    },
+    save(token, expiresAt) {
+      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(EXPIRY_KEY, expiresAt);
+    },
+    clear() {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(EXPIRY_KEY);
+      localStorage.removeItem(CACHE_KEY);
+    },
+    getToken() {
+      const s = this.get();
+      return s ? s.token : null;
+    },
+    isNative() {
+      return Boolean(document.getElementById("my-account-native-customer"));
+    }
+  };
+  const DiptyqueNativeSession = {
+    get() {
+      const el = document.getElementById("my-account-native-customer");
+      if (!el) return null;
+      try {
+        return JSON.parse(el.textContent || "null") || null;
+      } catch (e) {
+        console.warn("[DiptyqueAccount] Failed to parse #ma-native-customer JSON", e);
+        return null;
+      }
+    }
+  };
+  function getNativeCSRFToken() {
+    var _a;
+    return ((_a = document.querySelector('#ma-native-form [name="authenticity_token"]')) == null ? void 0 : _a.value) || "";
+  }
+  function logoutAccount(redirectUrl) {
+    DiptyqueTokenStore.clear();
+    sessionStorage.removeItem("dp_ca_token");
+    window.location.href = redirectUrl || "/";
+  }
+  class DiptyqueStorefrontClient {
+    /**
+     * @param {string} endpoint  Full Storefront GraphQL endpoint URL
+     * @param {string} token     Public Storefront access token
+     */
+    constructor(endpoint, token) {
+      if (!endpoint) throw new Error("[DiptyqueStorefrontClient] endpoint is required");
+      if (!token) throw new Error("[DiptyqueStorefrontClient] token is required");
+      this._endpoint = endpoint;
+      this._token = token;
+    }
+    /**
+     * Execute a GraphQL operation.
+     * @param {string} query
+     * @param {Object} [variables]
+     * @returns {Promise<Object>}  `data` field from the GraphQL response
+     */
+    async request(query, variables = {}) {
+      let res;
+      try {
+        res = await fetch(this._endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Shopify-Storefront-Access-Token": this._token
+          },
+          body: JSON.stringify({ query, variables })
+        });
+      } catch (networkErr) {
+        throw new Error("[StorefrontClient] Network error: " + networkErr.message);
+      }
+      if (!res.ok) {
+        throw new Error("[StorefrontClient] HTTP " + res.status + " " + res.statusText);
+      }
+      const json = await res.json();
+      if (json.errors && json.errors.length) {
+        const msg = json.errors.map((e) => e.message).join("; ");
+        throw new Error("[StorefrontClient] GraphQL error: " + msg);
+      }
+      return json.data || {};
+    }
+  }
+  class DiptyqueBackendClient {
+    /**
+     * @param {string}          baseUrl   Backend base URL
+     * @param {() => string|null} getToken  Callback returning current access token
+     */
+    constructor(baseUrl, getToken) {
+      if (!baseUrl) throw new Error("[DiptyqueBackendClient] baseUrl is required");
+      if (!getToken) throw new Error("[DiptyqueBackendClient] getToken callback is required");
+      this._base = baseUrl.replace(/\/+$/, "");
+      this._getToken = getToken;
+    }
+    /**
+     * POST JSON to a backend endpoint.
+     * Automatically merges `customer_access_token` into the request body.
+     * @param {string} path   e.g. "/api/customers/account/addresses/create"
+     * @param {Object} [body]
+     * @returns {Promise<Object>}
+     */
+    async post(path, body = {}) {
+      const url = this._base + path;
+      let res;
+      try {
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer_access_token: this._getToken(),
+            ...body
+          })
+        });
+      } catch (networkErr) {
+        throw new Error("[BackendClient] Network error: " + networkErr.message);
+      }
+      let json;
+      try {
+        json = await res.json();
+      } catch {
+        json = {};
+      }
+      if (!res.ok || json.success === false) {
+        const err = new Error(json.message || "HTTP " + res.status);
+        err.status = res.status;
+        err.code = json.code;
+        err.response = json;
+        console.warn("[BackendClient]", res.status, url, json);
+        throw err;
+      }
+      return json.data !== void 0 ? json.data : json;
+    }
+  }
+  const FETCH_CUSTOMER_QUERY = (
+    /* graphql */
+    `
   query GetCustomer($token: String!) {
     customer(customerAccessToken: $token) {
       id firstName lastName email phone acceptsMarketing
@@ -29,21 +249,198 @@
       }
     }
   }
-`,R=`
+`
+  );
+  const CREATE_TOKEN_MUTATION = (
+    /* graphql */
+    `
   mutation CustomerTokenCreate($input: CustomerAccessTokenCreateInput!) {
     customerAccessTokenCreate(input: $input) {
       customerAccessToken { accessToken expiresAt }
       customerUserErrors  { field message code }
     }
   }
-`,j=`
+`
+  );
+  const METAFIELDS_SET_MUTATION = (
+    /* graphql */
+    `
   mutation CustomerMetafieldsSet($metafields: [CustomerMetafieldsSetInput!]!) {
     customerMetafieldsSet(metafields: $metafields) {
       metafields { namespace key value }
       userErrors  { field message code }
     }
   }
-`,H="https://shopify.com/account/customer/api/2024-10/graphql";function U(o){if(!o)return null;const e=String(o).trim();if(/^\+\d{7,15}$/.test(e))return e;const t=e.replace(/[\s\-().]/g,"");return/^\d+$/.test(t)&&/^0\d{9,10}$/.test(t)?"+81"+t.slice(1):null}class Y{constructor(e,t){this._sf=e,this._be=t}async createAccessToken(e,t){var n,c,l;const s=(await this._sf.request(R,{input:{email:e,password:t}})).customerAccessTokenCreate,a=(s==null?void 0:s.customerUserErrors)||[];if(a.length||!((n=s==null?void 0:s.customerAccessToken)!=null&&n.accessToken)){const i=new Error(((c=a[0])==null?void 0:c.message)||"Invalid credentials");throw i.isAuthError=!0,i.code=((l=a[0])==null?void 0:l.code)||"UNIDENTIFIED_CUSTOMER",i}return s.customerAccessToken}async verifyPassword(e,t){return(await this.createAccessToken(e,t).catch(()=>{const s=new Error("currentPasswordInvalid");throw s.isPasswordError=!0,s.status=401,s})).accessToken}async fetchCustomer(e){return(await this._sf.request(B,{token:e})).customer||null}async updateProfile(e){return this._be.post("/api/customers/account/update-profile",{first_name:e.firstName,last_name:e.lastName,first_name_kana:e.first_name_kana,last_name_kana:e.last_name_kana,email:e.email,phone:e.phone,birthday:e.birthday||"",current_password:e.current_password||""})}async updatePassword(e,t){return this._be.post("/api/customers/account/update-password",{current_password:e,new_password:t})}async updateMetafields(e){var c,l,i,d,m;const t=[];if(e.last_name_kana&&t.push({namespace:"registration",key:"last_name_kana",value:e.last_name_kana,type:"single_line_text_field"}),e.first_name_kana&&t.push({namespace:"registration",key:"first_name_kana",value:e.first_name_kana,type:"single_line_text_field"}),e.birthday&&t.push({namespace:"registration",key:"birthday",value:e.birthday,type:"date"}),!t.length)return;const r=sessionStorage.getItem("dp_ca_token");if(!r){console.warn("[CustomerApi] No dp_ca_token — metafields not updated");return}const s=await fetch(H,{method:"POST",headers:{"Content-Type":"application/json",Authorization:r},body:JSON.stringify({query:j,variables:{metafields:t}})});if(!s.ok)throw new Error("[CustomerApi] Customer Account API HTTP "+s.status);const a=await s.json();if((c=a.errors)!=null&&c.length)throw new Error(((l=a.errors[0])==null?void 0:l.message)||"Metafield GraphQL error");const n=((d=(i=a.data)==null?void 0:i.customerMetafieldsSet)==null?void 0:d.userErrors)||[];if(n.length)throw new Error(((m=n[0])==null?void 0:m.message)||"Metafield error")}async updateProfileNative(e,t){const r=new URLSearchParams;if(r.append("form_type","customer"),r.append("utf8","✓"),r.append("customer[first_name]",e.firstName||""),r.append("customer[last_name]",e.lastName||""),r.append("customer[email]",e.email||""),e.phone){const a=U(e.phone);a&&r.append("customer[phone]",a)}t&&r.append("authenticity_token",t);const s=await fetch("/account",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:r.toString(),credentials:"same-origin"});if(!s.ok&&!s.redirected){const a=new Error("Native profile update failed: HTTP "+s.status);throw a.status=s.status,a.isNative=!0,a}}async updatePasswordNative(e,t,r){const s=new URLSearchParams;s.append("form_type","customer"),s.append("utf8","✓"),s.append("customer[password]",e),s.append("customer[password_confirmation]",t),r&&s.append("authenticity_token",r);const a=await fetch("/account",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:s.toString(),credentials:"same-origin"});if(!a.ok&&!a.redirected)throw new Error("Native password update failed: HTTP "+a.status)}}const z=`
+`
+  );
+  const CUSTOMER_ACCOUNT_API_ENDPOINT = "https://shopify.com/account/customer/api/2024-10/graphql";
+  function _toE164Japan(raw) {
+    if (!raw) return null;
+    const trimmed = String(raw).trim();
+    if (/^\+\d{7,15}$/.test(trimmed)) return trimmed;
+    const digits = trimmed.replace(/[\s\-().]/g, "");
+    if (!/^\d+$/.test(digits)) return null;
+    if (/^0\d{9,10}$/.test(digits)) {
+      return "+81" + digits.slice(1);
+    }
+    return null;
+  }
+  class DiptyqueCustomerApi {
+    /**
+     * @param {import('./storefront').DiptyqueStorefrontClient} storefrontClient
+     * @param {import('./backend').DiptyqueBackendClient}       backendClient
+     */
+    constructor(storefrontClient, backendClient) {
+      this._sf = storefrontClient;
+      this._be = backendClient;
+    }
+    // ── Auth ───────────────────────────────────────────────────────────────────
+    async createAccessToken(email, password) {
+      var _a, _b, _c;
+      const data = await this._sf.request(CREATE_TOKEN_MUTATION, {
+        input: { email, password }
+      });
+      const result = data.customerAccessTokenCreate;
+      const userErrors = (result == null ? void 0 : result.customerUserErrors) || [];
+      if (userErrors.length || !((_a = result == null ? void 0 : result.customerAccessToken) == null ? void 0 : _a.accessToken)) {
+        const err = new Error(((_b = userErrors[0]) == null ? void 0 : _b.message) || "Invalid credentials");
+        err.isAuthError = true;
+        err.code = ((_c = userErrors[0]) == null ? void 0 : _c.code) || "UNIDENTIFIED_CUSTOMER";
+        throw err;
+      }
+      return result.customerAccessToken;
+    }
+    async verifyPassword(email, password) {
+      const result = await this.createAccessToken(email, password).catch(() => {
+        const pwdErr = new Error("currentPasswordInvalid");
+        pwdErr.isPasswordError = true;
+        pwdErr.status = 401;
+        throw pwdErr;
+      });
+      return result.accessToken;
+    }
+    // ── Read ───────────────────────────────────────────────────────────────────
+    async fetchCustomer(accessToken) {
+      const data = await this._sf.request(FETCH_CUSTOMER_QUERY, { token: accessToken });
+      return data.customer || null;
+    }
+    // ── Profile update (Backend) ───────────────────────────────────────────────
+    async updateProfile(fields) {
+      return this._be.post("/api/customers/account/update-profile", {
+        first_name: fields.firstName,
+        last_name: fields.lastName,
+        first_name_kana: fields.first_name_kana,
+        last_name_kana: fields.last_name_kana,
+        email: fields.email,
+        phone: fields.phone,
+        birthday: fields.birthday || "",
+        current_password: fields.current_password || ""
+      });
+    }
+    // ── Password update (Backend) ──────────────────────────────────────────────
+    // Backend verifies current_password internally via its own Storefront API
+    // call (server-side), so no browser-side verifyPassword step is needed.
+    async updatePassword(currentPassword, newPassword) {
+      return this._be.post("/api/customers/account/update-password", {
+        current_password: currentPassword,
+        new_password: newPassword
+      });
+    }
+    // ── Metafields (Customer Account API / PKCE) ───────────────────────────────
+    async updateMetafields(fields) {
+      var _a, _b, _c, _d, _e;
+      const metafieldsInput = [];
+      if (fields.last_name_kana) {
+        metafieldsInput.push({
+          namespace: "registration",
+          key: "last_name_kana",
+          value: fields.last_name_kana,
+          type: "single_line_text_field"
+        });
+      }
+      if (fields.first_name_kana) {
+        metafieldsInput.push({
+          namespace: "registration",
+          key: "first_name_kana",
+          value: fields.first_name_kana,
+          type: "single_line_text_field"
+        });
+      }
+      if (fields.birthday) {
+        metafieldsInput.push({
+          namespace: "registration",
+          key: "birthday",
+          value: fields.birthday,
+          type: "date"
+        });
+      }
+      if (!metafieldsInput.length) return;
+      const caToken = sessionStorage.getItem("dp_ca_token");
+      if (!caToken) {
+        console.warn("[CustomerApi] No dp_ca_token — metafields not updated");
+        return;
+      }
+      const res = await fetch(CUSTOMER_ACCOUNT_API_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: caToken },
+        body: JSON.stringify({
+          query: METAFIELDS_SET_MUTATION,
+          variables: { metafields: metafieldsInput }
+        })
+      });
+      if (!res.ok) throw new Error("[CustomerApi] Customer Account API HTTP " + res.status);
+      const json = await res.json();
+      if ((_a = json.errors) == null ? void 0 : _a.length) throw new Error(((_b = json.errors[0]) == null ? void 0 : _b.message) || "Metafield GraphQL error");
+      const userErrors = ((_d = (_c = json.data) == null ? void 0 : _c.customerMetafieldsSet) == null ? void 0 : _d.userErrors) || [];
+      if (userErrors.length) throw new Error(((_e = userErrors[0]) == null ? void 0 : _e.message) || "Metafield error");
+    }
+    // ── Native session mutations ───────────────────────────────────────────────
+    async updateProfileNative(fields, csrfToken) {
+      const body = new URLSearchParams();
+      body.append("form_type", "customer");
+      body.append("utf8", "✓");
+      body.append("customer[first_name]", fields.firstName || "");
+      body.append("customer[last_name]", fields.lastName || "");
+      body.append("customer[email]", fields.email || "");
+      if (fields.phone) {
+        const e164 = _toE164Japan(fields.phone);
+        if (e164) body.append("customer[phone]", e164);
+      }
+      if (csrfToken) body.append("authenticity_token", csrfToken);
+      const res = await fetch("/account", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+        credentials: "same-origin"
+      });
+      if (!res.ok && !res.redirected) {
+        const err = new Error("Native profile update failed: HTTP " + res.status);
+        err.status = res.status;
+        err.isNative = true;
+        throw err;
+      }
+    }
+    async updatePasswordNative(newPassword, confirmPassword, csrfToken) {
+      const body = new URLSearchParams();
+      body.append("form_type", "customer");
+      body.append("utf8", "✓");
+      body.append("customer[password]", newPassword);
+      body.append("customer[password_confirmation]", confirmPassword);
+      if (csrfToken) body.append("authenticity_token", csrfToken);
+      const res = await fetch("/account", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+        credentials: "same-origin"
+      });
+      if (!res.ok && !res.redirected) {
+        throw new Error("Native password update failed: HTTP " + res.status);
+      }
+    }
+  }
+  const GET_ORDERS_QUERY = (
+    /* graphql */
+    `
   query GetCustomerOrders($token: String!, $first: Int!) {
     customer(customerAccessToken: $token) {
       orders(first: $first, sortKey: PROCESSED_AT, reverse: true) {
@@ -64,11 +461,60 @@
       }
     }
   }
-`;class K{constructor(e){this._sf=e}async list(e,t=20){var s,a;return(((a=(s=(await this._sf.request(z,{token:e,first:t})).customer)==null?void 0:s.orders)==null?void 0:a.edges)??[]).map(n=>n.node)}}class V{constructor(e,t){this._el=e,this._t=t,this._handlers={},this._dobPicker=null}on(e,t){this._handlers[e]=t}_emit(e,...t){this._handlers[e]?this._handlers[e](...t):console.warn("[ProfileRenderer] No handler for:",e)}renderLoading(){this._el.innerHTML=`
+`
+  );
+  class DiptyqueOrderApi {
+    /** @param {import('./storefront').DiptyqueStorefrontClient} storefrontClient */
+    constructor(storefrontClient) {
+      this._sf = storefrontClient;
+    }
+    /**
+     * Fetch the customer's recent orders.
+     * @param {string} accessToken
+     * @param {number} [limit=20]
+     * @returns {Promise<Object[]>}
+     */
+    async list(accessToken, limit = 20) {
+      var _a, _b;
+      const data = await this._sf.request(GET_ORDERS_QUERY, {
+        token: accessToken,
+        first: limit
+      });
+      return (((_b = (_a = data.customer) == null ? void 0 : _a.orders) == null ? void 0 : _b.edges) ?? []).map((e) => e.node);
+    }
+  }
+  class DiptyqueProfileRenderer {
+    /**
+     * @param {HTMLElement} container
+     * @param {Function}    t          i18n lookup fn
+     */
+    constructor(container, t) {
+      this._el = container;
+      this._t = t;
+      this._handlers = {};
+      this._dobPicker = null;
+    }
+    // ── Event dispatch ─────────────────────────────────────────────────────────
+    on(action, handler) {
+      this._handlers[action] = handler;
+    }
+    _emit(action, ...args) {
+      if (this._handlers[action]) {
+        this._handlers[action](...args);
+      } else {
+        console.warn("[ProfileRenderer] No handler for:", action);
+      }
+    }
+    // ── Public render ──────────────────────────────────────────────────────────
+    renderLoading() {
+      this._el.innerHTML = `
       <div class="my-account__loading">
         <div class="my-account__spinner"></div>
-        <p>${this._t("loading","読み込み中...")}</p>
-      </div>`}renderLoginPrompt(){this._el.innerHTML=`
+        <p>${this._t("loading", "読み込み中...")}</p>
+      </div>`;
+    }
+    renderLoginPrompt() {
+      this._el.innerHTML = `
       <div class="my-account__not-logged-in">
         <div class="my-account__not-logged-in-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"
@@ -77,58 +523,66 @@
             <circle cx="12" cy="7" r="4"/>
           </svg>
         </div>
-        <h2>${this._t("login_required","ログインが必要です")}</h2>
-        <p>${this._t("login_prompt","アカウント情報を表示するにはログインしてください。")}</p>
+        <h2>${this._t("login_required", "ログインが必要です")}</h2>
+        <p>${this._t("login_prompt", "アカウント情報を表示するにはログインしてください。")}</p>
         <button type="button" class="my-account__login-btn button" data-open-account-modal="login">
-          ${this._t("login_btn","ログイン")}
+          ${this._t("login_btn", "ログイン")}
         </button>
-      </div>`}renderDashboard(e){const t=this._t,r=e.metafields||[],s=u(h(r,"registration","last_name_kana")),a=u(h(r,"registration","first_name_kana")),n=u(q(h(r,"registration","birthday")));this._el.innerHTML=`
+      </div>`;
+    }
+    renderDashboard(customer) {
+      const t = this._t;
+      const mfs = customer.metafields || [];
+      const lastKana = escapeHtml(getMetafieldValue(mfs, "registration", "last_name_kana"));
+      const firstKana = escapeHtml(getMetafieldValue(mfs, "registration", "first_name_kana"));
+      const dob = escapeHtml(isoToDisplayDate(getMetafieldValue(mfs, "registration", "birthday")));
+      this._el.innerHTML = `
       <!-- ── Profile section ────────────────────────────────────────── -->
       <div class="my-account__form-section" data-section="profile">
-        <h2 class="my-account__section-heading">${t("profile_title","お客様情報")}</h2>
+        <h2 class="my-account__section-heading">${t("profile_title", "お客様情報")}</h2>
         <div class="my-account__form-grid">
 
           <div class="my-account__form-field">
-            <label for="ma-lastName">${t("last_name","姓")} *</label>
+            <label for="ma-lastName">${t("last_name", "姓")} *</label>
             <input id="ma-lastName" name="lastName" data-field="lastName"
               class="my-account__input" type="text"
-              value="${u(e.lastName||"")}"
-              placeholder="${t("last_name","姓")}" autocomplete="family-name">
+              value="${escapeHtml(customer.lastName || "")}"
+              placeholder="${t("last_name", "姓")}" autocomplete="family-name">
             <span class="my-account__field-error" data-error-for="lastName" aria-live="polite"></span>
           </div>
 
           <div class="my-account__form-field">
-            <label for="ma-firstName">${t("first_name","名")} *</label>
+            <label for="ma-firstName">${t("first_name", "名")} *</label>
             <input id="ma-firstName" name="firstName" data-field="firstName"
               class="my-account__input" type="text"
-              value="${u(e.firstName||"")}"
-              placeholder="${t("first_name","名")}" autocomplete="given-name">
+              value="${escapeHtml(customer.firstName || "")}"
+              placeholder="${t("first_name", "名")}" autocomplete="given-name">
             <span class="my-account__field-error" data-error-for="firstName" aria-live="polite"></span>
           </div>
 
           <div class="my-account__form-field">
-            <label for="ma-last-name-kana">${t("furigana_last","フリガナ（姓）")} *</label>
+            <label for="ma-last-name-kana">${t("furigana_last", "フリガナ（姓）")} *</label>
             <input id="ma-last-name-kana" name="last_name_kana" data-field="last_name_kana"
               class="my-account__input" type="text"
-              value="${s}" placeholder="${t("furigana_last","フリガナ（姓）")}">
+              value="${lastKana}" placeholder="${t("furigana_last", "フリガナ（姓）")}">
             <span class="my-account__field-error" data-error-for="last_name_kana" aria-live="polite"></span>
           </div>
 
           <div class="my-account__form-field">
-            <label for="ma-first-name-kana">${t("furigana_first","フリガナ（名）")} *</label>
+            <label for="ma-first-name-kana">${t("furigana_first", "フリガナ（名）")} *</label>
             <input id="ma-first-name-kana" name="first_name_kana" data-field="first_name_kana"
               class="my-account__input" type="text"
-              value="${a}" placeholder="${t("furigana_first","フリガナ（名）")}">
+              value="${firstKana}" placeholder="${t("furigana_first", "フリガナ（名）")}">
             <span class="my-account__field-error" data-error-for="first_name_kana" aria-live="polite"></span>
           </div>
         </div>
 
         <div class="my-account__form-field my-account__form-field--full mt-16">
-          <label for="ma-dob">${t("dob","生年月日")} <span class="my-account__info-icon">?</span></label>
+          <label for="ma-dob">${t("dob", "生年月日")} <span class="my-account__info-icon">?</span></label>
           <div class="my-account__date-input">
             <input id="ma-dob" name="dob" data-field="dob"
               class="my-account__input" type="text"
-              value="${n}" placeholder="YYYY/MM/DD">
+              value="${dob}" placeholder="YYYY/MM/DD">
             <span id="ma-dob-toggle" class="my-account__calendar-icon" style="cursor:pointer;">
               <svg style="pointer-events:none;" width="16" height="16" viewBox="0 0 24 24" fill="none"
                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -142,19 +596,19 @@
         </div>
 
         <div class="my-account__form-field my-account__form-field--full mt-16">
-          <label for="ma-phone">${t("phone","電話番号")} *</label>
+          <label for="ma-phone">${t("phone", "電話番号")} *</label>
           <input id="ma-phone" name="phone" data-field="phone"
             class="my-account__input" type="tel"
-            value="${u(e.phone||"")}"
+            value="${escapeHtml(customer.phone || "")}"
             placeholder="012322222" autocomplete="tel">
           <span class="my-account__field-error" data-error-for="phone" aria-live="polite"></span>
         </div>
 
         <div class="my-account__form-field my-account__form-field--full mt-16">
-          <label for="ma-email">${t("email","Eメールアドレス")} *</label>
+          <label for="ma-email">${t("email", "Eメールアドレス")} *</label>
           <input id="ma-email" name="email" data-field="email"
             class="my-account__input" type="email"
-            value="${u(e.email||"")}"
+            value="${escapeHtml(customer.email || "")}"
             placeholder="your@email.com" autocomplete="email">
           <span class="my-account__field-error" data-error-for="email" aria-live="polite"></span>
         </div>
@@ -162,127 +616,746 @@
         <!-- Email change requires current password verification -->
         <div class="my-account__form-field my-account__form-field--full mt-16 my-account__form-field--hidden"
              data-profile-email-verify>
-          <label for="ma-profileCurrentPassword">${t("current_password","現在のパスワード")} *</label>
+          <label for="ma-profileCurrentPassword">${t("current_password", "現在のパスワード")} *</label>
           <div class="my-account__password-input">
             <input id="ma-profileCurrentPassword" name="profileCurrentPassword"
               data-field="profileCurrentPassword"
               class="my-account__input" type="password"
-              placeholder="${t("current_password","現在のパスワード")}" autocomplete="current-password">
+              placeholder="${t("current_password", "現在のパスワード")}" autocomplete="current-password">
             ${this._eyeIcon()}
           </div>
           <span class="my-account__field-error" data-error-for="profileCurrentPassword" aria-live="polite"></span>
         </div>
 
-        <p class="my-account__required-text">${t("required","* 必須")}</p>
+        <p class="my-account__required-text">${t("required", "* 必須")}</p>
         <div class="my-account__form-message" data-form-message="profile" role="alert" aria-live="polite"></div>
-        <button type="button" class="my-account__submit-btn" data-submit="profile">${t("submit","確定")}</button>
+        <button type="button" class="my-account__submit-btn" data-submit="profile">${t("submit", "確定")}</button>
       </div>
 
       <!-- ── Password section ──────────────────────────────────────── -->
       <div class="my-account__form-section mt-40" data-section="password">
-        <h2 class="my-account__section-heading">${t("login_info_title","ログイン情報")}</h2>
-        ${this._passwordField("currentPassword",t("password","パスワード"),"current-password")}
-        ${this._passwordField("newPassword",t("new_password","新しいパスワード"),"new-password",!0)}
-        <p class="my-account__password-hint">${t("password_hint","ⓘ パスワードは8文字以上で、英字・数字・記号を含む必要があります。")}</p>
-        ${this._passwordField("confirmPassword",t("password_confirm","パスワード（再入力）"),"new-password")}
+        <h2 class="my-account__section-heading">${t("login_info_title", "ログイン情報")}</h2>
+        ${this._passwordField("currentPassword", t("password", "パスワード"), "current-password")}
+        ${this._passwordField("newPassword", t("new_password", "新しいパスワード"), "new-password", true)}
+        <p class="my-account__password-hint">${t("password_hint", "ⓘ パスワードは8文字以上で、英字・数字・記号を含む必要があります。")}</p>
+        ${this._passwordField("confirmPassword", t("password_confirm", "パスワード（再入力）"), "new-password")}
 
         <div class="my-account__form-message" data-form-message="password" role="alert" aria-live="polite"></div>
-        <button type="button" class="my-account__submit-btn" data-submit="password">${t("submit","確定")}</button>
+        <button type="button" class="my-account__submit-btn" data-submit="password">${t("submit", "確定")}</button>
       </div>
-
-      <!-- ── Benefits banner ───────────────────────────────────────── -->
-      ${this._benefitsBanner()}
-    `,this._bindEvents(e),this._initDobPicker()}setFieldError(e,t){const r=this._el.querySelector(`[data-field="${e}"]`),s=this._el.querySelector(`[data-error-for="${e}"]`);r&&(r.classList.add("my-account__input--error"),r.setAttribute("aria-invalid","true")),s&&(s.textContent=t)}clearFieldError(e){const t=this._el.querySelector(`[data-field="${e}"]`),r=this._el.querySelector(`[data-error-for="${e}"]`);t&&(t.classList.remove("my-account__input--error"),t.removeAttribute("aria-invalid")),r&&(r.textContent="")}setFormMessage(e,t,r){const s=this._el.querySelector(`[data-form-message="${r}"]`);s&&(s.textContent=t,s.className=e?`my-account__form-message my-account__form-message--${e}`:"my-account__form-message",e==="success"&&setTimeout(()=>{s.textContent===t&&(s.textContent="",s.className="my-account__form-message")},6e3))}setSubmitState(e,t,r){const s=this._el.querySelector(`[data-submit="${e}"]`);s&&(s.disabled=t,t?(s.dataset.originalText=s.textContent,s.textContent=r||"...",s.classList.add("my-account__submit-btn--loading")):(s.textContent=s.dataset.originalText||this._t("submit","確定"),delete s.dataset.originalText,s.classList.remove("my-account__submit-btn--loading")))}showEmailVerifyField(e){const t=this._el.querySelector("[data-profile-email-verify]");if(t&&(t.classList.toggle("my-account__form-field--hidden",!e),!e)){const r=t.querySelector('[data-field="profileCurrentPassword"]');r&&(r.value=""),this.clearFieldError("profileCurrentPassword")}}getProfileFormData(){const e=t=>{var r;return(((r=this._el.querySelector(`[data-field="${t}"]`))==null?void 0:r.value)??"").trim()};return{lastName:e("lastName"),firstName:e("firstName"),last_name_kana:e("last_name_kana"),first_name_kana:e("first_name_kana"),dob:e("dob"),phone:e("phone"),email:e("email"),profileCurrentPassword:e("profileCurrentPassword")}}getPasswordFormData(){const e=t=>{var r;return((r=this._el.querySelector(`[data-field="${t}"]`))==null?void 0:r.value)??""};return{currentPassword:e("currentPassword"),newPassword:e("newPassword"),confirmPassword:e("confirmPassword")}}clearPasswordFields(){["currentPassword","newPassword","confirmPassword"].forEach(e=>{const t=this._el.querySelector(`[data-field="${e}"]`);t&&(t.value="")})}_eyeIcon(){return`<button type="button" class="my-account__password-toggle">
+`;
+      this._bindEvents(customer);
+      this._initDobPicker();
+    }
+    // ── Field-level feedback ───────────────────────────────────────────────────
+    setFieldError(fieldName, message) {
+      const input = this._el.querySelector(`[data-field="${fieldName}"]`);
+      const errEl = this._el.querySelector(`[data-error-for="${fieldName}"]`);
+      if (input) {
+        input.classList.add("my-account__input--error");
+        input.setAttribute("aria-invalid", "true");
+      }
+      if (errEl) errEl.textContent = message;
+    }
+    clearFieldError(fieldName) {
+      const input = this._el.querySelector(`[data-field="${fieldName}"]`);
+      const errEl = this._el.querySelector(`[data-error-for="${fieldName}"]`);
+      if (input) {
+        input.classList.remove("my-account__input--error");
+        input.removeAttribute("aria-invalid");
+      }
+      if (errEl) errEl.textContent = "";
+    }
+    setFormMessage(type, message, section) {
+      const msgEl = this._el.querySelector(`[data-form-message="${section}"]`);
+      if (!msgEl) return;
+      msgEl.textContent = message;
+      msgEl.className = type ? `my-account__form-message my-account__form-message--${type}` : "my-account__form-message";
+      if (type === "success") {
+        setTimeout(() => {
+          if (msgEl.textContent === message) {
+            msgEl.textContent = "";
+            msgEl.className = "my-account__form-message";
+          }
+        }, 6e3);
+      }
+    }
+    setSubmitState(section, loading, savingLabel) {
+      const btn = this._el.querySelector(`[data-submit="${section}"]`);
+      if (!btn) return;
+      btn.disabled = loading;
+      if (loading) {
+        btn.dataset.originalText = btn.textContent;
+        btn.textContent = savingLabel || "...";
+        btn.classList.add("my-account__submit-btn--loading");
+      } else {
+        btn.textContent = btn.dataset.originalText || this._t("submit", "確定");
+        delete btn.dataset.originalText;
+        btn.classList.remove("my-account__submit-btn--loading");
+      }
+    }
+    showEmailVerifyField(visible) {
+      const field = this._el.querySelector("[data-profile-email-verify]");
+      if (!field) return;
+      field.classList.toggle("my-account__form-field--hidden", !visible);
+      if (!visible) {
+        const input = field.querySelector('[data-field="profileCurrentPassword"]');
+        if (input) input.value = "";
+        this.clearFieldError("profileCurrentPassword");
+      }
+    }
+    getProfileFormData() {
+      const g = (field) => {
+        var _a;
+        return (((_a = this._el.querySelector(`[data-field="${field}"]`)) == null ? void 0 : _a.value) ?? "").trim();
+      };
+      return {
+        lastName: g("lastName"),
+        firstName: g("firstName"),
+        last_name_kana: g("last_name_kana"),
+        first_name_kana: g("first_name_kana"),
+        dob: g("dob"),
+        phone: g("phone"),
+        email: g("email"),
+        profileCurrentPassword: g("profileCurrentPassword")
+      };
+    }
+    getPasswordFormData() {
+      const g = (field) => {
+        var _a;
+        return ((_a = this._el.querySelector(`[data-field="${field}"]`)) == null ? void 0 : _a.value) ?? "";
+      };
+      return {
+        currentPassword: g("currentPassword"),
+        newPassword: g("newPassword"),
+        confirmPassword: g("confirmPassword")
+      };
+    }
+    clearPasswordFields() {
+      ["currentPassword", "newPassword", "confirmPassword"].forEach((f) => {
+        const el = this._el.querySelector(`[data-field="${f}"]`);
+        if (el) el.value = "";
+      });
+    }
+    // ── Private helpers ────────────────────────────────────────────────────────
+    _eyeIcon() {
+      return `<button type="button" class="my-account__password-toggle">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
       </svg>
-    </button>`}_passwordField(e,t,r,s=!1){return`
-      <div class="my-account__form-field my-account__form-field--full${s?" mt-16":""}">
-        <label for="ma-${e}">${t} *</label>
+    </button>`;
+    }
+    _passwordField(fieldName, label, autocomplete, addHintGap = false) {
+      return `
+      <div class="my-account__form-field my-account__form-field--full${addHintGap ? " mt-16" : ""}">
+        <label for="ma-${fieldName}">${label} *</label>
         <div class="my-account__password-input">
-          <input id="ma-${e}" name="${e}" data-field="${e}"
+          <input id="ma-${fieldName}" name="${fieldName}" data-field="${fieldName}"
             class="my-account__input" type="password"
-            placeholder="${t}" autocomplete="${r}">
+            placeholder="${label}" autocomplete="${autocomplete}">
           ${this._eyeIcon()}
         </div>
-        <span class="my-account__field-error" data-error-for="${e}" aria-live="polite"></span>
-      </div>`}_benefitsBanner(){const e=this._t;return`
-      <div class="my-account__benefits-banner mt-40">
-        <h3 class="my-account__benefits-title">${e("benefits_title","DIptyqueの会員特典")}</h3>
-        <p class="my-account__benefits-subtitle">${e("benefits_subtitle","Diptyque アカウントには、様々な特典がございます：")}</p>
-        <div class="my-account__benefits-icons">
-          <div class="my-account__benefit-item">
-            <div class="my-account__benefit-icon-wrapper">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 11h16"/><path d="M12 11V7"/><path d="M8 7a4 4 0 0 1 8 0v4H8V7z"/></svg>
-            </div>
-            <span class="my-account__benefit-text">${e("benefit_1","お誕生日に香りのサプライズ")}</span>
-          </div>
-          <div class="my-account__benefit-item">
-            <div class="my-account__benefit-icon-wrapper">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-            <span class="my-account__benefit-text">${e("benefit_2","Diptyqueのイベントへのご招待")}</span>
-          </div>
-          <div class="my-account__benefit-item">
-            <div class="my-account__benefit-icon-wrapper">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-2-2H5L3 8v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"/><path d="M3 8h18"/><path d="M12 3v5"/><path d="M16 12a4 4 0 0 1-8 0"/></svg>
-            </div>
-            <span class="my-account__benefit-text">${e("benefit_3","会員限定の特別販売へのご招待")}</span>
-          </div>
-        </div>
-      </div>`}_bindEvents(e){var t,r;this._el.querySelectorAll(".my-account__password-toggle").forEach(s=>{s.addEventListener("click",()=>{const a=s.previousElementSibling,n=a.type==="password";a.type=n?"text":"password",s.innerHTML=n?'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'})}),(t=this._el.querySelector('[data-submit="profile"]'))==null||t.addEventListener("click",()=>{this._emit("profile:submit",this.getProfileFormData())}),(r=this._el.querySelector('[data-submit="password"]'))==null||r.addEventListener("click",()=>{this._emit("password:submit",this.getPasswordFormData())}),this._el.querySelectorAll("[data-field]").forEach(s=>{s.addEventListener("input",()=>{if(this.clearFieldError(s.dataset.field),s.dataset.field==="email"){const a=(e.email||"").toLowerCase().trim()!==s.value.toLowerCase().trim();this.showEmailVerifyField(a)}})}),this.showEmailVerifyField(!1)}_initDobPicker(){if(this._dobPicker){try{this._dobPicker.destroy()}catch{}this._dobPicker=null}const e=document.getElementById("ma-dob"),t=document.getElementById("ma-dob-toggle");if(!e)return;const r=()=>{var n;const s=typeof flatpickr<"u"&&((n=flatpickr.l10ns)!=null&&n.ja)?flatpickr.l10ns.ja:"default",a=flatpickr(e,{dateFormat:"Y/m/d",allowInput:!0,disableMobile:!1,locale:s,maxDate:"today",minDate:"1900-01-01",appendTo:document.body,onReady(c,l,i){i.input.removeAttribute("readonly")},onChange(){e.dispatchEvent(new Event("input",{bubbles:!0}))}});t==null||t.addEventListener("click",c=>{c.preventDefault(),c.stopPropagation(),a.open()}),e.addEventListener("click",()=>a.open()),this._dobPicker=a};if(typeof flatpickr<"u")r();else{const s=setInterval(()=>{typeof flatpickr<"u"&&(clearInterval(s),r())},50)}}}class J{constructor(e,t){this._el=e,this._t=t}render(e){if(e.status==="loading"){this.renderLoading();return}if(e.status==="error"){this.renderError(e.error);return}this.renderOrders(e.orders)}renderLoading(){this._el.innerHTML=`
+        <span class="my-account__field-error" data-error-for="${fieldName}" aria-live="polite"></span>
+      </div>`;
+    }
+    _bindEvents(customer) {
+      var _a, _b;
+      this._el.querySelectorAll(".my-account__password-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const input = btn.previousElementSibling;
+          const isPass = input.type === "password";
+          input.type = isPass ? "text" : "password";
+          btn.innerHTML = isPass ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        });
+      });
+      (_a = this._el.querySelector('[data-submit="profile"]')) == null ? void 0 : _a.addEventListener("click", () => {
+        this._emit("profile:submit", this.getProfileFormData());
+      });
+      (_b = this._el.querySelector('[data-submit="password"]')) == null ? void 0 : _b.addEventListener("click", () => {
+        this._emit("password:submit", this.getPasswordFormData());
+      });
+      this._el.querySelectorAll("[data-field]").forEach((input) => {
+        input.addEventListener("input", () => {
+          this.clearFieldError(input.dataset.field);
+          if (input.dataset.field === "email") {
+            const changed = (customer.email || "").toLowerCase().trim() !== input.value.toLowerCase().trim();
+            this.showEmailVerifyField(changed);
+          }
+        });
+      });
+      this.showEmailVerifyField(false);
+    }
+    _initDobPicker() {
+      if (this._dobPicker) {
+        try {
+          this._dobPicker.destroy();
+        } catch (_) {
+        }
+        this._dobPicker = null;
+      }
+      const input = document.getElementById("ma-dob");
+      const toggle = document.getElementById("ma-dob-toggle");
+      if (!input) return;
+      const doInit = () => {
+        var _a;
+        const locale = typeof flatpickr !== "undefined" && ((_a = flatpickr.l10ns) == null ? void 0 : _a.ja) ? flatpickr.l10ns.ja : "default";
+        const fp = flatpickr(input, {
+          dateFormat: "Y/m/d",
+          allowInput: true,
+          disableMobile: false,
+          locale,
+          maxDate: "today",
+          minDate: "1900-01-01",
+          appendTo: document.body,
+          onReady(_d, _s, instance) {
+            instance.input.removeAttribute("readonly");
+          },
+          onChange() {
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+        });
+        toggle == null ? void 0 : toggle.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          fp.open();
+        });
+        input.addEventListener("click", () => fp.open());
+        this._dobPicker = fp;
+      };
+      if (typeof flatpickr !== "undefined") {
+        doInit();
+      } else {
+        const iv = setInterval(() => {
+          if (typeof flatpickr !== "undefined") {
+            clearInterval(iv);
+            doInit();
+          }
+        }, 50);
+      }
+    }
+  }
+  function formatDate(isoString, format = "YYYY/MM/DD") {
+    if (!isoString) return "";
+    const d = new Date(isoString);
+    if (isNaN(d)) return String(isoString);
+    const map = {
+      YYYY: d.getFullYear(),
+      MM: String(d.getMonth() + 1).padStart(2, "0"),
+      M: d.getMonth() + 1,
+      DD: String(d.getDate()).padStart(2, "0"),
+      D: d.getDate()
+    };
+    return format.replace(/YYYY|MM|DD|M|D/g, (key) => map[key]);
+  }
+  function formatPrice(money) {
+    if (!money) return "";
+    const amount = parseFloat(money.amount ?? 0);
+    const currency = money.currencyCode ?? "JPY";
+    try {
+      return new Intl.NumberFormat("ja-JP", {
+        style: "currency",
+        currency,
+        minimumFractionDigits: currency === "JPY" ? 0 : 2
+      }).format(amount);
+    } catch {
+      return `${currency} ${amount}`;
+    }
+  }
+  class DiptyqueOrderRenderer {
+    /**
+     * @param {HTMLElement} container  Panel element to render into
+     * @param {Function}    t          i18n lookup fn
+     */
+    constructor(container, t) {
+      this._el = container;
+      this._t = t;
+    }
+    render(state) {
+      if (state.status === "loading") {
+        this.renderLoading();
+        return;
+      }
+      if (state.status === "error") {
+        this.renderError(state.error);
+        return;
+      }
+      this.renderOrders(state.orders);
+    }
+    renderLoading() {
+      this._el.innerHTML = `
       <div class="my-account__loading">
         <div class="my-account__spinner"></div>
-        <p>${this._t("loading","読み込み中...")}</p>
-      </div>`}renderError(e){this._el.innerHTML=`<p class="my-account__form-message--error">${e||"エラーが発生しました。"}</p>`}renderOrders(e){const t=this._t;if(!e.length){this._el.innerHTML=`
+        <p>${this._t("loading", "読み込み中...")}</p>
+      </div>`;
+    }
+    renderError(message) {
+      this._el.innerHTML = `<p class="my-account__form-message--error">${message || "エラーが発生しました。"}</p>`;
+    }
+    renderOrders(orders) {
+      const t = this._t;
+      if (!orders.length) {
+        this._el.innerHTML = `
         <div class="my-account__empty">
-          <p>${t("no_orders","注文履歴はまだありません。")}</p>
+          <p>${t("no_orders", "注文履歴はまだありません。")}</p>
           <a href="/collections/all" class="my-account__shop-btn button">
-            ${t("start_shopping","ショッピングを始める")}
+            ${t("start_shopping", "ショッピングを始める")}
           </a>
-        </div>`;return}this._el.innerHTML=`
+        </div>`;
+        return;
+      }
+      this._el.innerHTML = `
       <div class="my-account__orders">
-        ${e.map(r=>{var n;const s=(((n=r.lineItems)==null?void 0:n.edges)||[]).map(c=>c.node),a=r.totalPrice;return`
+        ${orders.map((order) => {
+        var _a;
+        const lines = (((_a = order.lineItems) == null ? void 0 : _a.edges) || []).map((e) => e.node);
+        const total = order.totalPrice;
+        return `
             <div class="my-account__order">
               <div class="my-account__order-header">
                 <div class="my-account__order-info">
-                  <span class="my-account__order-name">${u(r.name)}</span>
-                  <span class="my-account__order-date">${A(r.processedAt)}</span>
+                  <span class="my-account__order-name">${escapeHtml(order.name)}</span>
+                  <span class="my-account__order-date">${formatDate(order.processedAt)}</span>
                 </div>
                 <div class="my-account__order-status">
-                  <span class="my-account__status-badge my-account__status-badge--${(r.financialStatus||"").toLowerCase()}">
-                    ${M(r.financialStatus)}
+                  <span class="my-account__status-badge my-account__status-badge--${(order.financialStatus || "").toLowerCase()}">
+                    ${translateOrderStatus(order.financialStatus)}
                   </span>
-                  <span class="my-account__status-badge my-account__status-badge--${(r.fulfillmentStatus||"unfulfilled").toLowerCase()}">
-                    ${I(r.fulfillmentStatus)}
+                  <span class="my-account__status-badge my-account__status-badge--${(order.fulfillmentStatus || "unfulfilled").toLowerCase()}">
+                    ${translateFulfillmentStatus(order.fulfillmentStatus)}
                   </span>
                 </div>
               </div>
 
               <div class="my-account__order-items">
-                ${s.map(c=>{var d,m,_,p;const l=(m=(d=c.variant)==null?void 0:d.image)==null?void 0:m.url,i=(_=c.variant)==null?void 0:_.price;return`
+                ${lines.map((item) => {
+          var _a2, _b, _c, _d;
+          const imgUrl = (_b = (_a2 = item.variant) == null ? void 0 : _a2.image) == null ? void 0 : _b.url;
+          const price = (_c = item.variant) == null ? void 0 : _c.price;
+          return `
                     <div class="my-account__order-item">
-                      ${l?`<img src="${l}" alt="${u(c.title)}" class="my-account__item-image" loading="lazy">`:'<div class="my-account__item-image my-account__item-image--placeholder"></div>'}
+                      ${imgUrl ? `<img src="${imgUrl}" alt="${escapeHtml(item.title)}" class="my-account__item-image" loading="lazy">` : '<div class="my-account__item-image my-account__item-image--placeholder"></div>'}
                       <div class="my-account__item-details">
-                        <p class="my-account__item-title">${u(c.title)}</p>
-                        ${(p=c.variant)!=null&&p.title&&c.variant.title!=="Default Title"?`<p class="my-account__item-variant">${u(c.variant.title)}</p>`:""}
-                        <p class="my-account__item-qty">${t("qty","数量")}: ${c.quantity}</p>
+                        <p class="my-account__item-title">${escapeHtml(item.title)}</p>
+                        ${((_d = item.variant) == null ? void 0 : _d.title) && item.variant.title !== "Default Title" ? `<p class="my-account__item-variant">${escapeHtml(item.variant.title)}</p>` : ""}
+                        <p class="my-account__item-qty">${t("qty", "数量")}: ${item.quantity}</p>
                       </div>
                       <div class="my-account__item-price">
-                        ${i?b(i.amount,i.currencyCode):""}
+                        ${price ? formatPrice(price) : ""}
                       </div>
-                    </div>`}).join("")}
+                    </div>`;
+        }).join("")}
               </div>
 
               <div class="my-account__order-total">
-                <span>${t("total","合計")}</span>
+                <span>${t("total", "合計")}</span>
                 <span class="my-account__order-total-amount">
-                  ${a?b(a.amount,a.currencyCode):""}
+                  ${total ? formatPrice(total) : ""}
                 </span>
               </div>
-            </div>`}).join("")}
-      </div>`}}function P(o){let e=o;const t=new Set,r=()=>t.forEach(s=>{try{s(e)}catch(a){console.error("[DiptyqueStore] Subscriber error",a)}});return{get(){return e},set(s){e=s,r()},update(s){e=s(e),r()},subscribe(s){return t.add(s),()=>t.delete(s)},find(s){return(Array.isArray(e)?e:(e==null?void 0:e.items)??[]).find(s)}}}const G=P({status:"idle",customer:null,error:null}),Q=P({status:"idle",orders:[],error:null});class W{constructor(e,t,r={}){this._api=e,this._renderer=t,this._isNative=r.isNative||!1,this._logoutUrl=r.logoutUrl||"/account/logout",this._getNativeSession=r.getNativeSession||null,this._store=G,this._store.subscribe(s=>{if(s.status==="loading"){t.renderLoading();return}if(s.status==="error"){window.location.href="/";return}s.status==="ready"&&s.customer&&(t.renderDashboard(s.customer),this._bindRendererActions())})}async load(e,t=null){var r,s;if(t){this._store.set({status:"ready",customer:t,error:null});return}if(!e){this._store.set({status:"error",customer:null,error:"no_session"});return}this._store.set({status:"loading",customer:null,error:null});try{const a=await this._api.fetchCustomer(e);if(!a){const n=(r=this._getNativeSession)==null?void 0:r.call(this);n?this._store.set({status:"ready",customer:n,error:null}):this._store.set({status:"error",customer:null,error:"invalid_token"});return}this._store.set({status:"ready",customer:a,error:null})}catch(a){console.error("[ProfileController] Failed to load customer",a);const n=(s=this._getNativeSession)==null?void 0:s.call(this);n?this._store.set({status:"ready",customer:n,error:null}):this._store.set({status:"error",customer:null,error:a.message})}}_bindRendererActions(){var e;this._renderer.on("profile:submit",t=>this._handleProfileSubmit(t)),this._renderer.on("password:submit",t=>this._handlePasswordSubmit(t)),(e=document.getElementById("my-account-logout"))==null||e.addEventListener("click",()=>{S(this._isNative?this._logoutUrl:"/")},{once:!0})}async _handleProfileSubmit(e){var l;if(this._profileBusy)return;this._profileBusy=!0;const t=this._renderer._t,r=this._renderer;r.setSubmitState("profile",!0,t("saving","保存中...")),r.setFormMessage("","","profile"),["lastName","firstName","last_name_kana","first_name_kana","dob","phone","email","profileCurrentPassword"].forEach(i=>r.clearFieldError(i));const a=this._validateProfile(e,t);if((((l=this._store.get().customer)==null?void 0:l.email)||"").toLowerCase()!==(e.email||"").toLowerCase()&&!e.profileCurrentPassword&&(a.profileCurrentPassword=t("validation_current_password_required_for_email","メールアドレスを変更する場合は現在のパスワードを入力してください。")),Object.keys(a).length){Object.entries(a).forEach(([i,d])=>r.setFieldError(i,d)),r.setSubmitState("profile",!1),this._profileBusy=!1;return}try{const i={firstName:e.firstName,lastName:e.lastName,first_name_kana:e.first_name_kana,last_name_kana:e.last_name_kana,email:e.email,phone:e.phone,birthday:e.dob?L(e.dob):"",current_password:e.profileCurrentPassword||""};this._isNative?await this._api.updateProfileNative(i,E()):await this._api.updateProfile(i);try{await this._api.updateMetafields({last_name_kana:i.last_name_kana,first_name_kana:i.first_name_kana,birthday:i.birthday})}catch(d){console.warn("[ProfileController] Metafield update skipped:",d.message)}this._store.update(d=>({...d,customer:{...d.customer,firstName:e.firstName,lastName:e.lastName,email:e.email,phone:e.phone}})),r.setFormMessage("success",t("save_success","情報が保存されました。"),"profile")}catch(i){console.error("[ProfileController] Profile update error",i),i.isPasswordError||i.status===401?r.setFieldError("profileCurrentPassword",t("validation_current_password_invalid","現在のパスワードが正しくありません。")):i.code==="TAKEN"?r.setFieldError("email",t("validation_email_taken","このメールアドレスは既に使用されています。")):r.setFormMessage("error",i.message||t("save_failed","保存に失敗しました。"),"profile")}finally{r.setSubmitState("profile",!1),this._profileBusy=!1}}async _handlePasswordSubmit(e){if(this._passwordBusy)return;this._passwordBusy=!0;const t=this._renderer._t,r=this._renderer;if(r.setSubmitState("password",!0,t("saving","保存中...")),r.setFormMessage("","","password"),["currentPassword","newPassword","confirmPassword"].forEach(a=>r.clearFieldError(a)),!e.currentPassword&&!e.newPassword&&!e.confirmPassword){r.setSubmitState("password",!1),this._passwordBusy=!1;return}const s=this._validatePassword(e,t);if(Object.keys(s).length){Object.entries(s).forEach(([a,n])=>r.setFieldError(a,n)),r.setSubmitState("password",!1),this._passwordBusy=!1;return}try{const a=this._store.get().customer;if(this._isNative)await this._api.updatePasswordNative(e.newPassword,e.confirmPassword,E());else{await this._api.updatePassword(e.currentPassword,e.newPassword),g.clear(),r.clearPasswordFields(),r.setFormMessage("success",t("password_changed_relogin","パスワードを変更しました。再度ログインしてください。"),"password"),setTimeout(()=>{window.location.href="/"},2e3);return}r.clearPasswordFields(),r.setFormMessage("success",t("save_success","情報が保存されました。"),"password")}catch(a){console.error("[ProfileController] Password update error",a),a.isPasswordError||a.status===401?r.setFieldError("currentPassword",t("validation_current_password_invalid","現在のパスワードが正しくありません。")):r.setFormMessage("error",a.message||t("save_failed","保存に失敗しました。"),"password")}finally{r.setSubmitState("password",!1),this._passwordBusy=!1}}_validateProfile(e,t){const r={},s=/^[\u30A0-\u30FF\u30FC\s]+$/,a=["lastName","firstName","last_name_kana","first_name_kana","phone","email"];for(const n of a)e[n]||(r[n]=t("validation_required","この項目は必須です。"));if(e.last_name_kana&&!r.last_name_kana&&!s.test(e.last_name_kana)&&(r.last_name_kana=t("validation_kana_invalid","全角カタカナで入力してください。")),e.first_name_kana&&!r.first_name_kana&&!s.test(e.first_name_kana)&&(r.first_name_kana=t("validation_kana_invalid","全角カタカナで入力してください。")),e.email&&!r.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.email)&&(r.email=t("validation_email_invalid","有効なメールアドレスを入力してください。")),e.phone&&!r.phone){const n=e.phone;if(!/^[0-9+()\-\s]+$/.test(n))r.phone=t("validation_phone_invalid","有効な電話番号を入力してください。");else{const c=n.replace(/\D/g,"");(c.length<8||c.length>15)&&(r.phone=t("validation_phone_invalid","有効な電話番号を入力してください。"))}}if(e.dob)if(!/^\d{4}\/\d{2}\/\d{2}$/.test(e.dob))r.dob=t("validation_dob_invalid","YYYY/MM/DD 形式の有効な日付を入力してください。");else{const[n,c,l]=e.dob.split("/").map(Number),i=new Date(n,c-1,l);(!(i.getFullYear()===n&&i.getMonth()===c-1&&i.getDate()===l)||i>new Date)&&(r.dob=t("validation_dob_invalid","YYYY/MM/DD 形式の有効な日付を入力してください。"))}return r}_validatePassword(e,t){const r={};return e.currentPassword||(r.currentPassword=t("validation_required","この項目は必須です。")),e.newPassword?e.newPassword.length>=8&&/[a-zA-Z]/.test(e.newPassword)&&/\d/.test(e.newPassword)&&/[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?`~]/.test(e.newPassword)||(r.newPassword=t("validation_password_weak","パスワードは8文字以上で、英字・数字・記号を含む必要があります。")):r.newPassword=t("validation_required","この項目は必須です。"),e.confirmPassword?e.newPassword&&e.confirmPassword!==e.newPassword&&(r.confirmPassword=t("validation_password_mismatch","パスワードが一致しません。")):r.confirmPassword=t("validation_required","この項目は必須です。"),r}}class X{constructor(e,t){this._api=e,this._renderer=t,this._store=Q,this._store.subscribe(r=>t.render(r))}async load(e,t=20){if(!e){this._store.set({status:"ready",orders:[],error:null});return}this._store.set({status:"loading",orders:[],error:null});try{const r=await this._api.list(e,t);this._store.set({status:"ready",orders:r,error:null})}catch(r){console.error("[OrderController] Failed to load orders",r),this._store.set({status:"error",orders:[],error:r.message})}}seedFromNative(e){this._store.set({status:"ready",orders:e||[],error:null})}}function Z(){const o=(window.location.hash||"").replace(/^#/,"").trim(),e=new URLSearchParams(window.location.search).get("tab")||"",t=["profile","orders","addresses","cards","shipping"];return t.includes(o)?o:t.includes(e)?e:"profile"}function v(o,e){const r=["profile","orders","addresses","cards","shipping"].includes(o)?o:"profile";if(document.querySelectorAll(".my-account__nav-item").forEach(s=>{s.classList.toggle("my-account__nav-item--active",s.dataset.tab===r)}),document.querySelectorAll(".my-account__panel").forEach(s=>{s.classList.toggle("my-account__panel--active",s.dataset.panel===r)}),e){const s=r==="profile"?"":"#"+r;window.location.hash!==s&&(s?window.location.hash=s:history.replaceState(null,"",window.location.pathname+window.location.search))}}function ee(){document.querySelectorAll(".my-account__nav-item[data-tab]").forEach(o=>{o.addEventListener("click",e=>{e.preventDefault(),v(o.dataset.tab,!0)})}),window.addEventListener("hashchange",()=>{const o=window.location.hash.replace(/^#/,"");["profile","orders","addresses","cards","shipping"].includes(o)&&v(o,!1)})}function te(o){var l;const e=localStorage.getItem("shopifyCustomerAccessToken"),t=localStorage.getItem("shopifyCustomerAccessTokenExpiresAt"),r=e&&t&&new Date(t)>new Date,s=document.querySelector(".account-button");if(!s||s.dataset.accountInitialized||(s.dataset.accountInitialized="true",!r))return;if(!document.getElementById("account-dropdown-styles")){const i=document.createElement("style");i.id="account-dropdown-styles",i.textContent=`
+            </div>`;
+      }).join("")}
+      </div>`;
+    }
+  }
+  function createDiptyqueStore(initialState) {
+    let state = initialState;
+    const subs = /* @__PURE__ */ new Set();
+    const notify = () => subs.forEach((fn) => {
+      try {
+        fn(state);
+      } catch (e) {
+        console.error("[DiptyqueStore] Subscriber error", e);
+      }
+    });
+    return {
+      get() {
+        return state;
+      },
+      set(next) {
+        state = next;
+        notify();
+      },
+      update(fn) {
+        state = fn(state);
+        notify();
+      },
+      subscribe(listener) {
+        subs.add(listener);
+        return () => subs.delete(listener);
+      },
+      find(predicate) {
+        const s = Array.isArray(state) ? state : (state == null ? void 0 : state.items) ?? (state == null ? void 0 : state.orders) ?? [];
+        return s.find(predicate);
+      }
+    };
+  }
+  const diptyqueCustomerStore = createDiptyqueStore({
+    status: "idle",
+    customer: null,
+    error: null
+  });
+  const diptyqueOrderStore = createDiptyqueStore({
+    status: "idle",
+    orders: [],
+    error: null
+  });
+  class DiptyqueProfileController {
+    /**
+     * @param {import('../api/customer').DiptyqueCustomerApi}       api
+     * @param {import('../ui/profile').DiptyqueProfileRenderer}     renderer
+     * @param {{ isNative?: boolean, logoutUrl?: string }}          options
+     */
+    constructor(api, renderer, options = {}) {
+      this._api = api;
+      this._renderer = renderer;
+      this._isNative = options.isNative || false;
+      this._logoutUrl = options.logoutUrl || "/account/logout";
+      this._getNativeSession = options.getNativeSession || null;
+      this._store = diptyqueCustomerStore;
+      this._store.subscribe((state) => {
+        if (state.status === "loading") {
+          renderer.renderLoading();
+          return;
+        }
+        if (state.status === "error") {
+          window.location.href = "/";
+          return;
+        }
+        if (state.status === "ready" && state.customer) {
+          renderer.renderDashboard(state.customer);
+          this._bindRendererActions();
+        }
+      });
+    }
+    // ── Init ───────────────────────────────────────────────────────────────────
+    async load(accessToken, nativeCustomer = null) {
+      var _a, _b;
+      if (nativeCustomer) {
+        this._store.set({ status: "ready", customer: nativeCustomer, error: null });
+        return;
+      }
+      if (!accessToken) {
+        this._store.set({ status: "error", customer: null, error: "no_session" });
+        return;
+      }
+      this._store.set({ status: "loading", customer: null, error: null });
+      try {
+        const customer = await this._api.fetchCustomer(accessToken);
+        if (!customer) {
+          const nativeFallback = (_a = this._getNativeSession) == null ? void 0 : _a.call(this);
+          if (nativeFallback) {
+            this._store.set({ status: "ready", customer: nativeFallback, error: null });
+          } else {
+            this._store.set({ status: "error", customer: null, error: "invalid_token" });
+          }
+          return;
+        }
+        this._store.set({ status: "ready", customer, error: null });
+      } catch (err) {
+        console.error("[ProfileController] Failed to load customer", err);
+        const nativeFallback = (_b = this._getNativeSession) == null ? void 0 : _b.call(this);
+        if (nativeFallback) {
+          this._store.set({ status: "ready", customer: nativeFallback, error: null });
+        } else {
+          this._store.set({ status: "error", customer: null, error: err.message });
+        }
+      }
+    }
+    // ── Event wiring ───────────────────────────────────────────────────────────
+    _bindRendererActions() {
+      var _a;
+      this._renderer.on("profile:submit", (formData) => this._handleProfileSubmit(formData));
+      this._renderer.on("password:submit", (formData) => this._handlePasswordSubmit(formData));
+      (_a = document.getElementById("my-account-logout")) == null ? void 0 : _a.addEventListener("click", () => {
+        logoutAccount(this._isNative ? this._logoutUrl : "/");
+      }, { once: true });
+    }
+    // ── Profile submit ─────────────────────────────────────────────────────────
+    async _handleProfileSubmit(formData) {
+      var _a;
+      if (this._profileBusy) return;
+      this._profileBusy = true;
+      const t = this._renderer._t;
+      const renderer = this._renderer;
+      renderer.setSubmitState("profile", true, t("saving", "保存中..."));
+      renderer.setFormMessage("", "", "profile");
+      const fields = [
+        "lastName",
+        "firstName",
+        "last_name_kana",
+        "first_name_kana",
+        "dob",
+        "phone",
+        "email",
+        "profileCurrentPassword"
+      ];
+      fields.forEach((f) => renderer.clearFieldError(f));
+      const errors = this._validateProfile(formData, t);
+      const currentEmail = ((_a = this._store.get().customer) == null ? void 0 : _a.email) || "";
+      const emailChanged = currentEmail.toLowerCase() !== (formData.email || "").toLowerCase();
+      if (emailChanged && !formData.profileCurrentPassword) {
+        errors.profileCurrentPassword = t(
+          "validation_current_password_required_for_email",
+          "メールアドレスを変更する場合は現在のパスワードを入力してください。"
+        );
+      }
+      if (Object.keys(errors).length) {
+        Object.entries(errors).forEach(([f, msg]) => renderer.setFieldError(f, msg));
+        renderer.setSubmitState("profile", false);
+        this._profileBusy = false;
+        return;
+      }
+      try {
+        const payload = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          first_name_kana: formData.first_name_kana,
+          last_name_kana: formData.last_name_kana,
+          email: formData.email,
+          phone: formData.phone,
+          birthday: formData.dob ? displayToIsoDate(formData.dob) : "",
+          current_password: formData.profileCurrentPassword || ""
+        };
+        if (this._isNative) {
+          await this._api.updateProfileNative(payload, getNativeCSRFToken());
+        } else {
+          await this._api.updateProfile(payload);
+        }
+        try {
+          await this._api.updateMetafields({
+            last_name_kana: payload.last_name_kana,
+            first_name_kana: payload.first_name_kana,
+            birthday: payload.birthday
+          });
+        } catch (mfErr) {
+          console.warn("[ProfileController] Metafield update skipped:", mfErr.message);
+        }
+        this._store.update((s) => ({
+          ...s,
+          customer: {
+            ...s.customer,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone
+          }
+        }));
+        renderer.setFormMessage("success", t("save_success", "情報が保存されました。"), "profile");
+      } catch (err) {
+        console.error("[ProfileController] Profile update error", err);
+        if (err.isPasswordError || err.status === 401) {
+          renderer.setFieldError(
+            "profileCurrentPassword",
+            t("validation_current_password_invalid", "現在のパスワードが正しくありません。")
+          );
+        } else if (err.code === "TAKEN") {
+          renderer.setFieldError("email", t("validation_email_taken", "このメールアドレスは既に使用されています。"));
+        } else {
+          renderer.setFormMessage("error", err.message || t("save_failed", "保存に失敗しました。"), "profile");
+        }
+      } finally {
+        renderer.setSubmitState("profile", false);
+        this._profileBusy = false;
+      }
+    }
+    // ── Password submit ────────────────────────────────────────────────────────
+    async _handlePasswordSubmit(formData) {
+      if (this._passwordBusy) return;
+      this._passwordBusy = true;
+      const t = this._renderer._t;
+      const renderer = this._renderer;
+      renderer.setSubmitState("password", true, t("saving", "保存中..."));
+      renderer.setFormMessage("", "", "password");
+      ["currentPassword", "newPassword", "confirmPassword"].forEach((f) => renderer.clearFieldError(f));
+      if (!formData.currentPassword && !formData.newPassword && !formData.confirmPassword) {
+        renderer.setSubmitState("password", false);
+        this._passwordBusy = false;
+        return;
+      }
+      const errors = this._validatePassword(formData, t);
+      if (Object.keys(errors).length) {
+        Object.entries(errors).forEach(([f, msg]) => renderer.setFieldError(f, msg));
+        renderer.setSubmitState("password", false);
+        this._passwordBusy = false;
+        return;
+      }
+      try {
+        const customer = this._store.get().customer;
+        if (this._isNative) {
+          await this._api.updatePasswordNative(
+            formData.newPassword,
+            formData.confirmPassword,
+            getNativeCSRFToken()
+          );
+        } else {
+          await this._api.updatePassword(formData.currentPassword, formData.newPassword);
+          DiptyqueTokenStore.clear();
+          renderer.clearPasswordFields();
+          renderer.setFormMessage("success", t("password_changed_relogin", "パスワードを変更しました。再度ログインしてください。"), "password");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2e3);
+          return;
+        }
+        renderer.clearPasswordFields();
+        renderer.setFormMessage("success", t("save_success", "情報が保存されました。"), "password");
+      } catch (err) {
+        console.error("[ProfileController] Password update error", err);
+        if (err.isPasswordError || err.status === 401) {
+          renderer.setFieldError(
+            "currentPassword",
+            t("validation_current_password_invalid", "現在のパスワードが正しくありません。")
+          );
+        } else {
+          renderer.setFormMessage("error", err.message || t("save_failed", "保存に失敗しました。"), "password");
+        }
+      } finally {
+        renderer.setSubmitState("password", false);
+        this._passwordBusy = false;
+      }
+    }
+    // ── Validation ─────────────────────────────────────────────────────────────
+    _validateProfile(data, t) {
+      const errors = {};
+      const kanaRegex = /^[\u30A0-\u30FF\u30FC\s]+$/;
+      const required = ["lastName", "firstName", "last_name_kana", "first_name_kana", "phone", "email"];
+      for (const key of required) {
+        if (!data[key]) errors[key] = t("validation_required", "この項目は必須です。");
+      }
+      if (data.last_name_kana && !errors.last_name_kana && !kanaRegex.test(data.last_name_kana)) {
+        errors.last_name_kana = t("validation_kana_invalid", "全角カタカナで入力してください。");
+      }
+      if (data.first_name_kana && !errors.first_name_kana && !kanaRegex.test(data.first_name_kana)) {
+        errors.first_name_kana = t("validation_kana_invalid", "全角カタカナで入力してください。");
+      }
+      if (data.email && !errors.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        errors.email = t("validation_email_invalid", "有効なメールアドレスを入力してください。");
+      }
+      if (data.phone && !errors.phone) {
+        const raw = data.phone;
+        if (!/^[0-9+()\-\s]+$/.test(raw)) {
+          errors.phone = t("validation_phone_invalid", "有効な電話番号を入力してください。");
+        } else {
+          const digits = raw.replace(/\D/g, "");
+          if (digits.length < 8 || digits.length > 15) {
+            errors.phone = t("validation_phone_invalid", "有効な電話番号を入力してください。");
+          }
+        }
+      }
+      if (data.dob) {
+        if (!/^\d{4}\/\d{2}\/\d{2}$/.test(data.dob)) {
+          errors.dob = t("validation_dob_invalid", "YYYY/MM/DD 形式の有効な日付を入力してください。");
+        } else {
+          const [y, m, d] = data.dob.split("/").map(Number);
+          const date = new Date(y, m - 1, d);
+          const valid = date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+          if (!valid || date > /* @__PURE__ */ new Date()) {
+            errors.dob = t("validation_dob_invalid", "YYYY/MM/DD 形式の有効な日付を入力してください。");
+          }
+        }
+      }
+      return errors;
+    }
+    _validatePassword(data, t) {
+      const errors = {};
+      if (!data.currentPassword) errors.currentPassword = t("validation_required", "この項目は必須です。");
+      if (!data.newPassword) {
+        errors.newPassword = t("validation_required", "この項目は必須です。");
+      } else {
+        const strong = data.newPassword.length >= 8 && /[a-zA-Z]/.test(data.newPassword) && /\d/.test(data.newPassword) && /[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?`~]/.test(data.newPassword);
+        if (!strong) errors.newPassword = t(
+          "validation_password_weak",
+          "パスワードは8文字以上で、英字・数字・記号を含む必要があります。"
+        );
+      }
+      if (!data.confirmPassword) {
+        errors.confirmPassword = t("validation_required", "この項目は必須です。");
+      } else if (data.newPassword && data.confirmPassword !== data.newPassword) {
+        errors.confirmPassword = t("validation_password_mismatch", "パスワードが一致しません。");
+      }
+      return errors;
+    }
+  }
+  class DiptyqueOrderController {
+    /**
+     * @param {import('../api/orders').DiptyqueOrderApi}       api
+     * @param {import('../ui/order').DiptyqueOrderRenderer}   renderer
+     */
+    constructor(api, renderer) {
+      this._api = api;
+      this._renderer = renderer;
+      this._store = diptyqueOrderStore;
+      this._store.subscribe((state) => renderer.render(state));
+    }
+    async load(accessToken, limit = 20) {
+      if (!accessToken) {
+        this._store.set({ status: "ready", orders: [], error: null });
+        return;
+      }
+      this._store.set({ status: "loading", orders: [], error: null });
+      try {
+        const orders = await this._api.list(accessToken, limit);
+        this._store.set({ status: "ready", orders, error: null });
+      } catch (err) {
+        console.error("[OrderController] Failed to load orders", err);
+        this._store.set({ status: "error", orders: [], error: err.message });
+      }
+    }
+    /** Seed orders from Liquid-injected native customer JSON (no network). */
+    seedFromNative(orders) {
+      this._store.set({ status: "ready", orders: orders || [], error: null });
+    }
+  }
+  function resolveInitialTab() {
+    const hash = (window.location.hash || "").replace(/^#/, "").trim();
+    const param = new URLSearchParams(window.location.search).get("tab") || "";
+    const valid = ["profile", "orders", "addresses", "cards", "shipping"];
+    return valid.includes(hash) ? hash : valid.includes(param) ? param : "profile";
+  }
+  function setActiveTab(tab, updateHistory) {
+    const valid = ["profile", "orders", "addresses", "cards", "shipping"];
+    const safeTab = valid.includes(tab) ? tab : "profile";
+    document.querySelectorAll(".my-account__nav-item").forEach((el) => {
+      el.classList.toggle("my-account__nav-item--active", el.dataset.tab === safeTab);
+    });
+    document.querySelectorAll(".my-account__panel").forEach((el) => {
+      el.classList.toggle("my-account__panel--active", el.dataset.panel === safeTab);
+    });
+    if (updateHistory) {
+      const nextHash = safeTab === "profile" ? "" : "#" + safeTab;
+      if (window.location.hash !== nextHash) {
+        if (nextHash) window.location.hash = nextHash;
+        else history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+    }
+  }
+  function initTabNavigation() {
+    document.querySelectorAll(".my-account__nav-item[data-tab]").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        setActiveTab(el.dataset.tab, true);
+      });
+    });
+    window.addEventListener("hashchange", () => {
+      const hash = window.location.hash.replace(/^#/, "");
+      const valid = ["profile", "orders", "addresses", "cards", "shipping"];
+      if (valid.includes(hash)) setActiveTab(hash, false);
+    });
+  }
+  function injectHeaderDropdown(t) {
+    var _a;
+    const sfToken = localStorage.getItem("shopifyCustomerAccessToken");
+    const sfExpiry = localStorage.getItem("shopifyCustomerAccessTokenExpiresAt");
+    const isLoggedIn = sfToken && sfExpiry && new Date(sfExpiry) > /* @__PURE__ */ new Date();
+    const accountBtn = document.querySelector(".account-button");
+    if (!accountBtn || accountBtn.dataset.accountInitialized) return;
+    accountBtn.dataset.accountInitialized = "true";
+    if (!isLoggedIn) return;
+    if (!document.getElementById("account-dropdown-styles")) {
+      const style = document.createElement("style");
+      style.id = "account-dropdown-styles";
+      style.textContent = `
       .account-button{position:relative}
       .account-dropdown{position:absolute;top:calc(100% + 8px);right:0;min-width:160px;
         background:var(--color-background);border:1px solid var(--color-border,#e0e0e0);
@@ -293,10 +1366,102 @@
         text-align:left;cursor:pointer;white-space:nowrap;transition:background .15s}
       .account-dropdown__item:hover{background:rgba(0,0,0,.04)}
       .account-dropdown__item+.account-dropdown__item{border-top:1px solid var(--color-border,#e0e0e0)}
-    `,document.head.appendChild(i)}const a=s.querySelector("[data-open-account-modal]");if(!a)return;const n=document.createElement("button");n.type="button",n.className=a.className,n.setAttribute("aria-label",a.getAttribute("aria-label")||"Account"),n.setAttribute("aria-haspopup","true"),n.setAttribute("aria-expanded","false"),n.innerHTML=a.innerHTML,a.replaceWith(n);const c=document.createElement("div");c.className="account-dropdown",c.setAttribute("role","menu"),c.innerHTML=`
+    `;
+      document.head.appendChild(style);
+    }
+    const existing = accountBtn.querySelector("[data-open-account-modal]");
+    if (!existing) return;
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = existing.className;
+    toggle.setAttribute("aria-label", existing.getAttribute("aria-label") || "Account");
+    toggle.setAttribute("aria-haspopup", "true");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.innerHTML = existing.innerHTML;
+    existing.replaceWith(toggle);
+    const dropdown = document.createElement("div");
+    dropdown.className = "account-dropdown";
+    dropdown.setAttribute("role", "menu");
+    dropdown.innerHTML = `
     <a href="/pages/my-account" class="account-dropdown__item" role="menuitem">
-      ${o("header_my_account","マイアカウント")}
+      ${t("header_my_account", "マイアカウント")}
     </a>
     <button type="button" class="account-dropdown__item" id="header-logout-btn" role="menuitem">
-      ${o("logout","ログアウト")}
-    </button>`,s.appendChild(c),n.addEventListener("click",i=>{i.stopPropagation();const d=c.classList.toggle("is-open");n.setAttribute("aria-expanded",String(d))}),(l=c.querySelector("#header-logout-btn"))==null||l.addEventListener("click",()=>{S("/")}),document.addEventListener("click",()=>{c.classList.remove("is-open"),n.setAttribute("aria-expanded","false")}),document.addEventListener("keydown",i=>{i.key==="Escape"&&(c.classList.remove("is-open"),n.setAttribute("aria-expanded","false"))})}function C(){var T;const o=document.getElementById("my-account-app");if(!o)return;const e=x("ma-config"),t=N("ma-i18n");if(!e.storefrontEndpoint||!e.storefrontToken){console.error("[account-boot] Missing storefront config in #ma-config");return}const r=k.get(),s=localStorage.getItem("shopifyCustomerAccessToken"),a=localStorage.getItem("shopifyCustomerAccessTokenExpiresAt"),c=s&&a&&new Date(a)>new Date?{token:s}:g.get();if(!r&&!c){window.location.href="/";return}const l=new D(e.storefrontEndpoint,e.storefrontToken),i=new O(e.apiBase,()=>localStorage.getItem("shopifyCustomerAccessToken")),d=o.querySelector('[data-panel="profile"]'),m=new V(d,t),_=new Y(l,i),p=new W(_,m,{isNative:!1,logoutUrl:e.logoutUrl||"/account/logout",getNativeSession:()=>k.get()}),re=o.querySelector('[data-panel="orders"]'),se=new J(re,t),ae=new K(l),$=new X(ae,se);if(ee(),v(Z(),!1),r){p.load(null,r);const f=(((T=r.orders)==null?void 0:T.edges)||[]).map(oe=>oe.node);$.seedFromNative(f)}else{const f=c.token;p.load(f),$.load(f)}te(t)}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",C):C()})();
+      ${t("logout", "ログアウト")}
+    </button>`;
+    accountBtn.appendChild(dropdown);
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+    });
+    (_a = dropdown.querySelector("#header-logout-btn")) == null ? void 0 : _a.addEventListener("click", () => {
+      logoutAccount("/");
+    });
+    document.addEventListener("click", () => {
+      dropdown.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        dropdown.classList.remove("is-open");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+  function boot() {
+    var _a;
+    const appEl = document.getElementById("my-account-app");
+    if (!appEl) return;
+    const config = loadConfig("ma-config");
+    const t = loadI18n("ma-i18n");
+    if (!config.storefrontEndpoint || !config.storefrontToken) {
+      console.error("[account-boot] Missing storefront config in #ma-config");
+      return;
+    }
+    const nativeCustomer = DiptyqueNativeSession.get();
+    const storedToken = localStorage.getItem("shopifyCustomerAccessToken");
+    const storedExpiry = localStorage.getItem("shopifyCustomerAccessTokenExpiresAt");
+    const tokenValid = storedToken && storedExpiry && new Date(storedExpiry) > /* @__PURE__ */ new Date();
+    const session = tokenValid ? { token: storedToken } : DiptyqueTokenStore.get();
+    if (!nativeCustomer && !session) {
+      window.location.href = "/";
+      return;
+    }
+    const sf = new DiptyqueStorefrontClient(config.storefrontEndpoint, config.storefrontToken);
+    const be = new DiptyqueBackendClient(config.apiBase, () => localStorage.getItem("shopifyCustomerAccessToken"));
+    const profilePanel = appEl.querySelector('[data-panel="profile"]');
+    const profileRenderer = new DiptyqueProfileRenderer(profilePanel, t);
+    const customerApi = new DiptyqueCustomerApi(sf, be);
+    const profileCtrl = new DiptyqueProfileController(customerApi, profileRenderer, {
+      // Always use backend (Vercel API) for profile updates, regardless of
+      // whether a native Shopify session exists. Native session is only used to
+      // pre-populate display data; API calls require a storefront access token.
+      isNative: false,
+      logoutUrl: config.logoutUrl || "/account/logout",
+      // Provide native session fallback so controller can recover if stored token is stale
+      getNativeSession: () => DiptyqueNativeSession.get()
+    });
+    const ordersPanel = appEl.querySelector('[data-panel="orders"]');
+    const orderRenderer = new DiptyqueOrderRenderer(ordersPanel, t);
+    const orderApi = new DiptyqueOrderApi(sf);
+    const orderCtrl = new DiptyqueOrderController(orderApi, orderRenderer);
+    initTabNavigation();
+    setActiveTab(resolveInitialTab(), false);
+    if (nativeCustomer) {
+      profileCtrl.load(null, nativeCustomer);
+      const nativeOrders = (((_a = nativeCustomer.orders) == null ? void 0 : _a.edges) || []).map((e) => e.node);
+      orderCtrl.seedFromNative(nativeOrders);
+    } else {
+      const token = session.token;
+      profileCtrl.load(token);
+      orderCtrl.load(token);
+    }
+    injectHeaderDropdown(t);
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();

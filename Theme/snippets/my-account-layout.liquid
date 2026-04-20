@@ -34,17 +34,17 @@
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
-        <a href="/pages/account"
-           class="my-account__nav-item{% if active_nav == 'cards' %} my-account__nav-item--active{% endif %}"
-           data-view="profile">
+        <a href="/pages/account?tab=saved-cards"
+           class="my-account__nav-item{% if active_nav == 'saved-cards' %} my-account__nav-item--active{% endif %}"
+           data-view="saved-cards">
           <span>{{ 'custom_account.nav_cards' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
-        <a href="/pages/account"
-           class="my-account__nav-item{% if active_nav == 'shipping' %} my-account__nav-item--active{% endif %}"
-           data-view="profile">
-          <span>{{ 'custom_account.nav_shipping' | t }}</span>
+        <a href="/pages/account?tab=newsletter"
+           class="my-account__nav-item{% if active_nav == 'newsletter' %} my-account__nav-item--active{% endif %}"
+           data-view="newsletter">
+          <span>{{ 'custom_account.nav_newsletter' | t }}</span>
           <span class="my-account__nav-arrow">▶</span>
         </a>
 
@@ -54,6 +54,31 @@
     {%- comment -%} ── Main content slot ─────────────────────────────── {%- endcomment -%}
     <main class="my-account__main" id="my-account-content">
       {{ content }}
+
+      <section class="my-account__benefits-banner mt-40" aria-label="{{ 'custom_account.benefits_title' | t }}">
+        <h3 class="my-account__benefits-title">{{ 'custom_account.benefits_title' | t }}</h3>
+        <p class="my-account__benefits-subtitle">{{ 'custom_account.benefits_subtitle' | t }}</p>
+        <div class="my-account__benefits-icons">
+          <div class="my-account__benefit-item">
+            <div class="my-account__benefit-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 11h16"/><path d="M12 11V7"/><path d="M8 7a4 4 0 0 1 8 0v4H8V7z"/></svg>
+            </div>
+            <span class="my-account__benefit-text">{{ 'custom_account.benefit_1' | t }}</span>
+          </div>
+          <div class="my-account__benefit-item">
+            <div class="my-account__benefit-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <span class="my-account__benefit-text">{{ 'custom_account.benefit_2' | t }}</span>
+          </div>
+          <div class="my-account__benefit-item">
+            <div class="my-account__benefit-icon-wrapper">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2a4b38" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-2-2H5L3 8v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"/><path d="M3 8h18"/><path d="M12 3v5"/><path d="M16 12a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <span class="my-account__benefit-text">{{ 'custom_account.benefit_3' | t }}</span>
+          </div>
+        </div>
+      </section>
     </main>
 
   </div>

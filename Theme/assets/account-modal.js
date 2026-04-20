@@ -1,4 +1,5 @@
-const REGISTER_API_URL = 'https://diptyqueshopifybe.vercel.app/api/register';
+const REGISTER_API_PATH = '/api/register';
+
 
 class AccountModal {
   constructor() {
@@ -13,6 +14,8 @@ class AccountModal {
     this.storefrontToken = this.modal?.dataset.storefrontToken || '';
     this.shopId = this.modal?.dataset.shopId || '';
     this.shopDomain = this.modal?.dataset.shopDomain || '';
+    this.registerApiBaseUrl = this.modal?.dataset.apiBaseUrl || '';
+    this.registerApiUrl = this.resolveRegisterApiUrl();
 
     if (!this.modal) return;
 
@@ -29,6 +32,11 @@ class AccountModal {
     } catch {
       return {};
     }
+  }
+
+  resolveRegisterApiUrl() {
+    const base = String(this.registerApiBaseUrl || '').trim().replace(/\/+$/, '');
+    return base ? `${base}${REGISTER_API_PATH}` : REGISTER_API_PATH;
   }
 
   bindEvents() {
@@ -200,7 +208,7 @@ class AccountModal {
     const payload = this.buildRegisterPayload(form, meta);
 
     try {
-      const response = await fetch(REGISTER_API_URL, {
+      const response = await fetch(this.registerApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -273,7 +281,7 @@ class AccountModal {
 
   buildRegisterPayload(form, meta) {
     const val = (id) => (form.querySelector(`#${id}`)?.value ?? '').trim();
-    const acceptsMarketingEl = form.querySelector('input[name="customer[accepts_marketing]"]');
+    const acceptsMarketingEl = form.querySelector('input[name="customer[accepts_marketing]"]') || form.querySelector('#modal-RegisterEmailOptIn');
     return {
       first_name: val('modal-RegisterFirstName'),
       last_name: val('modal-RegisterLastName'),
@@ -286,6 +294,7 @@ class AccountModal {
       birthday: meta.birthday || '',
       sms_opt_in: Boolean(meta.sms_opt_in),
       mail_opt_in: Boolean(meta.mail_opt_in),
+      postal_opt_in: Boolean(meta.postal_opt_in),
       accepts_marketing: Boolean(acceptsMarketingEl?.checked),
     };
   }
@@ -624,6 +633,7 @@ class AccountModal {
         phone: phoneNormalized || String(phone?.value || '').trim(),
         sms_opt_in: Boolean(smsOptIn?.checked),
         mail_opt_in: Boolean(mailOptIn?.checked),
+        postal_opt_in: Boolean(mailOptIn?.checked),
       },
     };
   }
@@ -761,6 +771,7 @@ class AccountModal {
       `birthday=${meta.birthday || ''}`,
       `sms_opt_in=${meta.sms_opt_in ? 'true' : 'false'}`,
       `mail_opt_in=${meta.mail_opt_in ? 'true' : 'false'}`,
+      `postal_opt_in=${meta.postal_opt_in ? 'true' : 'false'}`,
       `phone=${meta.phone || ''}`,
     ];
     noteInput.value = lines.join('\n');
