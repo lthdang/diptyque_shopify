@@ -1,3 +1,4 @@
+import React from "react";
 import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
@@ -26,21 +27,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 function AppShell() {
   const app = useAppBridge();
 
-  // During the App Bridge session-token exchange on hard refresh, the hook
-  // may return undefined. Show a skeleton rather than empty content so that
-  // Frame has something to render and never falls back to the warning icon.
-  if (!app) {
-    return <SkeletonPage />;
-  }
-
   return (
     <>
       <s-app-nav>
         <s-link href="/app">Store Overview</s-link>
         <s-link href="/app/additional">Additional page</s-link>
         <s-link href="/app/scheduled-publish">Scheduled Publishing</s-link>
+        <s-link href="/app/customers">Customers</s-link>
       </s-app-nav>
-      <Outlet />
+
+      <React.Suspense fallback={<SkeletonPage />}>
+        <Outlet />
+      </React.Suspense>
     </>
   );
 }
