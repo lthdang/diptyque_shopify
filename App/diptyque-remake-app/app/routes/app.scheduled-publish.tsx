@@ -26,6 +26,7 @@ import {
   Toast,
 } from "@shopify/polaris";
 import { formatInTimeZone } from "date-fns-tz";
+import { SCHEDULED_STATUS } from "../config/enums";
 
 // ─── Type definitions ──────────────────────────────────────────────────────────
 
@@ -46,7 +47,7 @@ interface ScheduledRecord {
   productImage: string | null;
   scheduledAt: string;
   publishedAt: string | null;
-  status: string;
+  status: SCHEDULED_STATUS; // "PROCESSING" | "FAILED" | "SCHEDULED" | "CANCELLED" | "PUBLISHED"
   errorMessage: string | null;
 }
 
@@ -124,7 +125,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       prisma.scheduledPublish.findMany({
         where: {
           shop: session.shop,
-          status: { in: ["SCHEDULED", "PROCESSING", "FAILED"] },
+          status: {
+            in: [
+              SCHEDULED_STATUS.SCHEDULED,
+              SCHEDULED_STATUS.PROCESSING,
+              SCHEDULED_STATUS.FAILED,
+            ],
+          },
         },
         orderBy: { scheduledAt: "asc" },
         select: selectFields,
@@ -132,7 +139,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       prisma.scheduledPublish.findMany({
         where: {
           shop: session.shop,
-          status: { in: ["PUBLISHED", "CANCELLED"] },
+          status: {
+            in: [SCHEDULED_STATUS.PUBLISHED, SCHEDULED_STATUS.CANCELLED],
+          },
         },
         orderBy: { scheduledAt: "desc" },
         take: 50,
@@ -224,10 +233,10 @@ function CountdownCell({
   onExpire?: () => void;
 }) {
   const countdown = useCountdown(
-    status === "SCHEDULED" ? scheduledAt : null,
+    status === SCHEDULED_STATUS.SCHEDULED ? scheduledAt : null,
     onExpire,
   );
-  if (status !== "SCHEDULED")
+  if (status !== SCHEDULED_STATUS.SCHEDULED)
     return (
       <Text as="span" tone="subdued">
         —
@@ -256,20 +265,22 @@ function ProductStatusBadge({ status }: { status: string }) {
 }
 
 // ─── Queue status badge ────────────────────────────────────────────────────────
-
-function QueueStatusBadge({ status }: { status: string }) {
-  switch (status) {
-    case "SCHEDULED":
-      return <Badge tone="warning">Pending</Badge>;
-    case "PUBLISHED":
-      return <Badge tone="success">Published</Badge>;
-    case "FAILED":
-      return <Badge tone="critical">Failed</Badge>;
-    case "CANCELLED":
-      return <Badge tone="info">Cancelled</Badge>;
-    default:
-      return <Badge>{status}</Badge>;
+const STATUS_MAP: Record<
+  SCHEDULED_STATUS,
+  { label: string; tone?: "warning" | "success" | "critical" | "info" }
+> = {
+  [SCHEDULED_STATUS.SCHEDULED]: { label: "Pending", tone: "warning" },
+  [SCHEDULED_STATUS.PUBLISHED]: { label: "Published", tone: "success" },
+  [SCHEDULED_STATUS.FAILED]: { label: "Failed", tone: "critical" },
+  [SCHEDULED_STATUS.CANCELLED]: { label: "Cancelled", tone: "info" },
+  [SCHEDULED_STATUS.PROCESSING]: { label: "Processing", tone: "warning" },
+};
+function QueueStatusBadge({ status }: { status: SCHEDULED_STATUS }) {
+  const config = STATUS_MAP[status];
+  if (config) {
+    return <Badge tone={config.tone}>{config.label}</Badge>;
   }
+  return <Badge>{status}</Badge>;
 }
 
 // ─── Tab filter config ─────────────────────────────────────────────────────────
@@ -357,7 +368,10 @@ export default function ScheduledPublishPage() {
   useEffect(() => {
     const prev = prevScheduledRef.current;
     historyItems.forEach((item) => {
-      if (item.status === "PUBLISHED" && prev.has(item.productId)) {
+      if (
+        item.status === SCHEDULED_STATUS.PUBLISHED &&
+        prev.has(item.productId)
+      ) {
         showToast(`Product "${item.productTitle}" has been published!`);
         shopify.toast.show(`"${item.productTitle}" is now live!`, {
           duration: 5000,
@@ -366,14 +380,15 @@ export default function ScheduledPublishPage() {
     });
     prevScheduledRef.current = new Set(
       pendingItems
-        .filter((i) => i.status === "SCHEDULED")
+        .filter((i) => i.status === SCHEDULED_STATUS.SCHEDULED)
         .map((i) => i.productId),
     );
   }, [pendingItems, historyItems, showToast, shopify]);
 
   // Auto-refresh every 30 s when pending schedules exist
   useEffect(() => {
-    if (!pendingItems.some((i) => i.status === "SCHEDULED")) return;
+    if (!pendingItems.some((i) => i.status === SCHEDULED_STATUS.SCHEDULED))
+      return;
     const interval = setInterval(() => revalidator.revalidate(), 30_000);
     return () => clearInterval(interval);
   }, [pendingItems, revalidator]);
@@ -457,7 +472,7 @@ export default function ScheduledPublishPage() {
     () =>
       new Set(
         pendingItems
-          .filter((i) => i.status === "SCHEDULED")
+          .filter((i) => i.status === SCHEDULED_STATUS.SCHEDULED)
           .map((i) => i.productId),
       ),
     [pendingItems],
