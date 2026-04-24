@@ -1,0 +1,161 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "Title",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-primary--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "section_QwFB9x": {
+      "type": "section",
+      "blocks": {
+        "button_xjiVUV": {
+          "type": "button",
+          "name": "t:names.button",
+          "settings": {
+            "label": "トップページに戻る",
+            "link": "https://diptyque-remake.myshopify.com",
+            "open_in_new_tab": false,
+            "style_class": "button",
+            "width": "fit-content",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 100,
+            "bg_color": "#ffffff",
+            "text_color": "#000000",
+            "border_width": 1,
+            "border_radius": 0,
+            "border_color": "#000000",
+            "padding_top": 10,
+            "padding_bottom": 10,
+            "padding_left": 20,
+            "padding_right": 20,
+            "font_size": 16,
+            "font_family": "inherit",
+            "hover_accent": true
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "button_xjiVUV"
+      ],
+      "name": "t:names.custom_section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 40,
+        "padding-block-end": 20
+      }
+    },
+    "collection_products_3TVm3y": {
+      "type": "collection-products",
+      "name": "Collection products",
+      "settings": {
+        "collection": "frontpage",
+        "layout": "carousel",
+        "product_count": 8,
+        "columns": 4,
+        "horizontal_gap": 16,
+        "show_nav": true,
+        "nav_icon_color": "",
+        "nav_bg_color": "",
+        "section_width": "page-width",
+        "section_gap": 24,
+        "color_scheme": "",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "title": "ディプティックのベストセラー",
+        "title_color": "",
+        "title_font_size": 24,
+        "title_alignment": "center",
+        "image_ratio": "1/1",
+        "image_padding": 0,
+        "product_title_color": "",
+        "product_title_size": 18,
+        "text_alignment": "left",
+        "buy_now_label": "Buy it now",
+        "btn_bg": "",
+        "btn_text": "",
+        "btn_padding": 12
+      }
+    }
+  },
+  "order": [
+    "main",
+    "section_QwFB9x",
+    "collection_products_3TVm3y"
+  ]
+}
