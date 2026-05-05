@@ -864,7 +864,7 @@
         "image_alignment": "center",
         "desktop_height": "60vh",
         "mobile_height": "40vh",
-        "overlay_color": "#00000000"
+        "overlay_color": "rgba(0,0,0,0)"
       }
     },
     "section_qGbrpH": {
@@ -1112,7 +1112,7 @@
                   "settings": {
                     "image": "shopify://shop_images/CLASSIC-CANDLE-REVAMP_2026_VISUEL_COMPLEMENTAIRE_BEST-SELLERS_BOUGIES_CLASSIQUES_sRGB_72DPI_2025x2700px_DIPTYQUE__3___2.avif",
                     "link": "https://www.diptyqueparis.com/ja_jp/c/candle-renewal-events-2026.html",
-                    "image_ratio": "adapt",
+                    "image_ratio": "square",
                     "width": "fill",
                     "custom_width": 100,
                     "width_mobile": "fill",
@@ -1139,7 +1139,7 @@
                     "alignment": "left",
                     "type_preset": "custom",
                     "font": "var(--font-body--family)",
-                    "font_size": "1rem",
+                    "font_size": "1.25rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -1265,9 +1265,9 @@
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
-                    "type_preset": "h5",
+                    "type_preset": "custom",
                     "font": "var(--font-body--family)",
-                    "font_size": "1rem",
+                    "font_size": "1.25rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -1395,7 +1395,7 @@
                     "alignment": "left",
                     "type_preset": "custom",
                     "font": "var(--font-body--family)",
-                    "font_size": "1rem",
+                    "font_size": "1.25rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -1523,7 +1523,7 @@
                     "alignment": "left",
                     "type_preset": "custom",
                     "font": "var(--font-body--family)",
-                    "font_size": "1rem",
+                    "font_size": "1.25rem",
                     "line_height": "normal",
                     "letter_spacing": "normal",
                     "case": "none",
@@ -1611,6 +1611,21 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "divider_REGKHB": {
+      "type": "divider",
+      "custom_css": [],
+      "name": "t:names.divider_section",
+      "settings": {
+        "color_scheme": "scheme-58084d4c-a86e-4d0a-855e-a0966e5043f7",
+        "section_width": "page-width",
+        "thickness": 3,
+        "corner_radius": "square",
+        "width_percent": 100,
+        "alignment_horizontal": "center",
+        "padding-block-start": 16,
+        "padding-block-end": 16
+      }
     }
   },
   "order": [
@@ -1622,6 +1637,7 @@
     "section_WLGLHR",
     "pin_image_popup_xTKAp7",
     "section_qGbrpH",
-    "carousel_6NAVtQ"
+    "carousel_6NAVtQ",
+    "divider_REGKHB"
   ]
 }
