@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1558 nodes · 2375 edges · 163 communities (64 shown, 99 thin omitted)
+- 1558 nodes · 2375 edges · 160 communities (64 shown, 96 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 114 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0c402a32`
+- Built from commit: `6b0df0f7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -112,17 +112,16 @@
 - [[_COMMUNITY_Community 94|Community 94]]
 - [[_COMMUNITY_Community 95|Community 95]]
 - [[_COMMUNITY_Community 96|Community 96]]
-- [[_COMMUNITY_Community 97|Community 97]]
-- [[_COMMUNITY_Community 98|Community 98]]
-- [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
+- [[_COMMUNITY_Community 102|Community 102]]
 - [[_COMMUNITY_Community 103|Community 103]]
-- [[_COMMUNITY_Community 104|Community 104]]
-- [[_COMMUNITY_Community 105|Community 105]]
 - [[_COMMUNITY_Community 106|Community 106]]
-- [[_COMMUNITY_Community 109|Community 109]]
-- [[_COMMUNITY_Community 110|Community 110]]
-- [[_COMMUNITY_Community 111|Community 111]]
+- [[_COMMUNITY_Community 107|Community 107]]
+- [[_COMMUNITY_Community 108|Community 108]]
+- [[_COMMUNITY_Community 122|Community 122]]
+- [[_COMMUNITY_Community 123|Community 123]]
+- [[_COMMUNITY_Community 124|Community 124]]
 - [[_COMMUNITY_Community 125|Community 125]]
 - [[_COMMUNITY_Community 126|Community 126]]
 - [[_COMMUNITY_Community 127|Community 127]]
@@ -158,9 +157,6 @@
 - [[_COMMUNITY_Community 157|Community 157]]
 - [[_COMMUNITY_Community 158|Community 158]]
 - [[_COMMUNITY_Community 159|Community 159]]
-- [[_COMMUNITY_Community 160|Community 160]]
-- [[_COMMUNITY_Community 161|Community 161]]
-- [[_COMMUNITY_Community 162|Community 162]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `AccountModal` - 34 edges
@@ -186,7 +182,7 @@
 - `k()` --calls--> `de()`  [INFERRED]
   Theme/assets/flatpickr.min.js → Theme/assets/account-app.bundle.js
 
-## Communities (163 total, 99 thin omitted)
+## Communities (160 total, 96 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -233,106 +229,102 @@ Cohesion: 0.07
 Nodes (13): CartAddEvent, CartErrorEvent, CartUpdateEvent, DiscountUpdateEvent, FilterUpdateEvent, MediaStartedPlayingEvent, MegaMenuHoverEvent, QuantitySelectorUpdateEvent (+5 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.07
-Nodes (11): DragZoomWrapper, HeaderDrawer, OverflowList, OverflowMinimumEvent, AnchoredPopoverComponent, DialogOpenEvent, FlyToCart, HeaderComponent (+3 more)
+Cohesion: 0.09
+Nodes (5): et, rt, st, Xe, Ze
 
 ### Community 14 - "Community 14"
-Cohesion: 0.14
-Nodes (4): D, He, Re, Ye
+Cohesion: 0.1
+Nodes (20): AnnouncementBar, CartIcon, Component, DeferredMedia, MediaGallery, PricePerItemComponent, ProductCard, ProductCardLink (+12 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.17
-Nodes (3): Ae, c(), T()
-
-### Community 16 - "Community 16"
 Cohesion: 0.13
 Nodes (25): account-app.js, account-navigation.js, account-router.js, controllers/address.js, ui/address.js, account-pages/addresses.js, auth.js, build.mjs (+17 more)
 
+### Community 16 - "Community 16"
+Cohesion: 0.09
+Nodes (7): SectionRenderer, LocalPickup, ProductInventory, ProductPrice, QuickAddDialog, events, morph
+
 ### Community 17 - "Community 17"
+Cohesion: 0.09
+Nodes (13): DragZoomWrapper, HeaderDrawer, OverflowList, OverflowMinimumEvent, DialogOpenEvent, FlyToCart, SearchPageInputComponent, hydrate() (+5 more)
+
+### Community 18 - "Community 18"
 Cohesion: 0.1
 Nodes (8): calculateHeaderGroupHeight(), debounce(), Scheduler, setHeaderMenuStyle(), TextComponent, updateAllHeaderCustomProperties(), updateHeaderHeights(), updateTransparentHeaderOffset()
 
-### Community 18 - "Community 18"
-Cohesion: 0.11
-Nodes (19): AnnouncementBar, CartIcon, Component, DeferredMedia, MediaGallery, PricePerItemComponent, ProductCard, ProductCardLink (+11 more)
-
 ### Community 19 - "Community 19"
 Cohesion: 0.15
-Nodes (3): DiptyqueAddressRenderer, escapeHtml(), normalizeProvince()
+Nodes (4): D, He, Re, Ye
 
-### Community 21 - "Community 21"
+### Community 20 - "Community 20"
+Cohesion: 0.17
+Nodes (3): Ae, c(), T()
+
+### Community 22 - "Community 22"
 Cohesion: 0.13
 Nodes (3): be, Ee, w
 
-### Community 25 - "Community 25"
-Cohesion: 0.13
-Nodes (3): et, Xe, Ze
-
-### Community 27 - "Community 27"
-Cohesion: 0.12
-Nodes (7): CartDiscount, hydrate(), onDocumentReady(), events, PaginatedListAspectRatioHelper, hydrate, sectionRenderer
-
-### Community 28 - "Community 28"
+### Community 26 - "Community 26"
 Cohesion: 0.15
 Nodes (19): Customer Database Table, ScheduledPublish Database Table, Session Database Table, Create Schedule API Endpoint, Cancel Schedule API Endpoint, Dashboard Index Page, Additional Page, Customers Page (+11 more)
 
-### Community 30 - "Community 30"
-Cohesion: 0.12
-Nodes (8): AddToCartComponent, SectionRenderer, ThemePerformance, CartNote, LocalPickup, ProductInventory, morph, performance
+### Community 27 - "Community 27"
+Cohesion: 0.14
+Nodes (5): calculatePaddingStart(), getScrollAxis(), Scroller, ScrollHint, throttle()
 
-### Community 33 - "Community 33"
+### Community 31 - "Community 31"
 Cohesion: 0.21
 Nodes (5): isLowPowerDevice(), prefersReducedMotion(), startViewTransition(), supportsViewTransitions(), ZoomDialog
 
-### Community 34 - "Community 34"
+### Community 32 - "Community 32"
 Cohesion: 0.17
 Nodes (8): Component, DeclarativeShadowElement, getAncestor(), getClosestComponent(), MissingRefError, parseData(), parseValue(), registerEventListeners()
 
-### Community 36 - "Community 36"
-Cohesion: 0.18
-Nodes (4): calculatePaddingStart(), getScrollAxis(), Scroller, throttle()
+### Community 34 - "Community 34"
+Cohesion: 0.13
+Nodes (6): CartDrawerComponent, getMostVisibleElement(), DialogComponent, PredictiveSearchComponent, Scroller, ZoomDialog
 
-### Community 39 - "Community 39"
+### Community 38 - "Community 38"
+Cohesion: 0.2
+Nodes (5): escapeHtml(), getMetafieldValue(), isoToDisplayDate(), loadI18n(), normalizeProvince()
+
+### Community 40 - "Community 40"
 Cohesion: 0.19
 Nodes (5): CollectionLinks, cycleFocus(), getFocusableElements(), removeTrapFocus(), trapFocus()
 
-### Community 40 - "Community 40"
+### Community 41 - "Community 41"
 Cohesion: 0.26
 Nodes (11): d(), E(), f(), g(), k(), l(), m(), n() (+3 more)
 
-### Community 41 - "Community 41"
+### Community 42 - "Community 42"
 Cohesion: 0.23
 Nodes (4): getNativeCSRFToken(), logoutAccount(), DiptyqueProfileController, displayToIsoDate()
 
 ### Community 43 - "Community 43"
-Cohesion: 0.17
-Nodes (6): QuickAddDialog, getMostVisibleElement(), DialogComponent, PredictiveSearchComponent, Scroller, ZoomDialog
+Cohesion: 0.18
+Nodes (4): navigate(), replaceRoute(), DiptyqueOrderDetailApi, DiptyqueOrderDetailController
 
-### Community 46 - "Community 46"
+### Community 47 - "Community 47"
 Cohesion: 0.18
 Nodes (3): findSubmenu(), HeaderMenu, onDocumentLoaded()
 
-### Community 52 - "Community 52"
+### Community 53 - "Community 53"
 Cohesion: 0.18
 Nodes (5): BlogPostsList, ResultsList, CartDiscount, PaginatedList, ViewTransitions
 
-### Community 56 - "Community 56"
+### Community 54 - "Community 54"
+Cohesion: 0.18
+Nodes (5): AddToCartComponent, ThemePerformance, CartDiscount, CartNote, performance
+
+### Community 59 - "Community 59"
 Cohesion: 0.2
 Nodes (3): DialogComponent, isClickedOutside(), isPointWithinElement()
 
-### Community 59 - "Community 59"
-Cohesion: 0.28
-Nodes (3): navigate(), replaceRoute(), DiptyqueOrderDetailController
-
-### Community 67 - "Community 67"
+### Community 69 - "Community 69"
 Cohesion: 0.46
 Nodes (7): claimNextJob(), executePublishJob(), isProductAlreadyActive(), pollAndProcess(), publishProductOnShopify(), resetStaleJobs(), startScheduler()
 
-### Community 68 - "Community 68"
-Cohesion: 0.33
-Nodes (3): getMetafieldValue(), isoToDisplayDate(), loadI18n()
-
-### Community 71 - "Community 71"
+### Community 72 - "Community 72"
 Cohesion: 0.38
 Nodes (7): DiptyqueAddressApi, DiptyqueBackendClient, DiptyqueCustomerApi, DiptyqueNewsletterApi, DiptyqueOrderDetailApi, DiptyqueOrderPaginatedApi, DiptyqueStorefrontClient
 
@@ -340,39 +332,39 @@ Nodes (7): DiptyqueAddressApi, DiptyqueBackendClient, DiptyqueCustomerApi, Dipty
 Cohesion: 0.6
 Nodes (5): boot(), initSidebarNav(), injectHeaderDropdown(), resolveSession(), loadConfig()
 
-### Community 76 - "Community 76"
+### Community 75 - "Community 75"
 Cohesion: 0.4
 Nodes (3): loginErrorMessage(), action(), loader()
 
-### Community 82 - "Community 82"
-Cohesion: 0.4
-Nodes (5): Prisma, Shopify App Template - React Router, Shopify CLI, Shopify Dev MCP, SQLite
-
-### Community 83 - "Community 83"
+### Community 80 - "Community 80"
 Cohesion: 0.6
 Nodes (3): applyFilters(), clearFilters(), updateListParams()
 
-### Community 88 - "Community 88"
+### Community 81 - "Community 81"
+Cohesion: 0.4
+Nodes (5): Prisma, Shopify App Template - React Router, Shopify CLI, Shopify Dev MCP, SQLite
+
+### Community 85 - "Community 85"
 Cohesion: 0.67
 Nodes (3): loader(), getCustomerById(), getCustomers()
 
-### Community 95 - "Community 95"
+### Community 92 - "Community 92"
 Cohesion: 0.5
 Nodes (4): CartUpdateEvent, ProductInventory, QuickAddComponent, VariantUpdateEvent
 
-### Community 96 - "Community 96"
+### Community 93 - "Community 93"
 Cohesion: 0.67
 Nodes (4): Diptyque Remake App, Prisma Database Client, Shopify App Configuration, Vite Configuration
 
-### Community 103 - "Community 103"
+### Community 100 - "Community 100"
 Cohesion: 0.67
 Nodes (3): formatPrice, printReceipt, reorder
 
-### Community 104 - "Community 104"
+### Community 101 - "Community 101"
 Cohesion: 0.67
 Nodes (3): CartAddEvent, CartDrawerComponent, DialogComponent
 
-### Community 106 - "Community 106"
+### Community 103 - "Community 103"
 Cohesion: 0.67
 Nodes (3): CartAddEvent, CartErrorEvent, GiftCardRecipientForm
 
@@ -383,14 +375,14 @@ Nodes (3): CartAddEvent, CartErrorEvent, GiftCardRecipientForm
 ## Knowledge Gaps
 - **4 isolated node(s):** `Scheduler`, `BlogPostsList`, `CartNote`, `ThemeEvents`
   These have ≤1 connection - possible missing edges or undocumented components.
-- **99 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **96 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `formatPrice` and `reorder`?**
   _Edge tagged AMBIGUOUS (relation: imports) - confidence is low._
-- **Why does `OverflowList` connect `Community 31` to `Community 13`?**
+- **Why does `OverflowList` connect `Community 29` to `Community 102`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **What connects `Scheduler`, `BlogPostsList`, `CartNote` to the rest of the system?**
   _4 weakly-connected nodes found - possible documentation gaps or missing edges._
