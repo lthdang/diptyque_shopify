@@ -1,0 +1,13 @@
+/*
+ * AppModal.module.css
+ *
+ * Polaris's Modal already provides the baseline overlay, focus trap,
+ * and responsive sizing. These overrides are intentionally minimal —
+ * only add rules that genuinely cannot be achieved via Polaris props or
+ * design tokens.
+ */
+
+/* Ensure the description text has comfortable reading width on large screens */
+.description {
+  max-width: 60ch;
+}

@@ -1,105 +1,133 @@
-# Diptyque Remake — Shopify Theme
+# Diptyque Remake — Shopify Monorepo
 
-A custom Shopify Online Store 2.0 theme built to deliver advanced UI components and rich admin customization for the Diptyque brand experience.
+A monorepo for the Diptyque Shopify storefront, containing a custom **Online Store 2.0 theme** and an **embedded Shopify app** for store management.
 
 ---
 
 ## 📌 Project Overview
 
-This is a **Shopify Online Store 2.0** theme project focused on building custom sections and blocks that go beyond the defaults. It extends the Shopify admin with deeply configurable components while maintaining clean, performant frontend output.
+This repository houses two tightly coupled workspaces:
 
-**Main purpose:**
-
-- Custom UI components such as `header-custom`, `tab-list-scroll`, and `pin-image-popup`
-- Extend Shopify Theme Editor customization via structured schema blocks
-
-**Key features:**
-
-- Custom sections with rich schema settings
-- Dynamic blocks with per-block configuration
-- Advanced UI behaviors: sticky elements, scroll-driven interactions, hover effects
-- Responsive layouts with mobile-first CSS
+| Workspace | Path                       | Purpose                                                  |
+| --------- | -------------------------- | -------------------------------------------------------- |
+| **Theme** | `Theme/`                   | Custom Shopify OS 2.0 theme with advanced UI components  |
+| **App**   | `App/diptyque-remake-app/` | Embedded Shopify app (React Router) for store operations |
 
 ---
 
 ## 🛠 Tech Stack
 
-| Technology               | Usage                                                       |
-| ------------------------ | ----------------------------------------------------------- |
-| **Shopify Liquid**       | Templating engine for all sections, snippets, and layouts   |
-| **HTML5 / CSS3**         | Markup and styling, including CSS custom properties         |
-| **JavaScript (Vanilla)** | Custom Elements (Web Components), scroll/intersection logic |
-| **Shopify CLI**          | Local development, theme push/pull, store preview           |
+### Theme
+
+| Technology               | Usage                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| **Shopify Liquid**       | Templating engine for all sections, snippets, and layouts                         |
+| **HTML5 / CSS3**         | Markup and styling, including CSS custom properties                               |
+| **JavaScript (Vanilla)** | Custom Elements (Web Components), scroll/intersection logic                       |
+| **Vite**                 | Bundles the account-page SPA (`src/account/`) into `assets/account-app.bundle.js` |
+| **Shopify CLI**          | Local development, theme push/pull, store preview                                 |
+
+### App
+
+| Technology              | Usage                                              |
+| ----------------------- | -------------------------------------------------- |
+| **React Router v7**     | Full-stack SSR framework for the embedded app      |
+| **Shopify App Bridge**  | Embeds the app inside the Shopify admin            |
+| **Shopify Polaris**     | Shopify admin UI component library                 |
+| **Prisma + PostgreSQL** | ORM and relational database for persistent storage |
+| **TypeScript**          | Type safety across the entire app codebase         |
+| **Docker / Render**     | Containerised deployment on Render.com             |
 
 ---
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
 ```
-.
-├── assets/         # CSS and JavaScript files
-├── blocks/         # Reusable block partials (prefixed with _)
-├── config/         # Theme settings schema (settings_schema.json)
-├── layout/         # Theme layout files (theme.liquid, password.liquid)
-├── locales/        # Translation strings
-├── sections/       # Main UI sections rendered on pages
-├── snippets/       # Reusable Liquid partials included by sections
-└── templates/      # JSON page templates
+diptyque-remake/
+├── Theme/                        # Shopify OS 2.0 theme
+│   ├── assets/                   # Compiled CSS, JS, and static files
+│   ├── blocks/                   # Block partials (prefixed with _)
+│   ├── config/                   # Theme settings schema
+│   ├── layout/                   # Root layout files (theme.liquid, password.liquid)
+│   ├── locales/                  # i18n translation strings
+│   ├── sections/                 # Standalone UI sections (each has Liquid + CSS + JS + schema)
+│   ├── snippets/                 # Shared Liquid partials ({% render %})
+│   ├── src/account/              # Account page SPA source (bundled by Vite)
+│   ├── templates/                # JSON page templates
+│   └── build.mjs                 # Vite build script → assets/account-app.bundle.js
+│
+└── App/diptyque-remake-app/      # Embedded Shopify app
+    ├── app/
+    │   ├── config/               # App-wide enums and constants
+    │   ├── jobs/                 # Background workers (e.g. publishProductWorker)
+    │   ├── routes/               # React Router routes (admin pages, API, webhooks)
+    │   ├── services/             # Business logic services
+    │   ├── db.server.ts          # Prisma client singleton
+    │   └── shopify.server.ts     # Shopify app authentication setup
+    ├── prisma/
+    │   └── schema.prisma         # Database models (Session, ScheduledPublish, Customer)
+    ├── extensions/               # Shopify app extensions
+    ├── shopify.app.toml          # App configuration (scopes, webhooks, URLs)
+    ├── Dockerfile                # Production container image
+    ├── docker-compose.yml        # Local Docker Compose setup
+    └── render.yaml               # Render.com deployment config
 ```
 
-| Folder       | Description                                                                                           |
-| ------------ | ----------------------------------------------------------------------------------------------------- |
-| `sections/`  | Each file is a standalone section with Liquid, CSS, JS, and schema. These appear in the Theme Editor. |
-| `snippets/`  | Shared partials (e.g. icon sets, card components) included via `{% render %}`.                        |
-| `assets/`    | Static CSS and JS files. JS uses custom elements pattern for self-contained behavior.                 |
-| `templates/` | JSON templates that define which sections appear on each page type.                                   |
-| `config/`    | Global theme settings exposed in the Theme Editor under "Theme settings".                             |
-| `blocks/`    | Block-level partials prefixed with `_` used inside section block rendering.                           |
+---
+
+## ✨ Features
+
+### Theme
+
+- **Custom sections** — `header-custom`, `tab-list-scroll`, `pin-image-popup`, `layered-slideshow`, `parallax-image`, `product-hotspots`, and more
+- **Rich block system** — Dozens of composable blocks for product cards, media, headings, tabs, carousels, and navigation
+- **Account SPA** — A Vite-bundled JavaScript app rendered on the `/pages/account` page
+- **Web Components** — All JS behaviour is encapsulated via `customElements.define`; no global scripts
+- **CSS custom properties** — Theme values are injected from Liquid into CSS via `--` variables
+- **Mobile-first responsive layouts** — Tested across devices with Shopify's preview tools
+
+### App
+
+- **Scheduled Publish** — Schedule Shopify products to go live at a future date/time; a background worker (`publishProductWorker`) processes the queue
+- **Customer Management** — Browse and manage store customers from within the Shopify admin
+- **Webhook Handling** — Responds to `app/uninstalled` and `app/scopes_update` events
+- **Embedded experience** — Fully embedded in the Shopify admin via App Bridge; session management handled by `@shopify/shopify-app-react-router`
 
 ---
 
 ## ⚙️ Setup & Development
 
-### Requirements
+### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18+)
-- [Shopify CLI](https://shopify.dev/docs/themes/tools/cli) (v3+)
+- [Node.js](https://nodejs.org/) `>=20.19 <22 || >=22.12`
+- [Shopify CLI](https://shopify.dev/docs/themes/tools/cli) v3+
 - A [Shopify Partner](https://partners.shopify.com/) account with access to a development store
-
-### Steps
-
-**1. Clone the repository**
-
-```bash
-git clone <repository-url>
-cd diptyque-remake
-```
-
-**2. Authenticate with Shopify**
-
-```bash
-shopify auth login
-```
-
-**3. Start local development**
-
-```bash
-shopify theme dev --store=<your-store>.myshopify.com
-```
-
-**4. Open the preview URL**
-
-The CLI outputs a local preview URL (e.g. `http://127.0.0.1:9292`). Open it in a browser to see live changes.
-
-> Changes to Liquid, CSS, and JS files are picked up automatically without a restart.
+- A PostgreSQL database (for the App)
 
 ---
 
-## 🚀 Shopify CLI Commands
+### Theme — Local Development
+
+```bash
+# 1. Enter the theme directory
+cd Theme
+
+# 2. Install dependencies (Vite build tooling)
+npm install
+
+# 3. Build the account-page JS bundle
+npm run build
+
+# 4. Start the Shopify theme dev server
+shopify theme dev --store=<your-store>.myshopify.com
+```
+
+> **Tip:** Use `npm run watch` (in a separate terminal) while running `shopify theme dev` to automatically rebuild the account bundle on changes.
+
+#### Theme CLI Commands
 
 | Command                 | Description                                           |
 | ----------------------- | ----------------------------------------------------- |
-| `shopify auth login`    | Authenticate your Shopify Partner account             |
 | `shopify theme dev`     | Start a local development server with live reload     |
 | `shopify theme push`    | Upload the local theme to the connected Shopify store |
 | `shopify theme pull`    | Download the current theme from the store to local    |
@@ -108,20 +136,95 @@ The CLI outputs a local preview URL (e.g. `http://127.0.0.1:9292`). Open it in a
 
 ---
 
-## 📌 Development Notes
+### App — Local Development
 
-- **Follow Shopify Liquid best practices** — avoid logic-heavy templates; move complexity into snippets or JS.
-- **Reuse snippets** — do not duplicate markup. Extract repeated patterns into `snippets/`.
-- **Validate schema JSON** — malformed schema blocks break the Theme Editor silently. Always lint before pushing.
-- **Test in Theme Editor** — all sections and blocks must render correctly and be configurable via the editor without errors.
-- **CSS custom properties** — use `--` variables for theming values passed from Liquid into stylesheets.
-- **Web Components** — JS behavior is encapsulated in custom elements (`customElements.define`). Avoid global scripts.
+```bash
+# 1. Enter the app directory
+cd App/diptyque-remake-app
+
+# 2. Install dependencies
+npm install
+
+# 3. Copy and configure environment variables
+cp .env.example .env   # then edit DATABASE_URL and other secrets
+
+# 4. Run database migrations
+npm run setup          # prisma generate && prisma migrate deploy
+
+# 5. Start the development server
+npm run dev            # shopify app dev
+```
+
+> Press `P` in the terminal to open the app URL in the browser. Install the app on your dev store to begin development.
+
+#### App Scripts
+
+| Script               | Description                                            |
+| -------------------- | ------------------------------------------------------ |
+| `npm run dev`        | Start the Shopify app dev server with tunnel           |
+| `npm run build`      | Build the React Router app for production              |
+| `npm run start`      | Serve the production build                             |
+| `npm run setup`      | Run Prisma migrations (used in deployment/Docker)      |
+| `npm run worker`     | Run the scheduled-publish background worker            |
+| `npm run worker:dev` | Run the worker in watch mode (auto-restarts on change) |
+| `npm run deploy`     | Deploy the app configuration to Shopify                |
+| `npm run lint`       | Run ESLint                                             |
+| `npm run typecheck`  | Run TypeScript type-checking                           |
 
 ---
 
-## ⚠️ Notes
+## 🚀 Deployment
 
-- Ensure your **Shopify CLI version** is up to date (`shopify version`). CLI v2 and v3 have different command signatures.
-- **Test on both mobile and desktop** before pushing — use browser DevTools and Shopify's mobile preview.
-- **Resolve all Liquid errors** locally before running `shopify theme push`. A broken section can prevent the entire page from rendering.
-- Do not push directly to a live production theme without first testing on a unpublished duplicate.
+### App — Render.com (Production)
+
+The app is deployed to **[Render.com](https://render.com)** via Docker. The live URL is:
+
+```
+https://diptyque-shopify.onrender.com
+```
+
+Configuration files:
+
+- `Dockerfile` — Multi-stage production build
+- `docker-compose.yml` — Local Docker Compose for testing the containerised app
+- `render.yaml` — Render service definitions (web + worker)
+- `entrypoint.sh` — Container entrypoint (runs migrations then starts the server)
+
+### App — Database
+
+The app uses **PostgreSQL** via Prisma. Key models:
+
+| Model              | Description                                          |
+| ------------------ | ---------------------------------------------------- |
+| `Session`          | Shopify OAuth session tokens                         |
+| `ScheduledPublish` | Product publish jobs (status: SCHEDULED → PUBLISHED) |
+| `Customer`         | Cached customer records synced from Shopify          |
+
+---
+
+## 📌 Development Notes
+
+### Theme
+
+- **Reuse snippets** — extract repeated markup into `snippets/` and include with `{% render %}`.
+- **Validate schema JSON** — malformed schema blocks break the Theme Editor silently; always lint before pushing.
+- **Test in Theme Editor** — all sections and blocks must be configurable from the editor without errors.
+- **No global scripts** — encapsulate all JS behaviour in Custom Elements (`customElements.define`).
+- **CSS custom properties** — pass Liquid values into CSS using `--` variables to keep styles decoupled.
+
+### App
+
+- **Run migrations before deploying** — always execute `prisma migrate deploy` as part of the release step.
+- **Worker must run separately** — the `publishProductWorker` is a standalone process; ensure it is provisioned alongside the web server in production.
+- **Webhooks are app-specific** — subscribe in `shopify.app.toml`, not via `afterAuth`, so Shopify auto-syncs on every `npm run deploy`.
+- **Embedded navigation** — use `Link` from `react-router` and `redirect` from `authenticate.admin`; avoid plain `<a>` tags inside the embedded iframe.
+
+---
+
+## ⚠️ Common Gotchas
+
+- Ensure **Shopify CLI** is up to date (`shopify version`). CLI v2 and v3 have different command signatures.
+- **Test on both mobile and desktop** before pushing the theme — use browser DevTools and Shopify's mobile preview.
+- **Resolve all Liquid errors** locally before `shopify theme push`; a broken section can prevent the entire page from rendering.
+- Do not push directly to the live/published theme without testing on an unpublished duplicate first.
+- If Prisma reports `The table does not exist`, run `npm run setup` to apply pending migrations.
